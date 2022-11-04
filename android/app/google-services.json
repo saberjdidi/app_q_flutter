@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "56022965949",
+    "project_id": "qualipro23",
+    "storage_bucket": "qualipro23.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56022965949:android:6f62291392eec6fe4b61d4",
+        "android_client_info": {
+          "package_name": "tn.saphirconsult.qualipro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56022965949-asber8al551eq677nqas0aits7aulnbi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMQTGvM8jZ0SSLrOZ-qq7d04WGaB3scQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56022965949-asber8al551eq677nqas0aits7aulnbi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
