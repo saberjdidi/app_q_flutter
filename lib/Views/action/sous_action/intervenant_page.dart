@@ -85,14 +85,12 @@ class _IntervenantsPageState extends State<IntervenantsPage> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          leading: RaisedButton(
+          leading: TextButton(
             onPressed: (){
               Get.back();
               //Get.offAll(HomePage());
             },
-            elevation: 0.0,
             child: Icon(Icons.arrow_back, color: Colors.blue,),
-            color: Colors.white,
           ),
           title: Text(
             'Intervenants',
@@ -113,56 +111,30 @@ class _IntervenantsPageState extends State<IntervenantsPage> {
                     Column(
                       children: [
                         ListTile(
-                          title: Expanded(
-                            flex: 1,
-                            child: ListTile(
-                              title: Text(
-                                ' Action: ${num_action}   \n Sous Action: ${num_sous_action}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: RichText(
-                                  text: TextSpan(
-                                    style: Theme.of(context).textTheme.bodyLarge,
-                                    children: [
-                                      WidgetSpan(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                          child: Icon(Icons.person),
-                                        ),
-                                      ),
-                                      TextSpan(text: '${listEmploye[index].nompre}'),
-
-                                      //TextSpan(text: '${action.declencheur}'),
-                                    ],
-
+                          title: Text(
+                            ' Action: ${num_action}   \n Sous Action: ${num_sous_action}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: RichText(
+                              text: TextSpan(
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                children: [
+                                  WidgetSpan(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                                      child: Icon(Icons.person),
+                                    ),
                                   ),
-                                ),
+                                  TextSpan(text: '${listEmploye[index].nompre}'),
+
+                                  //TextSpan(text: '${action.declencheur}'),
+                                ],
+
                               ),
                             ),
                           ),
-                        /*  subtitle: Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            /* child: Text('${listEmploye[index].act}',
-                              style:
-                              TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),*/
-                            child: ReadMoreText(
-                              "${listEmploye[index].mat}",
-                              style: TextStyle(
-                                  color: Color(0xFF3B465E),
-                                  fontWeight: FontWeight.bold),
-                              trimLines: 2,
-                              colorClickableText: CustomColors.bleuCiel,
-                              trimMode: TrimMode.Line,
-                              trimCollapsedText: 'more',
-                              trimExpandedText: 'less',
-                              moreStyle: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: CustomColors.bleuCiel),
-                            ),
-                          ), */
                         ),
                         Divider(
                           thickness: 1.0,

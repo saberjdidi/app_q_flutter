@@ -35,20 +35,18 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
             children: [
               MaterialButton(
                   color: Colors.blue,
-                  child: const Text(
-                      "Pick Images from Gallery",
+                  child: const Text("Pick Images from Gallery",
                       style: TextStyle(
-                          color: Colors.white70, fontWeight: FontWeight.bold
-                      )
-                  ),
+                          color: Colors.white70, fontWeight: FontWeight.bold)),
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
                       builder: ((builder) => bottomSheet()),
                     );
-                  }
+                  }),
+              SizedBox(
+                height: 20,
               ),
-              SizedBox(height: 20,),
               /* Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -84,22 +82,22 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
                     ),
                   )
               ), */
-              imageFileList.length == 0 ? Container()
+              imageFileList.length == 0
+                  ? Container()
                   : Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ImageSlideshow(
-                      children: generateImagesTile(),
-                      autoPlayInterval: 3000,
-                      isLoop: true,
-                      width: double.infinity,
-                      height: 200,
-                      initialPage: 0,
-                      indicatorColor: Colors.blue,
-                      indicatorBackgroundColor: Colors.grey,
-                    ),
-                  )
-              ),
+                      child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ImageSlideshow(
+                        children: generateImagesTile(),
+                        autoPlayInterval: 3000,
+                        isLoop: true,
+                        width: double.infinity,
+                        height: 200,
+                        initialPage: 0,
+                        indicatorColor: Colors.blue,
+                        indicatorBackgroundColor: Colors.grey,
+                      ),
+                    )),
               /*Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -144,15 +142,16 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
               ), */
             ],
           ),
-        )
-    );
+        ));
   }
 
-  List<Widget> generateImagesTile(){
-    return imageFileList.map((element) => ClipRRect(
-      child: Image.file(File(element.path), fit: BoxFit.cover),
-      borderRadius: BorderRadius.circular(10.0),
-    )).toList();
+  List<Widget> generateImagesTile() {
+    return imageFileList
+        .map((element) => ClipRRect(
+              child: Image.file(File(element.path), fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(10.0),
+            ))
+        .toList();
   }
 
   //2.Create BottomSheet
@@ -176,7 +175,92 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
             height: 20,
           ),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            FlatButton.icon(
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: MediaQuery.of(context).size.width / 1.1, height: 50),
+              child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFD18A3A8)),
+                  padding: MaterialStateProperty.all(EdgeInsets.all(14)),
+                ),
+                icon: Icon(Icons.image),
+                label: Text(
+                  'Camera',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                onPressed: () {
+                  if (imageFileList.length >= 5) {
+                    AwesomeDialog(
+                      context: context,
+                      animType: AnimType.SCALE,
+                      dialogType: DialogType.ERROR,
+                      body: Center(
+                        child: Text(
+                          "You can choose 5 images maximum",
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      title: 'Cancel',
+                      btnOkOnPress: () {
+                        Navigator.of(context).pop();
+                      },
+                    )..show();
+                    return;
+                  }
+                  takePhoto(ImageSource.camera);
+                },
+              ),
+            ),
+            SizedBox(
+              width: 20.0,
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: MediaQuery.of(context).size.width / 1.1, height: 50),
+              child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFD147FAA)),
+                  padding: MaterialStateProperty.all(EdgeInsets.all(14)),
+                ),
+                icon: Icon(Icons.image),
+                label: Text(
+                  'Gallery',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                onPressed: () {
+                  if (imageFileList.length >= 5) {
+                    AwesomeDialog(
+                      context: context,
+                      animType: AnimType.SCALE,
+                      dialogType: DialogType.ERROR,
+                      body: Center(
+                        child: Text(
+                          "You can choose 5 images maximum",
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      title: 'Cancel',
+                      btnOkOnPress: () {
+                        Navigator.of(context).pop();
+                      },
+                    )..show();
+                    return;
+                  }
+                  selectImages();
+                },
+              ),
+            ),
+            /* FlatButton.icon(
               icon: Icon(Icons.camera),
               onPressed: () {
                 if(imageFileList.length >= 5){
@@ -222,7 +306,7 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
                 selectImages();
               },
               label: Text("Gallery"),
-            ),
+            ), */
           ])
         ],
       ),
@@ -244,8 +328,7 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
           print('list from gallery ${base64List}');
         }
       }
-      setState(() {
-      });
+      setState(() {});
       Navigator.of(context).pop();
     } catch (error) {
       debugPrint(error.toString());
@@ -253,10 +336,12 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          error.toString(),
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            error.toString(),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Error',
         btnCancel: Text('Cancel'),
         btnOkOnPress: () {
@@ -286,10 +371,12 @@ class _MultipleImageScreenState extends State<MultipleImageScreen> {
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          error.toString(),
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            error.toString(),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Error',
         btnCancel: Text('Cancel'),
         btnOkOnPress: () {

@@ -34,16 +34,14 @@ class NewVisiteSecuritePage extends GetView<NewVisiteSecuriteController> {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: () async{
             //Get.back();
             //controller.clearData();
            await LocalVisiteSecuriteService().deleteTableEquipeVisiteSecurite();
            await Get.toNamed(AppRoute.visite_securite);
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Center(
           child: Text("Ajouter Visite Securite"),

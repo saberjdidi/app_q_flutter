@@ -101,13 +101,11 @@ class _ValiderIncidentEnvTraiterState extends State<ValiderIncidentEnvTraiter> {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: (){
             Get.back();
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Center(
           child: Text("Incident a Traiter N° ${widget.model.nIncident}"),

@@ -252,6 +252,7 @@ class NewIncidentEnvironnementController extends GetxController {
   int? type_incident_visible = 1;
   bool isVisibileTypeIncident = true;
   int? lieu_visible = 1;
+  int? lieu_obligatoire = 1;
   bool isVisibileLieu = true;
   int? cout_esteme_visible = 1;
   bool isVisibileCoutEsteme = true;
@@ -292,6 +293,7 @@ class NewIncidentEnvironnementController extends GetxController {
           }
           else if (model.nomParam == "Lieu" && model.module == "Environnement" && model.fiche == "Incident") {
             lieu_visible = model.visible;
+            lieu_obligatoire = model.visible;
             //product_bloque_visible = 0;
           }
           else if (model.nomParam == "Coût estimé" && model.module == "Environnement" && model.fiche == "Incident") {
@@ -343,7 +345,7 @@ class NewIncidentEnvironnementController extends GetxController {
             }
             else if (model.nomParam == "Lieu" && model.module == "Environnement" && model.fiche == "Incident") {
               lieu_visible = model.visible;
-              //product_bloque_visible = 0;
+              lieu_obligatoire = model.visible;
             }
             else if (model.nomParam == "Coût estimé" && model.module == "Environnement" && model.fiche == "Incident") {
               cout_esteme_visible = model.visible;
@@ -383,7 +385,7 @@ class NewIncidentEnvironnementController extends GetxController {
   var category_obligatoire = 0.obs;
   var type_consequence_obligatoire = 0.obs;
   var type_cause_obligatoire = 0.obs;
-  var lieu_obligatoire = 0.obs;
+  //var lieu_obligatoire = 0.obs;
   var designation_incident_obligatoire = 0.obs;
   var type_incident_obligatoire = 0.obs;
   var date_incident_obligatoire = 0.obs;
@@ -414,7 +416,7 @@ class NewIncidentEnvironnementController extends GetxController {
         category_obligatoire.value = model.incCat!;
         type_consequence_obligatoire.value = model.incTypecons!;
         type_cause_obligatoire.value = model.incTypecause!;
-        lieu_obligatoire.value = model.lieu!;
+        //lieu_obligatoire.value = model.lieu!;
         designation_incident_obligatoire.value = model.desIncident!;
         type_incident_obligatoire.value = model.typeIncident!;
         date_incident_obligatoire.value = model.dateIncident!;
@@ -451,7 +453,7 @@ class NewIncidentEnvironnementController extends GetxController {
         category_obligatoire.value = model.incCat!;
         type_consequence_obligatoire.value = model.incTypecons!;
         type_cause_obligatoire.value = model.incTypecause!;
-        lieu_obligatoire.value = model.lieu!;
+        //lieu_obligatoire.value = model.lieu!;
         designation_incident_obligatoire.value = model.desIncident!;
         type_incident_obligatoire.value = model.typeIncident!;
         date_incident_obligatoire.value = model.dateIncident!;
@@ -481,7 +483,7 @@ class NewIncidentEnvironnementController extends GetxController {
       Message.taskErrorOrWarning("Warning", "Category is required");
       return false;
     }
-    else if (lieuModel == null && lieu_obligatoire.value == 1) {
+    else if (lieuModel == null && lieu_visible == 1 && lieu_obligatoire == 1) {
       Message.taskErrorOrWarning("Warning", "Lieu is required");
       return false;
     }

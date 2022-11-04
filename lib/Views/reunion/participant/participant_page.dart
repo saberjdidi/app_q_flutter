@@ -28,31 +28,32 @@ import 'new_participant.dart';
 class ParticipantPage extends StatefulWidget {
   final nReunion;
 
- const ParticipantPage({Key? key, required this.nReunion}) : super(key: key);
+  const ParticipantPage({Key? key, required this.nReunion}) : super(key: key);
 
   @override
   State<ParticipantPage> createState() => _ParticipantPageState();
 }
 
 class _ParticipantPageState extends State<ParticipantPage> {
-  
   final matricule = SharedPreference.getMatricule();
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
-  List<ParticipantReunionModel> listParticipant = List<ParticipantReunionModel>.empty(growable: true);
+  List<ParticipantReunionModel> listParticipant =
+      List<ParticipantReunionModel>.empty(growable: true);
   bool isVisibleDeleteButton = true;
-
 
   @override
   void initState() {
     super.initState();
     getParticipants();
   }
+
   void getParticipants() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        var response = await LocalReunionService().readParticipantByReunion(widget.nReunion);
-        response.forEach((data){
+        var response = await LocalReunionService()
+            .readParticipantByReunion(widget.nReunion);
+        response.forEach((data) {
           setState(() {
             var model = ParticipantReunionModel();
             model.online = data['online'];
@@ -66,13 +67,13 @@ class _ParticipantPageState extends State<ParticipantPage> {
             isVisibleDeleteButton = false;
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         String? language = SharedPreference.getLangue() ?? "";
         //rest api
-       // await ReunionService().getParticipant(widget.nReunion)
-          await ReunionService().getParticipationByReunionAndLangue(widget.nReunion, language)
+        // await ReunionService().getParticipant(widget.nReunion)
+        await ReunionService()
+            .getParticipationByReunionAndLangue(widget.nReunion, language)
             .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
@@ -91,16 +92,13 @@ class _ParticipantPageState extends State<ParticipantPage> {
               isVisibleDeleteButton = true;
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -115,23 +113,24 @@ class _ParticipantPageState extends State<ParticipantPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          leading: RaisedButton(
-            onPressed: (){
+          leading: TextButton(
+            onPressed: () {
               //Get.back();
               Get.find<ReunionController>().listReunion.clear();
               Get.find<ReunionController>().getReunion();
               Get.toNamed(AppRoute.reunion);
               //Get.offAllNamed(AppRoute.reunion);
             },
-            elevation: 0.0,
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
-            color: Colors.white,
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
             'Participants of Reunion N°${widget.nReunion}',
@@ -142,107 +141,119 @@ class _ParticipantPageState extends State<ParticipantPage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listParticipant.isNotEmpty ?
-            Container(
-              child: RefreshWidget(
-                keyRefresh: keyRefresh,
-                onRefresh: () async {
-                  listParticipant.clear();
-                  getParticipants();
-                },
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    final status = listParticipant[index].confirm;
-                    String? message = "";
-                    switch(status){
-                      case 0:
-                        message = "Attente confirmation";
-                        break;
-                      case 1:
-                        message = "OUI";
-                        break;
-                      case -1:
-                        message = "NON";
-                        break;
-                      default:
-                        message = "";
-                    }
-                    return Card(
-                        color: Color(0xFFE9EAEE),
-                        child: ListTile(
-                          leading: Text(
-                            '${listParticipant[index].mat}',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-                          ),
-                          title: Text(
-                            '${listParticipant[index].nompre}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: RichText(
-                              text: TextSpan(
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                children: [
-                                  /* WidgetSpan(
+            child: listParticipant.isNotEmpty
+                ? Container(
+                    child: RefreshWidget(
+                      keyRefresh: keyRefresh,
+                      onRefresh: () async {
+                        listParticipant.clear();
+                        getParticipants();
+                      },
+                      child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          final status = listParticipant[index].confirm;
+                          String? message = "";
+                          switch (status) {
+                            case 0:
+                              message = "Attente confirmation";
+                              break;
+                            case 1:
+                              message = "OUI";
+                              break;
+                            case -1:
+                              message = "NON";
+                              break;
+                            default:
+                              message = "";
+                          }
+                          return Card(
+                            color: Color(0xFFE9EAEE),
+                            child: ListTile(
+                              leading: Text(
+                                '${listParticipant[index].mat}',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.lightBlue),
+                              ),
+                              title: Text(
+                                '${listParticipant[index].nompre}',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                    children: [
+                                      /* WidgetSpan(
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 2.0),
                                             child: Icon(Icons.amp_stories),
                                           ),
                                         ), */
-                                  TextSpan(text: '${message}'),
+                                      TextSpan(text: '${message}'),
 
-                                  //TextSpan(text: '${action.declencheur}'),
-                                ],
-
+                                      //TextSpan(text: '${action.declencheur}'),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              trailing: Visibility(
+                                visible: isVisibleDeleteButton,
+                                child: InkWell(
+                                    onTap: () {
+                                      deleteParticipant(
+                                          context,
+                                          listParticipant[index].mat,
+                                          listParticipant[index].intExt,
+                                          listParticipant[index].id);
+                                    },
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    )),
                               ),
                             ),
-                          ),
-                          trailing: Visibility(
-                            visible: isVisibleDeleteButton,
-                            child: InkWell(
-                                onTap: (){
-                                  deleteParticipant(context, listParticipant[index].mat, listParticipant[index].intExt, listParticipant[index].id);
-                                },
-                                child: Icon(Icons.delete, color: Colors.red,)
-                            ),
-                          ),
-                        ),
-                      );
-                  },
-                  itemCount: listParticipant.length,
-                  //itemCount: actionsList.length + 1,
-                ),
-              ),
-            )
-                : Center(child: Text('empty_list'.tr, style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                          );
+                        },
+                        itemCount: listParticipant.length,
+                        //itemCount: actionsList.length + 1,
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-             Get.to(NewParticipant(nReunion: widget.nReunion));
+          onPressed: () {
+            Get.to(NewParticipant(nReunion: widget.nReunion));
           },
           child: const Icon(
             Icons.add,
             color: Colors.white,
-            size: 32,),
+            size: 32,
+          ),
           backgroundColor: Colors.blue,
         ),
       ),
     );
   }
+
 //delete participant
-  deleteParticipant(context, mat, intExt, id){
+  deleteParticipant(context, mat, intExt, id) {
     AwesomeDialog(
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          'Are you sure to delete this item ${mat}',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            'Are you sure to delete this item ${mat}',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Delete',
         btnOk: ElevatedButton(
           style: ButtonStyle(
@@ -256,10 +267,14 @@ class _ParticipantPageState extends State<ParticipantPage> {
             ),
           ),
           onPressed: () async {
-
-            await ReunionService().deleteParticipantById(widget.nReunion, mat, intExt, id).then((resp) async {
+            await ReunionService()
+                .deleteParticipantById(widget.nReunion, mat, intExt, id)
+                .then((resp) async {
               //ShowSnackBar.snackBar("Successfully", "Participant Deleted", Colors.green);
-              listParticipant.removeWhere((element) => element.mat == mat && element.intExt == intExt && element.id == id);
+              listParticipant.removeWhere((element) =>
+                  element.mat == mat &&
+                  element.intExt == intExt &&
+                  element.id == id);
               setState(() {});
               await ApiControllersCall().getParticipantsReunion();
               Navigator.of(context).pop();
@@ -270,7 +285,8 @@ class _ParticipantPageState extends State<ParticipantPage> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Ok',
+            child: Text(
+              'Ok',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -280,7 +296,10 @@ class _ParticipantPageState extends State<ParticipantPage> {
             ),
           ),
         ),
-        closeIcon: Icon(Icons.close, color: Colors.red,),
+        closeIcon: Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
         btnCancel: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -297,7 +316,8 @@ class _ParticipantPageState extends State<ParticipantPage> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Cancel',
+            child: Text(
+              'Cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -306,7 +326,6 @@ class _ParticipantPageState extends State<ParticipantPage> {
               ),
             ),
           ),
-        )
-    )..show();
+        )).show();
   }
 }

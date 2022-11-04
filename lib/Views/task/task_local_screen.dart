@@ -79,14 +79,12 @@ class _TaskLocalScreenState extends State<TaskLocalScreen> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          leading: RaisedButton(
+          leading: TextButton(
             onPressed: (){
               //Navigator.pushNamedAndRemoveUntil(context, DashboardScreen.idScreen, (route) => false);
               Get.offAll(HomePage());
             },
-            elevation: 0.0,
             child: Icon(Icons.arrow_back, color: Colors.blue,),
-            color: Colors.white,
           ),
           title: Text(
             'Action Local',

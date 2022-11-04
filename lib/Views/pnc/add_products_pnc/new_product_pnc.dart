@@ -195,13 +195,11 @@ class _NewProductPNCState extends State<NewProductPNC> {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: (){
             Get.back();
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Text("New Product of P.N.C N°${widget.nnc}",textAlign: TextAlign.center,),
         backgroundColor: Colors.blue,

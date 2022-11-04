@@ -62,15 +62,38 @@ dependencies:
   toggle_switch: ^2.0.1
   font_awesome_flutter: ^10.1.0
   accordion: ^2.3.0
+  expandable: ^5.0.1
   searchable_listview: ^1.7.2
   either_dart: ^0.2.0
   shimmer: ^2.0.0
   flutter_html: ^2.2.1  #create html
   #pixel_perfect: ^1.1.1 #responsive design
+  firebase_auth: ^3.4.0
+  firebase_core: ^1.18.0
+  cloud_firestore: ^3.2.0
+  geolocator: ^7.7.0
+  geocoding: ^2.0.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.9.2
+  #flutter_native_splash: ^2.2.9
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/logo_foreground.png"
+
+#flutter_native_splash:
+  #color: "#ECF8F6"
+  #image: "assets/images/logo_foreground.png"
+  #android: true
+  #ios: true
+  #android_gravity: fill
+  #ios_content_mode: scaleAspectFill
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

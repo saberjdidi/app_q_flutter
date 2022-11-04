@@ -12,11 +12,11 @@ import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
 class IncidentEnvironnementController extends GetxController {
-
   var listIncident = List<IncidentEnvModel>.empty(growable: true).obs;
   var filterIncident = List<IncidentEnvModel>.empty(growable: true);
   var isDataProcessing = false.obs;
-  LocalIncidentEnvironnementService localIncidentEnvironnementService = LocalIncidentEnvironnementService();
+  LocalIncidentEnvironnementService localIncidentEnvironnementService =
+      LocalIncidentEnvironnementService();
   final matricule = SharedPreference.getMatricule();
   //search
   TextEditingController searchNumero = TextEditingController();
@@ -41,11 +41,12 @@ class IncidentEnvironnementController extends GetxController {
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -56,7 +57,8 @@ class IncidentEnvironnementController extends GetxController {
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //get local data
-        var response = await localIncidentEnvironnementService.readIncidentEnvironnement();
+        var response =
+            await localIncidentEnvironnementService.readIncidentEnvironnement();
         response.forEach((data) {
           var model = IncidentEnvModel();
           model.online = data['online'];
@@ -83,12 +85,12 @@ class IncidentEnvironnementController extends GetxController {
           model.gravite = data['gravite'];
           model.statut = data['statut'];
           listIncident.add(model);
-
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await IncidentEnvironnementService().getIncident(matricule).then((resp) async {
+        await IncidentEnvironnementService().getIncident(matricule).then(
+            (resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             print('get incident : ${data} ');
@@ -98,8 +100,8 @@ class IncidentEnvironnementController extends GetxController {
             model.incident = data['incident'];
             model.dateDetect = data['date_detect'];
             model.lieu = data['lieu'];
-            if(model.lieu == null){
-              model.lieu ="";
+            if (model.lieu == null) {
+              model.lieu = "";
             }
             model.type = data['type'];
             model.source = data['source'];
@@ -120,24 +122,21 @@ class IncidentEnvironnementController extends GetxController {
             model.gravite = data['gravite'];
             model.statut = data['statut'];
             listIncident.add(model);
-
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
+
   void searchIncident() async {
     try {
       isDataProcessing.value = true;
@@ -145,7 +144,9 @@ class IncidentEnvironnementController extends GetxController {
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //search local data
-        var response = await localIncidentEnvironnementService.searchIncidentEnvironnement(searchNumero.text, searchType, searchDesignation.text);
+        var response =
+            await localIncidentEnvironnementService.searchIncidentEnvironnement(
+                searchNumero.text, searchType, searchDesignation.text);
         response.forEach((data) {
           var model = IncidentEnvModel();
           model.online = data['online'];
@@ -179,10 +180,13 @@ class IncidentEnvironnementController extends GetxController {
           //searchType.clear();
           searchDesignation.clear();
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await IncidentEnvironnementService().searchIncident(matricule, searchNumero.text, searchCodeType, searchDesignation.text).then((resp) async {
+        await IncidentEnvironnementService()
+            .searchIncident(matricule, searchNumero.text, searchCodeType,
+                searchDesignation.text)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             print('search incident : ${data} ');
@@ -192,8 +196,8 @@ class IncidentEnvironnementController extends GetxController {
             model.incident = data['incident'];
             model.dateDetect = data['date_detect'];
             model.lieu = data['lieu'];
-            if(model.lieu == null){
-              model.lieu ="";
+            if (model.lieu == null) {
+              model.lieu = "";
             }
             model.type = data['type'];
             model.source = data['source'];
@@ -217,23 +221,20 @@ class IncidentEnvironnementController extends GetxController {
             listIncident.forEach((element) {
               print('element incident ${element.n} - ${element.incident}');
             });
-              searchNumero.clear();
-              searchDesignation.clear();
-              searchCodeType = '';
+            searchNumero.clear();
+            searchDesignation.clear();
+            searchCodeType = '';
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
@@ -244,17 +245,18 @@ class IncidentEnvironnementController extends GetxController {
       DateTime dateNow = DateTime.now();
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         await SyncDataController().syncIncidentEnvironnementToSQLServer();
         await SyncDataController().syncTypeCauseIncEnvToSQLServer();
         await SyncDataController().syncTypeConsequenceIncEnvToSQLServer();
+        await SyncDataController().syncActionIncEnvRattacherToSQLServer();
         //save data in db local
-        await IncidentEnvironnementService().getIncident(matricule).then((resp) async {
+        await IncidentEnvironnementService().getIncident(matricule).then(
+            (resp) async {
           resp.forEach((data) async {
             var model = IncidentEnvModel();
             model.online = 1;
@@ -262,8 +264,8 @@ class IncidentEnvironnementController extends GetxController {
             model.incident = data['incident'];
             model.dateDetect = data['date_detect'];
             model.lieu = data['lieu'];
-            if(model.lieu == null){
-              model.lieu ="";
+            if (model.lieu == null) {
+              model.lieu = "";
             }
             model.type = data['type'];
             model.source = data['source'];
@@ -285,26 +287,28 @@ class IncidentEnvironnementController extends GetxController {
             model.statut = data['statut'];
 
             //delete table
-            await localIncidentEnvironnementService.deleteTableIncidentEnvironnement();
+            await localIncidentEnvironnementService
+                .deleteTableIncidentEnvironnement();
             //save data
-            await localIncidentEnvironnementService.saveIncidentEnvironnement(model);
-            print('Inserting data in table IncidentEnvironnement : ${model.n} - ${model.incident}');
+            await localIncidentEnvironnementService
+                .saveIncidentEnvironnement(model);
+            print(
+                'Inserting data in table IncidentEnvironnement : ${model.n} - ${model.incident}');
           });
           listIncident.clear();
           getIncident();
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
         await ApiControllersCall().getTypeCauseIncidentEnvRattacher();
         await ApiControllersCall().getTypeConsequenceIncidentEnvRattacher();
+        await ApiControllersCall().getActionIncEnvRattacher();
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }

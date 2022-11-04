@@ -282,15 +282,13 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: (){
             localVisiteSecuriteService.deleteTableEquipeVisiteSecurite();
             Get.to(VisiteSecuritePage());
             //Get.back();
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Center(
           child: Text("New Visite Securite"),

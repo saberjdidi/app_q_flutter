@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import '../../Utils/constants.dart';
 import 'package:http/http.dart' as http;
@@ -803,6 +804,7 @@ class PNCService {
   //pnc traitement decision
   Future<List<dynamic>> getPNCTraitementDecision(matricule) async {
     try {
+      debugPrint('${AppConstants.PNC_URL}/getlisteTraitementDecision?mat=$matricule');
       var response = await http.get(
           Uri.parse('${AppConstants.PNC_URL}/getlisteTraitementDecision?mat=$matricule'),
           headers: {

@@ -1,4 +1,5 @@
 class AppRoute {
+  static const String licence = "/licence";
   static const String login = "/";
   static const String on_boarding = "/onboarding";
   static const String dashboard = "/home";

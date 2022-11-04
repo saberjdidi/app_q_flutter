@@ -82,13 +82,11 @@ class _RemplirPNCDecisionValidationState extends State<RemplirPNCDecisionValidat
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: (){
             Get.back();
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Center(
           child: Text("PNC N° ${widget.pncModel.nnc}"),

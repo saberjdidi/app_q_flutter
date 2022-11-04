@@ -39,12 +39,12 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
 
   ActionService actionService = ActionService();
   DateTime dateTime = DateTime.now();
-  TextEditingController  actionController = TextEditingController();
-  TextEditingController  sousActionController = TextEditingController();
-  TextEditingController  dateSuiviController = TextEditingController();
-  TextEditingController  pourcentSuivieController = TextEditingController();
-  TextEditingController  pourcentRealController = TextEditingController();
-  TextEditingController  rapportEffController = TextEditingController();
+  TextEditingController actionController = TextEditingController();
+  TextEditingController sousActionController = TextEditingController();
+  TextEditingController dateSuiviController = TextEditingController();
+  TextEditingController pourcentSuivieController = TextEditingController();
+  TextEditingController pourcentRealController = TextEditingController();
+  TextEditingController rapportEffController = TextEditingController();
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   int taux_suivi = 0;
@@ -56,12 +56,13 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
   String base64String = '';
 
   @override
-  void initState(){
+  void initState() {
     //dateSuiviController.text =widget.actionRealisation.dateReal.toString();
     dateSuiviController.text = DateFormat('yyyy-MM-dd').format(dateTime);
     actionController.text = widget.actionsuivi.act.toString();
     sousActionController.text = widget.actionsuivi.sousAct.toString();
-    pourcentSuivieController.text = widget.actionsuivi.pourcentSuivie.toString();
+    pourcentSuivieController.text =
+        widget.actionsuivi.pourcentSuivie.toString();
     pourcentRealController.text = widget.actionsuivi.pourcentReal.toString();
     rapportEffController.text = widget.actionsuivi.rapportEff.toString();
     super.initState();
@@ -72,87 +73,251 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
         context: context,
         initialDate: dateTime,
         firstDate: DateTime(2000),
-        lastDate: DateTime(2025)
-    );
-    if(datePicker != null){
+        lastDate: DateTime(2025));
+    if (datePicker != null) {
       setState(() {
         dateTime = datePicker;
         dateSuiviController.text = DateFormat('yyyy-MM-dd').format(datePicker);
       });
     }
   }
-  bool _dataValidation(){
 
+  bool _dataValidation() {
     taux_suivi = int.parse(pourcentSuivieController.text.toString());
 
-    if(widget.actionsuivi.pourcentReal! < 100){
-    Message.taskErrorOrWarning("Taux realisation", "taux realisation doit etre egal 100");
-    AwesomeDialog(
-    context: context,
-    animType: AnimType.SCALE,
-    dialogType: DialogType.ERROR,
-    body: Center(child: Text(
-    'Voulez vous modifier taux realisation',
-    style: TextStyle(fontStyle: FontStyle.italic),
-    ),),
-    title: 'Modifier Taux realisation',
-    btnCancel: Text('Cancel'),
-    btnOkOnPress: () {
-    //Navigator.of(context).pop();
-    Get.to(UpdateTauxRealisation(actionsuivi: widget.actionsuivi));
-    },
-    )..show();
-    return false;
-    }
-    else if(rapportEffController.text.trim()==''){
+    if (widget.actionsuivi.pourcentReal! < 100) {
+      Message.taskErrorOrWarning(
+          "Taux realisation", "taux realisation doit etre egal 100");
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.SCALE,
+        dialogType: DialogType.ERROR,
+        body: Center(
+          child: Text(
+            'Voulez vous modifier taux realisation',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        title: 'Modifier Taux realisation',
+        btnCancel: Text('Cancel'),
+        btnOkOnPress: () {
+          //Navigator.of(context).pop();
+          Get.to(UpdateTauxRealisation(actionsuivi: widget.actionsuivi));
+        },
+      )..show();
+      return false;
+    } else if (rapportEffController.text.trim() == '') {
       Message.taskErrorOrWarning("Rapport eff", "rapport eff is required");
       return false;
-    }
-    else if(taux_suivi > 100){
-      Message.taskErrorOrWarning("Taux Suivi", "Veuillez saisir donnée inférieur ou égal à 100");
+    } else if (taux_suivi > 100) {
+      Message.taskErrorOrWarning(
+          "Taux Suivi", "Veuillez saisir donnée inférieur ou égal à 100");
       return false;
     }
     return true;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
-          onPressed: (){
+        leading: TextButton(
+          onPressed: () {
             Get.back();
           },
-          elevation: 0.0,
-          child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
-        title: Text("Action N° ${widget.actionsuivi.nAct}",textAlign: TextAlign.center,),
+        title: Text(
+          "Action N° ${widget.actionsuivi.nAct}",
+          textAlign: TextAlign.center,
+        ),
         backgroundColor: Colors.blue,
       ),
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: SingleChildScrollView(
-                child: Form(
-                    key: _addItemFormKey,
-                    child: Padding(
-                        padding: EdgeInsets.all(25.0),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 8.0,),
-                            TextFormField(
-                              enabled: false,
-                              controller: actionController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              validator: (value) => Validator.validateField(
-                                  value: value!
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: SingleChildScrollView(
+            child: Form(
+                key: _addItemFormKey,
+                child: Padding(
+                    padding: EdgeInsets.all(25.0),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 8.0,
+                        ),
+                        TextFormField(
+                          enabled: false,
+                          controller: actionController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) =>
+                              Validator.validateField(value: value!),
+                          decoration: InputDecoration(
+                            labelText: 'Action',
+                            hintText: 'action',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          enabled: false,
+                          controller: sousActionController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) =>
+                              Validator.validateField(value: value!),
+                          decoration: InputDecoration(
+                            labelText: 'Sous Action',
+                            hintText: 'sous action',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          enabled: false,
+                          controller: pourcentRealController,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: 'Taux real',
+                            hintText: 'taux real',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            suffixIcon: Container(
+                              padding: EdgeInsets.all(12.0),
+                              child: Text(
+                                '%',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
                               ),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          controller: pourcentSuivieController,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: 'Taux suivi',
+                            hintText: 'taux suivi',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            suffixIcon: Container(
+                              padding: EdgeInsets.all(12.0),
+                              child: Text(
+                                '%',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          controller: dateSuiviController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) =>
+                              Validator.validateField(value: value!),
+                          onChanged: (value) {
+                            selectedDate(context);
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'Date Suivi',
+                              hintText: 'date',
+                              labelStyle: TextStyle(
+                                fontSize: 14.0,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 10.0,
+                              ),
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  selectedDate(context);
+                                },
+                                child: Icon(Icons.calendar_today),
+                              ),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.lightBlue, width: 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)))),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                            visible: true,
+                            child: TextFormField(
+                              controller: rapportEffController,
+                              keyboardType: TextInputType.multiline,
+                              textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Action',
-                                hintText: 'action',
+                                labelText: 'Rapport Eff *',
+                                hintText: 'rapport eff',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -161,173 +326,34 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                                   fontSize: 10.0,
                                 ),
                                 border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
                               ),
+                              validator: (value) =>
+                                  Validator.validateField(value: value!),
                               style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(height: 10.0,),
-                            TextFormField(
-                              enabled: false,
-                              controller: sousActionController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              validator: (value) => Validator.validateField(
-                                  value: value!
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Sous Action',
-                                hintText: 'sous action',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                              ),
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(height: 10.0,),
-                            TextFormField(
-                              enabled: false,
-                              controller: pourcentRealController,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: 'Taux real',
-                                hintText: 'taux real',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                                suffixIcon: Container(
-                                  padding: EdgeInsets.all(12.0),
-                                  child: Text('%', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
-                                ),
-                              ),
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(height: 10.0,),
-                            TextFormField(
-                              controller: pourcentSuivieController,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: 'Taux suivi',
-                                hintText: 'taux suivi',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                                suffixIcon: Container(
-                                  padding: EdgeInsets.all(12.0),
-                                  child: Text('%', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
-                                ),
-                              ),
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(height: 10.0,),
-                            TextFormField(
-                              controller: dateSuiviController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              validator: (value) => Validator.validateField(
-                                  value: value!
-                              ),
-                              onChanged: (value){
-                                selectedDate(context);
-                              },
-                              decoration: InputDecoration(
-                                  labelText: 'Date Suivi',
-                                  hintText: 'date',
-                                  labelStyle: TextStyle(
-                                    fontSize: 14.0,
-                                  ),
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 10.0,
-                                  ),
-                                  suffixIcon: InkWell(
-                                    onTap: (){
-                                      selectedDate(context);
-                                    },
-                                    child: Icon(Icons.calendar_today),
-                                  ),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                      borderRadius: BorderRadius.all(Radius.circular(10))
-                                  )
-                              ),
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                                visible: true,
-                                child: TextFormField(
-                                  controller: rapportEffController,
-                                  keyboardType: TextInputType.multiline,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Rapport Eff *',
-                                    hintText: 'rapport eff',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    ),
-                                  ),
-                                  validator: (value) => Validator.validateField(
-                                      value: value!
-                                  ),
-                                  style: TextStyle(fontSize: 14.0),
-                                  maxLines: 5,
-                                  minLines: 2,
-                                )
-                            ),
-                            SizedBox(height: 10.0,),
-                            MaterialButton(
-                                color: Colors.blue,
-                                child: const Text(
-                                    "Upload Images",
-                                    style: TextStyle(
-                                        color: Colors.white, fontWeight: FontWeight.bold
-                                    )
-                                ),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: ((builder) => bottomSheet()),
-                                  );
-                                }
-                            ),
-                            builImagePicker(),
-                            /*  Expanded(
+                              maxLines: 5,
+                              minLines: 2,
+                            )),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        MaterialButton(
+                            color: Colors.blue,
+                            child: const Text("Upload Images",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: ((builder) => bottomSheet()),
+                              );
+                            }),
+                        builImagePicker(),
+                        /*  Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Swiper(
@@ -341,81 +367,85 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                                   ),
                                 )
                             ), */
-                            SizedBox(height: 20.0,),
-                            _isProcessing
-                                ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  CustomColors.firebaseOrange,
-                                ),
-                              ),
-                            )
-                                :
-                            ElevatedButton(
-                              onPressed: () async {
-                                saveBtn();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  CustomColors.googleBackground,
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _isProcessing
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    CustomColors.firebaseOrange,
                                   ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text('Save',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: CustomColors.firebaseWhite,
-                                    letterSpacing: 2,
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  saveBtn();
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    CustomColors.googleBackground,
+                                  ),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                ),
-              ),
-            ),
-          )
-      ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Save',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: CustomColors.firebaseWhite,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                ),
+                              )
+                      ],
+                    ))),
+          ),
+        ),
+      )),
     );
   }
 
-  Widget builImagePicker(){
-   return imageFileList.length == 0 ? Container()
-       : Container(
-     padding: EdgeInsets.only(left: 20.0, right: 20.0),
-     //width: 170,
-     height: 170,
-     child: Padding(
-       padding: const EdgeInsets.all(8.0),
-       child: ImageSlideshow(
-         children: generateImagesTile(),
-         autoPlayInterval: 3000,
-         isLoop: true,
-         width: double.infinity,
-         height: 200,
-         initialPage: 0,
-         indicatorColor: Colors.blue,
-         indicatorBackgroundColor: Colors.grey,
-       ),
-     ),
-   );
+  Widget builImagePicker() {
+    return imageFileList.length == 0
+        ? Container()
+        : Container(
+            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+            //width: 170,
+            height: 170,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ImageSlideshow(
+                children: generateImagesTile(),
+                autoPlayInterval: 3000,
+                isLoop: true,
+                width: double.infinity,
+                height: 200,
+                initialPage: 0,
+                indicatorColor: Colors.blue,
+                indicatorBackgroundColor: Colors.grey,
+              ),
+            ),
+          );
   }
-  List<Widget> generateImagesTile(){
-    return imageFileList.map((element) => ClipRRect(
-      child: Image.file(File(element.path), fit: BoxFit.cover),
-      borderRadius: BorderRadius.circular(10.0),
-    )).toList();
+
+  List<Widget> generateImagesTile() {
+    return imageFileList
+        .map((element) => ClipRRect(
+              child: Image.file(File(element.path), fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(10.0),
+            ))
+        .toList();
   }
+
   //2.Create BottomSheet
   Widget bottomSheet() {
     return Container(
@@ -437,7 +467,92 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
             height: 20,
           ),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            FlatButton.icon(
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: MediaQuery.of(context).size.width / 3, height: 50),
+              child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFD18A3A8)),
+                  padding: MaterialStateProperty.all(EdgeInsets.all(14)),
+                ),
+                icon: Icon(Icons.image),
+                label: Text(
+                  'Camera',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                onPressed: () {
+                  if (imageFileList.length >= 5) {
+                    AwesomeDialog(
+                      context: context,
+                      animType: AnimType.SCALE,
+                      dialogType: DialogType.ERROR,
+                      body: Center(
+                        child: Text(
+                          "You can choose 5 images maximum",
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      title: 'Cancel',
+                      btnOkOnPress: () {
+                        Navigator.of(context).pop();
+                      },
+                    )..show();
+                    return;
+                  }
+                  takePhoto(ImageSource.camera);
+                },
+              ),
+            ),
+            SizedBox(
+              width: 20.0,
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: MediaQuery.of(context).size.width / 3, height: 50),
+              child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFD147FAA)),
+                  padding: MaterialStateProperty.all(EdgeInsets.all(14)),
+                ),
+                icon: Icon(Icons.image),
+                label: Text(
+                  'Gallery',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                onPressed: () {
+                  if (imageFileList.length >= 5) {
+                    AwesomeDialog(
+                      context: context,
+                      animType: AnimType.SCALE,
+                      dialogType: DialogType.ERROR,
+                      body: Center(
+                        child: Text(
+                          "You can choose 5 images maximum",
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      title: 'Cancel',
+                      btnOkOnPress: () {
+                        Navigator.of(context).pop();
+                      },
+                    )..show();
+                    return;
+                  }
+                  selectImages();
+                },
+              ),
+            ),
+            /*  FlatButton.icon(
               icon: Icon(Icons.camera),
               onPressed: () {
                 if(imageFileList.length >= 5){
@@ -483,7 +598,7 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                 selectImages();
               },
               label: Text("Gallery"),
-            ),
+            ), */
           ])
         ],
       ),
@@ -506,8 +621,7 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
           print('list from gallery ${base64List}');
         }
       }
-      setState(() {
-      });
+      setState(() {});
       Navigator.of(context).pop();
     } catch (error) {
       debugPrint(error.toString());
@@ -515,10 +629,12 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          error.toString(),
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            error.toString(),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Error',
         btnCancel: Text('Cancel'),
         btnOkOnPress: () {
@@ -548,10 +664,12 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          error.toString(),
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            error.toString(),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Error',
         btnCancel: Text('Cancel'),
         btnOkOnPress: () {
@@ -562,9 +680,9 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
   }
 
   Future saveBtn() async {
-    if(_dataValidation() && _addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && _addItemFormKey.currentState!.validate()) {
       try {
-        setState(()  {
+        setState(() {
           _isProcessing = true;
         });
         taux_suivi = int.parse(pourcentSuivieController.text.toString());
@@ -577,7 +695,8 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
           "rapportEff": rapportEffController.text.trim(),
           "dateSuivie": dateSuiviController.text
         }).then((resp) async {
-          ShowSnackBar.snackBar("Action Successfully", "Action suivi updated", Colors.green);
+          ShowSnackBar.snackBar(
+              "Action Successfully", "Action suivi updated", Colors.green);
           //Get.back();
           Get.to(ActionSuiviPage());
           await ApiControllersCall().getActionsSuivi();
@@ -587,7 +706,7 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
         });
 
         //upload images
-          base64List.forEach((element) async {
+        base64List.forEach((element) async {
           //print('base64 image: ${element}');
           await actionService.uploadImageSousAction({
             "nact": widget.actionsuivi.nAct.toString(),
@@ -600,24 +719,23 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
             //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);
             //Get.back();
             Get.to(ActionSuiviPage());
-
           }, onError: (err) {
             _isProcessing = false;
             ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
           });
-          });
-
-      }
-      catch (ex){
+        });
+      } catch (ex) {
         _isProcessing = false;
         AwesomeDialog(
           context: context,
           animType: AnimType.SCALE,
           dialogType: DialogType.ERROR,
-          body: Center(child: Text(
-            ex.toString(),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),),
+          body: Center(
+            child: Text(
+              ex.toString(),
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
           title: 'Error',
           btnCancel: Text('Cancel'),
           btnOkOnPress: () {
@@ -626,8 +744,7 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
         )..show();
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
-      }
-      finally{
+      } finally {
         _isProcessing = false;
       }
     }

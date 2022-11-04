@@ -38,7 +38,6 @@ import '../../Views/pnc/add_products_pnc/products_pnc_page.dart';
 import '../../Views/reunion/participant/participant_page.dart';
 
 class NewReunionController extends GetxController {
-
   var isDataProcessing = false.obs;
   var isVisibleNewPNC = true.obs;
   LocalPNCService localPNCService = LocalPNCService();
@@ -47,9 +46,15 @@ class NewReunionController extends GetxController {
   final matricule = SharedPreference.getMatricule();
 
   final addItemFormKey = GlobalKey<FormState>();
-  late TextEditingController datePrevueController, dateRealisationController,
-      orderController, lieuController, heureDebutController, heureFinController,
-      dureeRealController, commentaireController, dureeReunionController;
+  late TextEditingController datePrevueController,
+      dateRealisationController,
+      orderController,
+      lieuController,
+      heureDebutController,
+      heureFinController,
+      dureeRealController,
+      commentaireController,
+      dureeReunionController;
   DateTime datePickerPrevue = DateTime.now();
   DateTime datePickerRealisation = DateTime.now();
   TimeOfDay timeDebut = TimeOfDay(hour: 10, minute: 00);
@@ -57,6 +62,9 @@ class NewReunionController extends GetxController {
   dynamic currentTime = DateFormat('kk:mm').format(DateTime.now());
   int duree_hour = 00;
   int duree_minute = 00;
+
+  //stepper
+  var currentStep = 0.obs;
 
   //type
   TypeReunionModel? typeReunionModel = null;
@@ -95,15 +103,15 @@ class NewReunionController extends GetxController {
 
   //radio
   var etat = 0.obs;
-  onChangeEtat(var valeur){
+  onChangeEtat(var valeur) {
     etat.value = valeur;
     print('etat : ${etat.value}');
   }
 
   //domaine affectation
   getDomaineAffectation() async {
-    List<DomaineAffectationModel> domaineList = await List<
-        DomaineAffectationModel>.empty(growable: true);
+    List<DomaineAffectationModel> domaineList =
+        await List<DomaineAffectationModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
       var response = await localActionService.readDomaineAffectationByModule(
@@ -138,18 +146,18 @@ class NewReunionController extends GetxController {
         site_visible.value = model.vSite!;
         processus_visible.value = model.vProcessus!;
         activity_visible.value = model.vDomaine!;
-        direction_visible.value  = model.vDirection!;
-        service_visible.value  = model.vService!;
+        direction_visible.value = model.vDirection!;
+        service_visible.value = model.vService!;
 
         site_obligatoire.value = model.oSite!;
-        processus_obligatoire.value  = model.oProcessus!;
-        activity_obligatoire.value  = model.oDomaine!;
-        direction_obligatoire.value  = model.oDirection!;
-        service_obligatoire.value  = model.oService!;
-        print('fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+        processus_obligatoire.value = model.oProcessus!;
+        activity_obligatoire.value = model.oDomaine!;
+        direction_obligatoire.value = model.oDirection!;
+        service_obligatoire.value = model.oService!;
+        print(
+            'fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
       });
-    }
-    else if (connection == ConnectivityResult.wifi ||
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
       await ApiServicesCall().getDomaineAffectation().then((resp) async {
         resp.forEach((data) async {
@@ -182,91 +190,92 @@ class NewReunionController extends GetxController {
             site_visible.value = model.vSite!;
             processus_visible.value = model.vProcessus!;
             activity_visible.value = model.vDomaine!;
-            direction_visible.value  = model.vDirection!;
-            service_visible.value  = model.vService!;
+            direction_visible.value = model.vDirection!;
+            service_visible.value = model.vService!;
 
             site_obligatoire.value = model.oSite!;
-            processus_obligatoire.value  = model.oProcessus!;
-            activity_obligatoire.value  = model.oDomaine!;
-            direction_obligatoire.value  = model.oDirection!;
-            service_obligatoire.value  = model.oService!;
-            print('fiche: ${model
-                .fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+            processus_obligatoire.value = model.oProcessus!;
+            activity_obligatoire.value = model.oDomaine!;
+            direction_obligatoire.value = model.oDirection!;
+            service_obligatoire.value = model.oService!;
+            print(
+                'fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
           }
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     }
   }
 
   bool _dataValidation() {
-     if (typeReunionModel == null) {
-    Message.taskErrorOrWarning("Warning", "Type is required");
-    return false;
-    }
-     else if (orderController.text.trim() == '') {
-      Message.taskErrorOrWarning("Warning", "Order is required");
+    if (typeReunionModel == null) {
+      Message.taskErrorOrWarning("Warning", "Type is required");
       return false;
     }
+    /*  else if (orderController.text.trim() == '') {
+      Message.taskErrorOrWarning("Warning", "Order is required");
+      return false;
+    } */
     else if (datePrevueController.text.trim() == '') {
       Message.taskErrorOrWarning("Warning", "Date Prevue is required");
       return false;
-    }
-     else if (dateRealisationController.text.trim() == '') {
-       Message.taskErrorOrWarning("Warning", "Date Realisation is required");
-       return false;
-     }
-    else if (site_visible.value == 1 && site_obligatoire.value == 1 && siteModel == null) {
+    } else if (dateRealisationController.text.trim() == '') {
+      Message.taskErrorOrWarning("Warning", "Date Realisation is required");
+      return false;
+    } else if (site_visible.value == 1 &&
+        site_obligatoire.value == 1 &&
+        siteModel == null) {
       Message.taskErrorOrWarning("Warning", "Site is required");
       return false;
-    }
-    else if (processus_visible.value == 1 && processus_obligatoire.value == 1 && processusModel == null) {
+    } else if (processus_visible.value == 1 &&
+        processus_obligatoire.value == 1 &&
+        processusModel == null) {
       Message.taskErrorOrWarning("Warning", "Processus is required");
       return false;
-    }
-    else if (direction_visible.value == 1 && direction_obligatoire.value == 1 &&
+    } else if (direction_visible.value == 1 &&
+        direction_obligatoire.value == 1 &&
         directionModel == null) {
       Message.taskErrorOrWarning("Warning", "Direction is required");
       return false;
-    }
-    else if (service_visible.value == 1 && service_obligatoire.value == 1 &&
+    } else if (service_visible.value == 1 &&
+        service_obligatoire.value == 1 &&
         serviceModel == null) {
       Message.taskErrorOrWarning("Warning", "Service is required");
       return false;
-    }
-    else if (activity_visible.value == 1 && activity_obligatoire.value == 1 &&
+    } else if (activity_visible.value == 1 &&
+        activity_obligatoire.value == 1 &&
         activityModel == null) {
       Message.taskErrorOrWarning("Warning", "Activity is required");
       return false;
     }
-     double _doubleTimeDebut = timeDebut.hour.toDouble() +
-         (timeDebut.minute.toDouble() / 60);
-     double _doubleTimeFin = timeFin.hour.toDouble() +
-         (timeFin.minute.toDouble() / 60);
-      if(_doubleTimeDebut > _doubleTimeFin){
-       isDataProcessing.value = false;
-       Get.defaultDialog(
-           title: "Exception",
-           backgroundColor: Colors.white,
-           titleStyle: TextStyle(color: Colors.black),
-           middleTextStyle: TextStyle(color: Colors.black87),
-           textConfirm: "OK",
-           onConfirm: (){
-             Get.back();
-           },
-           textCancel: "Cancel",
-           cancelTextColor: Colors.red,
-           confirmTextColor: Colors.white,
-           buttonColor: Colors.blue,
-           barrierDismissible: false,
-           radius: 20,
-           content: Text('Heure Début doit etre inférieur à Heure Fin',
-             style: TextStyle(color: Colors.black87),)
-       );
-       return false;
-     }
+    double _doubleTimeDebut =
+        timeDebut.hour.toDouble() + (timeDebut.minute.toDouble() / 60);
+    double _doubleTimeFin =
+        timeFin.hour.toDouble() + (timeFin.minute.toDouble() / 60);
+    if (_doubleTimeDebut > _doubleTimeFin) {
+      isDataProcessing.value = false;
+      Get.defaultDialog(
+          title: "Exception",
+          backgroundColor: Colors.white,
+          titleStyle: TextStyle(color: Colors.black),
+          middleTextStyle: TextStyle(color: Colors.black87),
+          textConfirm: "OK",
+          onConfirm: () {
+            Get.back();
+          },
+          textCancel: "Cancel",
+          cancelTextColor: Colors.red,
+          confirmTextColor: Colors.white,
+          buttonColor: Colors.blue,
+          barrierDismissible: false,
+          radius: 20,
+          content: Text(
+            'Heure Début doit etre inférieur à Heure Fin',
+            style: TextStyle(color: Colors.black87),
+          ));
+      return false;
+    }
     return true;
   }
 
@@ -283,27 +292,32 @@ class NewReunionController extends GetxController {
     heureFinController = TextEditingController();
     dureeReunionController = TextEditingController();
     dureeRealController = TextEditingController();
-    datePrevueController.text = DateFormat('yyyy-MM-dd').format(datePickerPrevue);
-    dateRealisationController.text = DateFormat('yyyy-MM-dd').format(datePickerRealisation);
+    datePrevueController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerPrevue);
+    dateRealisationController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerRealisation);
     heureDebutController.text = currentTime.toString();
-    heureFinController.text = currentTime.toString(); //TimeOfDay.now().toString();
-    dureeReunionController.text ='${duree_hour}:${duree_minute}';
+    heureFinController.text =
+        currentTime.toString(); //TimeOfDay.now().toString();
+    dureeReunionController.text = '${duree_hour}:${duree_minute}';
 
     getDomaineAffectation();
     checkConnectivity();
   }
 
-
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue,
-          snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-    }
-    else if (connection == ConnectivityResult.wifi ||
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 900));
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue,
-          snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 900));
     }
   }
 
@@ -313,64 +327,62 @@ class NewReunionController extends GetxController {
         initialDate: datePickerPrevue,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //lastDate: DateTime.now()
-    ))!;
+        //lastDate: DateTime.now()
+        ))!;
     if (datePickerPrevue != null) {
-      datePrevueController.text = DateFormat('yyyy-MM-dd').format(datePickerPrevue);
+      datePrevueController.text =
+          DateFormat('yyyy-MM-dd').format(datePickerPrevue);
       //datePrevueController.text = DateFormat.yMMMMd().format(datePickerPrevue);
     }
   }
+
   selectedDateRealisation(BuildContext context) async {
     datePickerRealisation = (await showDatePicker(
         context: context,
         initialDate: datePickerRealisation,
         firstDate: DateTime(2021),
-        lastDate: DateTime.now()
-    ))!;
+        lastDate: DateTime.now()))!;
     if (datePickerRealisation != null) {
-      dateRealisationController.text = DateFormat('yyyy-MM-dd').format(datePickerRealisation);
+      dateRealisationController.text =
+          DateFormat('yyyy-MM-dd').format(datePickerRealisation);
     }
   }
+
   //final hours = timeDebut.hour.toString().padLeft(2, '0');
   selectedTimeDebut(BuildContext context) async {
-    timeDebut = (await showTimePicker(
-        context: context,
-        initialTime:timeDebut
-    ))!;
-    if(timeDebut == null) return;
+    timeDebut =
+        (await showTimePicker(context: context, initialTime: timeDebut))!;
+    if (timeDebut == null) return;
     if (timeDebut != null) {
       heureDebutController.text = '${timeDebut.hour}:${timeDebut.minute}';
 
       duree_hour = timeFin.hour - timeDebut.hour;
       duree_minute = timeFin.minute - timeDebut.minute;
-      dureeReunionController.text ='${duree_hour}:${duree_minute}';
+      dureeReunionController.text = '${duree_hour}:${duree_minute}';
     }
   }
+
   selectedTimeFin(BuildContext context) async {
-    timeFin = (await showTimePicker(
-        context: context,
-        initialTime:timeFin
-    ))!;
-    if(timeFin == null) return;
+    timeFin = (await showTimePicker(context: context, initialTime: timeFin))!;
+    if (timeFin == null) return;
     if (timeFin != null) {
       heureFinController.text = '${timeFin.hour}:${timeFin.minute}';
 
       duree_hour = timeFin.hour - timeDebut.hour;
       duree_minute = timeFin.minute - timeDebut.minute;
-      dureeReunionController.text ='${duree_hour}:${duree_minute}';
+      dureeReunionController.text = '${duree_hour}:${duree_minute}';
     }
   }
 
-
   Future saveBtn() async {
-    if(_dataValidation() && addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && addItemFormKey.currentState!.validate()) {
       try {
         var connection = await Connectivity().checkConnectivity();
         if (connection == ConnectivityResult.none) {
           int max_num_reunion = await localReunionService.getMaxNumReunion();
           var model = ReunionModel();
           model.online = 0;
-          model.nReunion = max_num_reunion+1;
+          model.nReunion = max_num_reunion + 1;
           model.typeReunion = typeReunionModel?.typeReunion;
           model.codeTypeReunion = selectedCodeType;
           model.datePrev = datePrevueController.text;
@@ -392,13 +404,14 @@ class NewReunionController extends GetxController {
           //save data sync
           await localReunionService.saveReunionSync(model);
           Get.back();
-          ShowSnackBar.snackBar("Mode Offline", "Reunion Added Successfully", Colors.green);
+          ShowSnackBar.snackBar(
+              "Mode Offline", "Reunion Added Successfully", Colors.green);
           Get.find<ReunionController>().listReunion.clear();
           Get.find<ReunionController>().getReunion();
           //Get.toNamed(AppRoute.reunion);
           clearData();
-        }
-        else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        } else if (connection == ConnectivityResult.wifi ||
+            connection == ConnectivityResult.mobile) {
           await ReunionService().saveReunion({
             "codetypeR": selectedCodeType,
             "dateprev": datePrevueController.text,
@@ -418,24 +431,25 @@ class NewReunionController extends GetxController {
             "id_service": selectedCodeService,
             "matdecl": matricule
           }).then((resp) {
-            ShowSnackBar.snackBar("Successfully", "Reunion Added ", Colors.green);
+            ShowSnackBar.snackBar(
+                "Successfully", "Reunion Added ", Colors.green);
             final num_reunion = resp['nReunion'];
             print('num reunion : ${num_reunion}');
 
-           Get.defaultDialog(
+            Get.defaultDialog(
                 title: 'Add Participants',
                 backgroundColor: Colors.white,
                 titleStyle: TextStyle(color: Colors.black),
                 middleTextStyle: TextStyle(color: Colors.white),
                 textConfirm: "Yes",
                 textCancel: "No",
-                onConfirm: (){
+                onConfirm: () {
                   //Get.find<ReunionController>().listReunion.clear();
                   //Get.find<ReunionController>().getReunion();
                   //Get.to(ParticipantPage(nReunion: num_reunion));
                   Get.offAll(ParticipantPage(nReunion: num_reunion));
                 },
-                onCancel: (){
+                onCancel: () {
                   Get.find<ReunionController>().listReunion.clear();
                   Get.find<ReunionController>().getReunion();
                   //Get.toNamed(AppRoute.reunion);
@@ -446,19 +460,20 @@ class NewReunionController extends GetxController {
                 buttonColor: Colors.blue,
                 barrierDismissible: false,
                 radius: 20,
-                content: Text('Do you want to add participants', style: TextStyle(
-                    color: Colors.black, fontSize: 16, fontFamily:'Brand-Bold'
-                ),)
-            );
-
+                content: Text(
+                  'Do you want to add participants',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontFamily: 'Brand-Bold'),
+                ));
           }, onError: (err) {
             isDataProcessing(false);
             print('Error : ${err.toString()}');
             ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
           });
-      }
-      }
-      catch (ex){
+        }
+      } catch (ex) {
         Get.defaultDialog(
             title: "Exception",
             backgroundColor: Colors.lightBlue,
@@ -471,8 +486,10 @@ class NewReunionController extends GetxController {
             buttonColor: Colors.red,
             barrierDismissible: false,
             radius: 50,
-            content: Text('${ex.toString()}', style: TextStyle(color: Colors.black),)
-        );
+            content: Text(
+              '${ex.toString()}',
+              style: TextStyle(color: Colors.black),
+            ));
         //ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
@@ -486,8 +503,10 @@ class NewReunionController extends GetxController {
     lieuController.clear();
     dureeRealController.clear();
     commentaireController.clear();
-    datePrevueController.text = DateFormat('yyyy-MM-dd').format(datePickerPrevue);
-    dateRealisationController.text = DateFormat('yyyy-MM-dd').format(datePickerRealisation);
+    datePrevueController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerPrevue);
+    dateRealisationController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerRealisation);
     selectedCodeType = 0;
     typeReunionModel = null;
     siteModel = null;
@@ -501,16 +520,16 @@ class NewReunionController extends GetxController {
     activityModel = null;
     selectedCodeActivity = 0;
     heureDebutController.text = currentTime.toString();
-    heureFinController.text = currentTime.toString(); //TimeOfDay.now().toString();
-    dureeReunionController.text ='${duree_hour}:${duree_minute}';
+    heureFinController.text =
+        currentTime.toString(); //TimeOfDay.now().toString();
+    dureeReunionController.text = '${duree_hour}:${duree_minute}';
   }
 
   //type reunion
   Widget customDropDownType(BuildContext context, TypeReunionModel? item) {
     if (typeReunionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -519,6 +538,7 @@ class NewReunionController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderType(
       BuildContext context, typeReunionModel, bool isSelected) {
     return Container(
@@ -526,10 +546,10 @@ class NewReunionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(typeReunionModel?.typeReunion ?? ''),
@@ -537,20 +557,24 @@ class NewReunionController extends GetxController {
       ),
     );
   }
+
   //site
   Widget customDropDownSite(BuildContext context, SiteModel? item) {
     if (siteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${siteModel?.site}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${siteModel?.site}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderSite(
       BuildContext context, siteModel, bool isSelected) {
     return Container(
@@ -558,10 +582,10 @@ class NewReunionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(siteModel?.site ?? ''),
@@ -569,20 +593,24 @@ class NewReunionController extends GetxController {
       ),
     );
   }
+
   //processus
   Widget customDropDownProcessus(BuildContext context, ProcessusModel? item) {
     if (processusModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${processusModel?.processus}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${processusModel?.processus}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderProcessus(
       BuildContext context, processusModel, bool isSelected) {
     return Container(
@@ -590,10 +618,10 @@ class NewReunionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
@@ -601,12 +629,12 @@ class NewReunionController extends GetxController {
       ),
     );
   }
+
   //Activity
   Widget customDropDownActivity(BuildContext context, ActivityModel? item) {
     if (activityModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -615,6 +643,7 @@ class NewReunionController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderActivity(
       BuildContext context, activityModel, bool isSelected) {
     return Container(
@@ -622,10 +651,10 @@ class NewReunionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(activityModel?.domaine ?? ''),
@@ -633,20 +662,24 @@ class NewReunionController extends GetxController {
       ),
     );
   }
+
   //direction
   Widget customDropDownDirection(BuildContext context, DirectionModel? item) {
     if (directionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${directionModel?.direction}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${directionModel?.direction}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDirection(
       BuildContext context, directionModel, bool isSelected) {
     return Container(
@@ -654,10 +687,10 @@ class NewReunionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(directionModel?.direction ?? ''),
@@ -665,20 +698,24 @@ class NewReunionController extends GetxController {
       ),
     );
   }
+
   //service
   Widget customDropDownService(BuildContext context, ServiceModel? item) {
     if (serviceModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${serviceModel?.service}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${serviceModel?.service}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderService(
       BuildContext context, serviceModel, bool isSelected) {
     return Container(
@@ -686,10 +723,10 @@ class NewReunionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(serviceModel?.service ?? ''),

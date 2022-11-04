@@ -124,13 +124,11 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
-          leading: RaisedButton(
+          leading: TextButton(
             onPressed: (){
               Get.offAll(HomePage());
             },
-            elevation: 0.0,
             child: Icon(Icons.arrow_back, color: Colors.blue,),
-            color: Colors.white,
           ),
           title: Text(
             'Non Confirmité a Valider : ${listPNCValider.length}',

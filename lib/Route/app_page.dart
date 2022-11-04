@@ -5,10 +5,12 @@ import 'package:qualipro_flutter/Views/audit/audit_page.dart';
 import 'package:qualipro_flutter/Views/documentation/documentation_page.dart';
 import '../Bindings/dashboard_binding.dart';
 import '../Middleware/auth_middleware.dart';
+import '../Middleware/super_middleware.dart';
 import '../Views/action/action_page.dart';
 import '../Views/home_page.dart';
 import '../Views/incident_environnement/incident_env_page.dart';
 import '../Views/incident_securite/incident_securite_page.dart';
+import '../Views/licence/licence_page.dart';
 import '../Views/login/login_screen.dart';
 import '../Views/login/onboarding_page.dart';
 import '../Views/pnc/pnc_navigation_bar_page.dart';
@@ -22,11 +24,17 @@ import 'app_route.dart';
 class AppPage {
   static var routesList = [
     GetPage(
+        name: AppRoute.licence,
+        page: () => LicencePage(),
+        binding: DashboardBinding(),
+    ),
+    GetPage(
         name: AppRoute.login,
         page: () => LoginScreen(),
         binding: DashboardBinding(),
       middlewares: [
-        AuthMiddleware()
+        AuthMiddleware(),
+        SuperMiddleware()
       ]
     ),
     GetPage(

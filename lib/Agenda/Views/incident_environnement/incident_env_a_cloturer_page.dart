@@ -116,13 +116,11 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
-          leading: RaisedButton(
+          leading: TextButton(
             onPressed: (){
               Get.offAll(HomePage());
             },
-            elevation: 0.0,
             child: Icon(Icons.arrow_back, color: Colors.blue,),
-            color: Colors.white,
           ),
           title: Text(
             'Incident a Cloturer : ${listIncident.length}',

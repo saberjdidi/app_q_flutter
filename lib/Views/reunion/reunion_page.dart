@@ -10,6 +10,7 @@ import '../../Utils/custom_colors.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
+import 'decision/decision_page.dart';
 import 'new_reunion.dart';
 import 'participant/participant_page.dart';
 import 'reunion_widget.dart';
@@ -22,7 +23,7 @@ class ReunionPage extends GetView<ReunionController> {
     const Color lightPrimary = Colors.white;
     const Color darkPrimary = Colors.white;
     return Scaffold(
-       drawer: NavigationDrawerWidget(),
+      drawer: NavigationDrawerWidget(),
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -61,7 +62,10 @@ class ReunionPage extends GetView<ReunionController> {
                     margin: EdgeInsets.only(left: 5, right: 5, bottom: 0.0),
                     child: Slidable(
                       key: const ValueKey(0),
-                      child: ReunionWidget(model: controller.listReunion[index], color: Colors.blueGrey,),
+                      child: ReunionWidget(
+                        model: controller.listReunion[index],
+                        color: Colors.blueGrey,
+                      ),
                       // The start action pane is the one at the left or the top side.
                       startActionPane: ActionPane(
                         // A motion is a widget used to control how the pane animates.
@@ -71,7 +75,9 @@ class ReunionPage extends GetView<ReunionController> {
                         children: [
                           SlidableAction(
                             onPressed: (context) {
-                              Get.to(ParticipantPage(nReunion: controller.listReunion[index].nReunion));
+                              Get.to(ParticipantPage(
+                                  nReunion:
+                                      controller.listReunion[index].nReunion));
                             },
                             backgroundColor: Color(0xFF21B7CA),
                             foregroundColor: Colors.white,
@@ -88,12 +94,14 @@ class ReunionPage extends GetView<ReunionController> {
                             // An action can be bigger than the others.
                             flex: 2,
                             onPressed: (context) {
-                              Get.to(ParticipantPage(nReunion: controller.listReunion[index].nReunion));
+                              Get.to(DecisionPage(
+                                  nReunion:
+                                      controller.listReunion[index].nReunion));
                             },
                             backgroundColor: Color(0xFF0DBD90),
                             foregroundColor: Colors.white,
-                            icon: Icons.edit,
-                            label: 'Participants',
+                            icon: Icons.account_tree_rounded,
+                            label: 'Decisions',
                           ),
                         ],
                       ),
@@ -125,34 +133,32 @@ class ReunionPage extends GetView<ReunionController> {
               label: '${'new'.tr} Reunion',
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
-              onTap: (){
-                Get.to(()=>NewReunionPage(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
-              }
-          ),
+              onTap: () {
+                Get.to(() => NewReunionPage(),
+                    transition: Transition.zoom,
+                    duration: Duration(milliseconds: 500));
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
               label: '${'search'.tr} Reunion',
-              onTap: (){
-                 showSearch(
-                    context: context,
-                    delegate: SearchReunionDelegate(controller.listReunion),
-                  );
-              }
-          ),
+              onTap: () {
+                showSearch(
+                  context: context,
+                  delegate: SearchReunionDelegate(controller.listReunion),
+                );
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.sync, color: Colors.blue, size: 32),
               label: 'Synchronisation',
-              onTap: (){
+              onTap: () {
                 controller.syncReunionToWebService();
-              }
-          )
+              })
         ],
       ),
     );
   }
-
 }

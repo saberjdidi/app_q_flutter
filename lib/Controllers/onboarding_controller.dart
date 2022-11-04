@@ -8,7 +8,6 @@ import '../Utils/snack_bar.dart';
 import 'api_controllers_call.dart';
 
 class OnBoardingController extends GetxController {
-
   ApiControllersCall apiControllersCall = ApiControllersCall();
   var isDataProcessing = false.obs;
 
@@ -18,6 +17,197 @@ class OnBoardingController extends GetxController {
     syncApiCallToLocalDB();
   }
 
+  Future syncApiCallToLocalDB() async {
+    try {
+      isDataProcessing.value = true;
+      var connection = await Connectivity().checkConnectivity();
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Mode Offline",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        Get.snackbar("Internet Connection", "Add Data in DataBase Local",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+
+        await apiControllersCall.getDomaineAffectation();
+        await apiControllersCall.getChampCache();
+        await apiControllersCall.getChampObligatoireAction();
+
+        ///action
+        if (SharedPreference.getIsVisibleAction() == 1) {
+          //agenda
+          await apiControllersCall.getActionsRealisation();
+          await apiControllersCall.getActionsSuivi();
+          await apiControllersCall.getActionsSuiteAudit();
+          //module action
+          await apiControllersCall.getAction();
+          await apiControllersCall.getSourceAction();
+          await apiControllersCall.getTypeAction();
+          await apiControllersCall.getResponsableCloture();
+          await apiControllersCall.getAuditAction();
+          await apiControllersCall.getTypeCauseAction();
+          await apiControllersCall.getTypeCauseActionARattacher();
+          await apiControllersCall.getAllSousAction();
+          await apiControllersCall.getGravite();
+          await apiControllersCall.getPriorite();
+          await apiControllersCall.getProcessusEmploye();
+        }
+
+        ///pnc
+        if (SharedPreference.getIsVisiblePNC() == 1) {
+          //agenda
+          await apiControllersCall.getPNCAValider();
+          await apiControllersCall.getPNCACorriger();
+          //await apiControllersCall.getPNCDecision();
+          await apiControllersCall.getPNCInvestigationEffectuer();
+          await apiControllersCall.getPNCInvestigationApprouver();
+          await apiControllersCall.getPNCASuivre();
+          await apiControllersCall.getPNCApprobationFinale();
+          await apiControllersCall.getPNCDecisionTraitementAValidater();
+          //module pnc
+          await apiControllersCall.getPNC();
+          await apiControllersCall.getAllProductsPNC();
+          await apiControllersCall.getAllTypeCausePNC();
+          await apiControllersCall.getChampObligatoirePNC();
+          await apiControllersCall.getFournisseurs();
+          await apiControllersCall.getTypePNC();
+          await apiControllersCall.getGravitePNC();
+          await apiControllersCall.getSourcePNC();
+          await apiControllersCall.getAtelierPNC();
+          await apiControllersCall.getClients();
+          await apiControllersCall.getAllTypeCausePNCARattacher();
+          //save is one/many product(s) in shared preference
+          await PNCService().parametrageProduct().then((param) {
+            Future oneProduct =
+                SharedPreference.setIsOneProduct(param['seulProduit']);
+          }, onError: (error) {
+            ShowSnackBar.snackBar(
+                'Error one product', error.toString(), Colors.red);
+          });
+        }
+        //agenda pnc
+        await apiControllersCall.getPNCDecision();
+        await apiControllersCall.getPNCATraiter();
+
+        ///reunion
+        if (SharedPreference.getIsVisibleReunion() == 1) {
+          //agenda
+          await apiControllersCall.getReunionInformer();
+          await apiControllersCall.getReunionPlanifier();
+
+          ///module
+          await apiControllersCall.getReunion();
+          await apiControllersCall.getParticipantsReunion();
+          await apiControllersCall.getActionReunionRattacher();
+          await apiControllersCall.getTypeReunion();
+        }
+        // incident environnement
+        if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
+          //agenda
+          await apiControllersCall.getIncidentEnvDecisionTraitement();
+          await apiControllersCall.getIncidentEnvATraiter();
+          await apiControllersCall.getIncidentEnvACloturer();
+
+          ///module
+          await apiControllersCall.getIncidentEnvironnement();
+          await apiControllersCall.getChampObligatoireIncidentEnv();
+          await apiControllersCall.getTypeIncidentEnv();
+          await apiControllersCall.getTypeCauseIncidentEnv();
+          await apiControllersCall.getTypeCauseIncidentEnvRattacher();
+          await apiControllersCall.getCategoryIncidentEnv();
+          await apiControllersCall.getTypeConsequenceIncidentEnvRattacher();
+          await apiControllersCall.getTypeConsequenceIncidentEnv();
+          await apiControllersCall.getLieuIncidentEnv();
+          await apiControllersCall.getSourceIncidentEnv();
+          await apiControllersCall.getCoutEstimeIncidentEnv();
+          await apiControllersCall.getGraviteIncidentEnv();
+          await apiControllersCall.getSecteurIncidentEnv();
+          await apiControllersCall.getActionIncEnvRattacher();
+        }
+        //incident securite
+        if (SharedPreference.getIsVisibleIncidentSecurite() == 1) {
+          //agenda
+          await apiControllersCall.getIncidentSecuriteDecisionTraitement();
+          await apiControllersCall.getIncidentSecuriteATraiter();
+          await apiControllersCall.getIncidentSecuriteACloturer();
+
+          ///module
+          await apiControllersCall.getIncidentSecurite();
+          await apiControllersCall.getChampObligatoireIncidentSecurite();
+          await apiControllersCall.getPosteTravailIncidentSecurite();
+          await apiControllersCall.getTypeIncidentSecurite();
+          await apiControllersCall.getCategoryIncidentSecurite();
+          await apiControllersCall.getCauseTypiqueIncidentSecurite();
+          await apiControllersCall.getTypeCauseIncidentSecRattacher();
+          await apiControllersCall.getTypeConsequenceIncSecRattacher();
+          await apiControllersCall.getCauseTypiqueIncSecRattacher();
+          await apiControllersCall.getSiteLesionIncSecRattacher();
+          await apiControllersCall.getTypeCauseIncidentSecurite();
+          await apiControllersCall.getTypeConsequenceIncidentSecurite();
+          await apiControllersCall.getSiteLesionIncidentSecurite();
+          await apiControllersCall.getGraviteIncidentSecurite();
+          await apiControllersCall.getSecteurIncidentSecurite();
+          await apiControllersCall.getCoutEstemeIncedentSecurite();
+          await apiControllersCall.getEvenementDeclencheurIncidentSecurite();
+          await apiControllersCall.getActionIncSecRattacher();
+        }
+        //Audit
+        if (SharedPreference.getIsVisibleAudit() == 1) {
+          //agenda
+          await apiControllersCall.getAuditEnTantQueAudite();
+          await apiControllersCall.getAuditEnTantQueAuditeur();
+          await apiControllersCall.getRapportAuditsAValider();
+          //Module
+          await apiControllersCall.getAudits();
+          await apiControllersCall.getChampAudit();
+          await apiControllersCall.getTypeAudit();
+          await apiControllersCall.getGraviteAudit();
+          await apiControllersCall.getTypeConstatAudit();
+          await apiControllersCall.getConstatsActionProv();
+          await apiControllersCall.getConstatsAction();
+          await apiControllersCall.getChampAuditByRefAudit();
+          await apiControllersCall.getAuditeurInterne();
+          await apiControllersCall.getAuditeurInterneARattacher();
+        }
+
+        ///Module Visite Securite
+        if (SharedPreference.getIsVisibleVisiteSecurite() == 1) {
+          await apiControllersCall.getVisiteSecurite();
+          await apiControllersCall.getCheckList();
+          await apiControllersCall.getUniteVisiteSecurite();
+          await apiControllersCall.getZoneVisiteSecurite();
+          await apiControllersCall.getSiteVisiteSecurite();
+          await apiControllersCall.getEquipeVisiteSecuriteFromAPI();
+          await apiControllersCall.getCheckListVSRattacher();
+          await apiControllersCall.getTauxCheckListVS();
+          await apiControllersCall.getActionVSRattacher();
+        }
+
+        ///Module documentation
+        if (SharedPreference.getIsVisibleDocumentation() == 1) {
+          await apiControllersCall.getDocument();
+          await apiControllersCall.getTypeDocument();
+        }
+
+        ///Domaine affectation
+        await apiControllersCall.getEmploye();
+        await apiControllersCall.getProduct();
+        await apiControllersCall.getSite();
+        await apiControllersCall.getProcessus();
+        await apiControllersCall.getDirection();
+        await apiControllersCall.getActivity();
+        await apiControllersCall.getService();
+      }
+    } catch (exception) {
+      isDataProcessing.value = false;
+      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      return Future.error('service : ${exception.toString()}');
+    } finally {
+      isDataProcessing.value = false;
+    }
+  }
+
+  /*
   Future syncApiCallToLocalDB() async {
     try {
       isDataProcessing.value = true;
@@ -171,4 +361,5 @@ class OnBoardingController extends GetxController {
     isDataProcessing.value = false;
   }
   }
+   */
 }

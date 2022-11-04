@@ -20,14 +20,15 @@ import '../../../../Utils/shared_preference.dart';
 import '../../../../Utils/snack_bar.dart';
 import '../remplir_pnc_decision_traitement.dart';
 
-
 class NewResponsableTraitement extends StatefulWidget {
   TraitementDecisionModel traitementDecisionModel;
 
-  NewResponsableTraitement({Key? key, required this.traitementDecisionModel}) : super(key: key);
+  NewResponsableTraitement({Key? key, required this.traitementDecisionModel})
+      : super(key: key);
 
   @override
-  State<NewResponsableTraitement> createState() => _NewResponsableTraitementState();
+  State<NewResponsableTraitement> createState() =>
+      _NewResponsableTraitementState();
 }
 
 class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
@@ -38,24 +39,22 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
   final matricule = SharedPreference.getMatricule();
 
   DateTime dateTime = DateTime.now();
-  TextEditingController  dateTraitementController = TextEditingController();
-  TextEditingController  traitementNCController = TextEditingController();
+  TextEditingController dateTraitementController = TextEditingController();
+  TextEditingController traitementNCController = TextEditingController();
 
-  
   String? employeMatricule = "";
   int? selectCodeTypeTraitement = 0;
 
   bool checkFirstResponsable = false;
   String firstResponsable = "0";
-  String? language ="";
-
+  String? language = "";
 
   @override
-  void initState(){
+  void initState() {
     dateTraitementController.text = DateFormat('yyyy-MM-dd').format(dateTime);
-    if(SharedPreference.getLangue() == null){
+    if (SharedPreference.getLangue() == null) {
       language = "";
-    }else {
+    } else {
       language = SharedPreference.getLangue();
     }
     super.initState();
@@ -66,12 +65,12 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
         context: context,
         initialDate: dateTime,
         firstDate: DateTime(2000),
-        lastDate: DateTime(2050)
-    );
-    if(datePicker != null){
+        lastDate: DateTime(2050));
+    if (datePicker != null) {
       setState(() {
         dateTime = datePicker;
-        dateTraitementController.text = DateFormat('yyyy-MM-dd').format(datePicker);
+        dateTraitementController.text =
+            DateFormat('yyyy-MM-dd').format(datePicker);
       });
     }
   }
@@ -81,13 +80,14 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
-          onPressed: (){
+        leading: TextButton(
+          onPressed: () {
             Get.back();
           },
-          elevation: 0.0,
-          child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
         title: Center(
           child: Text("New Responsable Traitement"),
@@ -96,174 +96,180 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
       ),
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: SingleChildScrollView(
-                child: Form(
-                    key: _addItemFormKey,
-                    child: Padding(
-                        padding: EdgeInsets.all(25.0),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: TextFormField(
-                                controller: dateTraitementController,
-                                keyboardType: TextInputType.text,
-                                textInputAction: TextInputAction.next,
-                                onChanged: (value){
-                                  selectedDate(context);
-                                },
-                                decoration: InputDecoration(
-                                    labelText: 'Delai Traitement',
-                                    hintText: 'date',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    suffixIcon: InkWell(
-                                      onTap: (){
-                                        selectedDate(context);
-                                      },
-                                      child: Icon(Icons.calendar_today),
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    )
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: SingleChildScrollView(
+            child: Form(
+                key: _addItemFormKey,
+                child: Padding(
+                    padding: EdgeInsets.all(25.0),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: TextFormField(
+                            controller: dateTraitementController,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (value) {
+                              selectedDate(context);
+                            },
+                            decoration: InputDecoration(
+                                labelText: 'Delai Traitement',
+                                hintText: 'date',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
                                 ),
-                                style: TextStyle(fontSize: 14.0),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    selectedDate(context);
+                                  },
+                                  child: Icon(Icons.calendar_today),
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                            visible: true,
+                            child: TextFormField(
+                              controller: traitementNCController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              decoration: InputDecoration(
+                                labelText: 'Traitement NC',
+                                hintText: 'Traitement NC',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
                               ),
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                                visible: true,
-                                child: TextFormField(
-                                  controller: traitementNCController,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Traitement NC',
-                                    hintText: 'Traitement NC',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    ),
-                                  ),
-                                  style: TextStyle(fontSize: 14.0),
-                                  minLines: 2,
-                                  maxLines: 5,
-                                )
-                            ),
-                            SizedBox(height: 10.0,),
-                            DropdownSearch<EmployeModel>(
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: true,
-                              isFilteredOnline: true,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Employe *",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
-                              ),
-                              onFind: (String? filter) => getEmploye(filter),
-                              onChanged: (data) {
-                                employeMatricule = data?.mat;
-                                print('employe: ${data?.nompre}, mat: ${employeMatricule}');
-                              },
-                              dropdownBuilder: customDropDownEmploye,
-                              popupItemBuilder: customPopupItemBuilderEmploye,
-                              validator: (u) =>
+                              style: TextStyle(fontSize: 14.0),
+                              minLines: 2,
+                              maxLines: 5,
+                            )),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        DropdownSearch<EmployeModel>(
+                          showSelectedItems: true,
+                          showClearButton: true,
+                          showSearchBox: true,
+                          isFilteredOnline: true,
+                          compareFn: (i, s) => i?.isEqual(s) ?? false,
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "Employe *",
+                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                            border: OutlineInputBorder(),
+                          ),
+                          onFind: (String? filter) => getEmploye(filter),
+                          onChanged: (data) {
+                            employeMatricule = data?.mat;
+                            print(
+                                'employe: ${data?.nompre}, mat: ${employeMatricule}');
+                          },
+                          dropdownBuilder: customDropDownEmploye,
+                          popupItemBuilder: customPopupItemBuilderEmploye,
+                          validator: (u) =>
                               u == null ? "Employe is required " : null,
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: CheckboxListTile(
-                                title: const Text('Premier Responsable'),
-                                value: checkFirstResponsable,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    checkFirstResponsable = value!;
-                                    if(checkFirstResponsable == true){
-                                      firstResponsable = "1";
-                                    }
-                                    else {
-                                      firstResponsable = "0";
-                                    }
-                                    print('Premier Responsable ${firstResponsable}');
-                                  });
-
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: CheckboxListTile(
+                            title: const Text('Premier Responsable'),
+                            value: checkFirstResponsable,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                checkFirstResponsable = value!;
+                                if (checkFirstResponsable == true) {
+                                  firstResponsable = "1";
+                                } else {
+                                  firstResponsable = "0";
+                                }
+                                print(
+                                    'Premier Responsable ${firstResponsable}');
+                              });
+                            },
+                            activeColor: Colors.blue,
+                            //secondary: const Icon(Icons.hourglass_empty),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        _isProcessing
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    CustomColors.firebaseOrange,
+                                  ),
+                                ),
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  saveBtn();
                                 },
-                                activeColor: Colors.blue,
-                                //secondary: const Icon(Icons.hourglass_empty),
-                              ),
-                            ),
-
-                            SizedBox(height: 15.0,),
-                            _isProcessing
-                                ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  CustomColors.firebaseOrange,
-                                ),
-                              ),
-                            )
-                                :
-                            ElevatedButton(
-                              onPressed: () async {
-                                saveBtn();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  CustomColors.googleBackground,
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    CustomColors.googleBackground,
+                                  ),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Text('Save',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: CustomColors.firebaseWhite,
-                                    letterSpacing: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Text(
+                                    'Save',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: CustomColors.firebaseWhite,
+                                      letterSpacing: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                ),
-              ),
-            ),
-          )
-      ),
+                              )
+                      ],
+                    ))),
+          ),
+        ),
+      )),
     );
   }
 
   Future saveBtn() async {
-    if(_addItemFormKey.currentState!.validate()){
+    if (_addItemFormKey.currentState!.validate()) {
       try {
-        setState(()  {
+        setState(() {
           _isProcessing = true;
         });
 
@@ -275,28 +281,32 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
           "premier": firstResponsable,
           "lang": language
         }).then((resp) async {
-          ShowSnackBar.snackBar("Successfully", "Responsable added", Colors.green);
+          ShowSnackBar.snackBar(
+              "Successfully", "Responsable added", Colors.green);
           //Get.back();
-          Get.to(RemplirPNCTraitementDecision(traitementDecisionModel: widget.traitementDecisionModel,));
+          Get.to(RemplirPNCTraitementDecision(
+            traitementDecisionModel: widget.traitementDecisionModel,
+          ));
         }, onError: (err) {
-          setState(()  {
+          setState(() {
             _isProcessing = false;
           });
           ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
         });
-      }
-      catch (ex){
-        setState(()  {
+      } catch (ex) {
+        setState(() {
           _isProcessing = false;
         });
         AwesomeDialog(
           context: context,
           animType: AnimType.SCALE,
           dialogType: DialogType.ERROR,
-          body: Center(child: Text(
-            ex.toString(),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),),
+          body: Center(
+            child: Text(
+              ex.toString(),
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
           title: 'Error',
           btnCancel: Text('Cancel'),
           btnOkOnPress: () {
@@ -305,9 +315,8 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
         )..show();
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
-      }
-      finally{
-        setState(()  {
+      } finally {
+        setState(() {
           _isProcessing = false;
         });
       }
@@ -317,10 +326,12 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
   //getEmploye
   Future<List<EmployeModel>> getEmploye(filter) async {
     try {
-      List<EmployeModel> employeList = await List<EmployeModel>.empty(growable: true);
-      List<EmployeModel>employeFilter = await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeList =
+          await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeFilter =
+          await List<EmployeModel>.empty(growable: true);
       var response = await LocalActionService().readEmploye();
-      response.forEach((data){
+      response.forEach((data) {
         var model = EmployeModel();
         model.mat = data['mat'];
         model.nompre = data['nompre'];
@@ -329,8 +340,7 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
       employeFilter = employeList.where((u) {
         var name = u.mat.toString().toLowerCase();
         var description = u.nompre!.toLowerCase();
-        return name.contains(filter) ||
-            description.contains(filter);
+        return name.contains(filter) || description.contains(filter);
       }).toList();
       return employeFilter;
     } catch (exception) {
@@ -338,11 +348,11 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
       return Future.error('service : ${exception.toString()}');
     }
   }
+
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
     if (item == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -351,6 +361,7 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
       );
     }
   }
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, EmployeModel item, bool isSelected) {
     return Container(
@@ -358,10 +369,10 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item.nompre ?? ''),

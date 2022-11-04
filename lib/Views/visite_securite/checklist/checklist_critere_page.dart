@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:qualipro_flutter/Models/incident_securite/cause_typique_model.dart';
 import 'package:qualipro_flutter/Services/incident_securite/incident_securite_service.dart';
+import 'package:qualipro_flutter/Services/visite_securite/local_visite_securite_service.dart';
 import 'package:qualipro_flutter/Services/visite_securite/visite_securite_service.dart';
 import '../../../Controllers/incident_securite/incident_securite_controller.dart';
 import '../../../Controllers/visite_securite/visite_securite_controller.dart';
@@ -22,17 +23,22 @@ import '../visite_securite_page.dart';
 class CheckListCriterePage extends StatefulWidget {
   final numFiche;
 
- const CheckListCriterePage({Key? key, required this.numFiche}) : super(key: key);
+  const CheckListCriterePage({Key? key, required this.numFiche})
+      : super(key: key);
 
   @override
   State<CheckListCriterePage> createState() => _CheckListCriterePageState();
 }
 
 class _CheckListCriterePageState extends State<CheckListCriterePage> {
+  LocalVisiteSecuriteService localVisiteSecuriteService =
+      LocalVisiteSecuriteService();
+  VisiteSecuriteService visiteSecuriteService = VisiteSecuriteService();
 
   bool _isProcessing = false;
   final matricule = SharedPreference.getMatricule();
-  List<CheckListCritereModel> listCheckList = List<CheckListCritereModel>.empty(growable: true);
+  List<CheckListCritereModel> listCheckList =
+      List<CheckListCritereModel>.empty(growable: true);
   List<TextEditingController> _controllers = new List.empty(growable: true);
   String? critere = "0";
   int? eval = 0;
@@ -47,40 +53,35 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
     getData();
     getTauxRespect();
   }
+
   void getData() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.defaultDialog(
-            title: 'mode_offline'.tr,
-            backgroundColor: Colors.white,
-            titleStyle: TextStyle(color: Colors.black),
-            middleTextStyle: TextStyle(color: Colors.white),
-            textCancel: "Back",
-            onCancel: (){
-              Get.back();
-            },
-            confirmTextColor: Colors.white,
-            buttonColor: Colors.blue,
-            barrierDismissible: false,
-            radius: 20,
-            content: Center(
-              child: Column(
-                children: <Widget>[
-                  Lottie.asset('assets/images/empty_list.json', width: 150, height: 150),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('no_internet'.tr,
-                        style: TextStyle(color: Colors.blueGrey, fontSize: 20)),
-                  ),
-                ],
-              ),
-            )
-        );
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        final response = await localVisiteSecuriteService
+            .readCheckListRattacherByidFiche(widget.numFiche);
+        response.forEach((data) {
+          setState(() {
+            var model = CheckListCritereModel();
+            model.id = data['id'];
+            model.idReg = data['idReg'];
+            model.lib = data['lib'];
+            model.eval = data['eval'];
+            model.commentaire = data['commentaire'];
+            listCheckList.add(model);
+
+            for (var i = 0; i < listCheckList.length; i++) {
+              _controllers.add(new TextEditingController());
+              _controllers[i].text = listCheckList[i].commentaire.toString();
+              //eval = listCheckList[i].eval;
+            }
+          });
+        });
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await VisiteSecuriteService().getCheckListCritere(widget.numFiche).then((resp) async {
+        await VisiteSecuriteService().getCheckListCritere(widget.numFiche).then(
+            (resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -92,43 +93,45 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
               model.commentaire = data['commentaire'];
               listCheckList.add(model);
 
-              for(var i=0; i<listCheckList.length; i++){
+              for (var i = 0; i < listCheckList.length; i++) {
                 _controllers.add(new TextEditingController());
                 _controllers[i].text = listCheckList[i].commentaire.toString();
                 //eval = listCheckList[i].eval;
               }
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-     }
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
+
   void getTauxRespect() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        tauxRespect = 0;
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        final response = await localVisiteSecuriteService
+            .readTauxCheckListVSByidFiche(widget.numFiche);
+        setState(() {
+          tauxRespect = response['taux'];
+          debugPrint('taux: $tauxRespect');
+        });
+        //tauxRespect = 0;
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await VisiteSecuriteService().getTauxRespect(widget.numFiche).then((response) async {
-          //isDataProcessing(false);
-            setState(() {
-              tauxRespect = response['taux'];
-              print('taux: $tauxRespect');
-            });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        await VisiteSecuriteService().getTauxRespect(widget.numFiche).then(
+            (response) async {
+          tauxRespect = response[0]['taux'];
+          debugPrint('taux: $tauxRespect');
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
@@ -146,21 +149,25 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           toolbarHeight: 70,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               //Get.back();
               Get.find<VisiteSecuriteController>().listVisiteSecurite.clear();
               Get.find<VisiteSecuriteController>().getData();
               Get.toNamed(AppRoute.visite_securite);
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue, size: 40,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+              size: 40,
+            ),
           ),
           title: Column(
             children: [
@@ -170,9 +177,10 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 5),
-                child: Text('Taux Respect : ${tauxRespect} %', style: TextStyle(
-                  color: Colors.blue, fontSize: 18
-                ),),
+                child: Text(
+                  'Taux Respect : ${tauxRespect} %',
+                  style: TextStyle(color: Colors.blue, fontSize: 18),
+                ),
               )
             ],
           ),
@@ -181,56 +189,55 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listCheckList.isNotEmpty ?
+            child: listCheckList.isNotEmpty
+                ? ListView.builder(
+                    itemBuilder: (context, index) {
+                      //_controllers.add(new TextEditingController());
+                      //_controllers[index].text = listCheckList[index].commentaire.toString();
+                      eval = listCheckList[index].eval;
 
-               ListView.builder(
-                  itemBuilder: (context, index) {
-
-                    //_controllers.add(new TextEditingController());
-                    //_controllers[index].text = listCheckList[index].commentaire.toString();
-                    eval = listCheckList[index].eval;
-
-                    return Card(
-                      color: Color(0xFFFFFFFF),
-                      child: ListTile(
-                        /*leading: Text(
+                      return Card(
+                        color: Color(0xFFFFFFFF),
+                        child: ListTile(
+                          /*leading: Text(
                           '${listCheckList[index].idReg}',
                           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
                         ), */
-                        title: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            '${listCheckList[index].lib}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          title: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              '${listCheckList[index].lib}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                        subtitle: Column(
-                          children: [
-                            DropdownSearch<ISPSPNCModel>(
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: false,
-                              isFilteredOnline: true,
-                              mode: Mode.DIALOG,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Respect",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
-                              ),
-                              onFind: (String? filter) => getRespect(filter),
-                              onChanged: (data) {
+                          subtitle: Column(
+                            children: [
+                              DropdownSearch<ISPSPNCModel>(
+                                showSelectedItems: true,
+                                showClearButton: true,
+                                showSearchBox: false,
+                                isFilteredOnline: true,
+                                mode: Mode.DIALOG,
+                                compareFn: (i, s) => i?.isEqual(s) ?? false,
+                                dropdownSearchDecoration: InputDecoration(
+                                  labelText: "Respect",
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(12, 12, 0, 0),
+                                  border: OutlineInputBorder(),
+                                ),
+                                onFind: (String? filter) => getRespect(filter),
+                                onChanged: (data) {
                                   critere = data?.value;
-                                  listCheckList[index].eval = int.parse(critere.toString());
+                                  listCheckList[index].eval =
+                                      int.parse(critere.toString());
                                   ispspncModel = data;
                                   print('critere value :${critere}');
-
-                              },
-                              dropdownBuilder: _customDropDownRespect,
-                              popupItemBuilder: _customPopupItemBuilderRespect,
-
-                            ),
-                           /* DropdownButton<String>(
+                                },
+                                dropdownBuilder: _customDropDownRespect,
+                                popupItemBuilder:
+                                    _customPopupItemBuilderRespect,
+                              ),
+                              /* DropdownButton<String>(
                                 items: ispsList.map((item) =>
                                  DropdownMenuItem<String>(
                                    value: item.value,
@@ -240,35 +247,38 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
                                 value: affect,
                                 onChanged: (item)=> setState(()=> affect = item )
                             ), */
-                            SizedBox(height: 10,),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: TextFormField(
-                                controller: _controllers[index],
-                                keyboardType: TextInputType.text,
-                                textInputAction: TextInputAction.next,
-                                //initialValue: listCheckList[index].commentaire,
-                                decoration: InputDecoration(
-                                    labelText: 'Commentaire',
-                                    hintText: 'Commentaire',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    )
-                                ),
-                                style: TextStyle(fontSize: 14.0),
+                              SizedBox(
+                                height: 10,
                               ),
-                            ),
-                          ],
-                        ),
-                        /* trailing: InkWell(
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: TextFormField(
+                                  controller: _controllers[index],
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.next,
+                                  //initialValue: listCheckList[index].commentaire,
+                                  decoration: InputDecoration(
+                                      labelText: 'Commentaire',
+                                      hintText: 'Commentaire',
+                                      labelStyle: TextStyle(
+                                        fontSize: 14.0,
+                                      ),
+                                      hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 10.0,
+                                      ),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.lightBlue,
+                                              width: 1),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)))),
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          /* trailing: InkWell(
                             onTap: (){
                              // deleteData(context, listCheckList[index].idCauseTypique);
                               showDialog<void>(
@@ -411,75 +421,104 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
                             },
                             child: Icon(Icons.edit, color: Color(0xFF1A67D9))
                         ), */
-                      ),
-                    );
-                  },
-                  itemCount: listCheckList.length,
-                  //itemCount: actionsList.length + 1,
-                )
-
-                : Center(child: Text('empty_list'.tr, style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                        ),
+                      );
+                    },
+                    itemCount: listCheckList.length,
+                    //itemCount: actionsList.length + 1,
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async{
-           //saveBtn();
+          onPressed: () async {
+            //saveBtn();
             for (var i = 0; i < listCheckList.length; i++) {
-              print('checklist : ${listCheckList[i].id}-${listCheckList[i].lib} -eval:${listCheckList[i].eval} - comment:${_controllers[i].text}');
-              if(_controllers[i].text.trim()=='' && listCheckList[i].eval==2){
-                Message.taskErrorOrWarning("Warning", "Commentaire est obligatoire");
+              print(
+                  'checklist : ${listCheckList[i].id}-${listCheckList[i].lib} -eval:${listCheckList[i].eval} - comment:${_controllers[i].text}');
+              if (_controllers[i].text.trim() == '' &&
+                  listCheckList[i].eval == 2) {
+                Message.taskErrorOrWarning(
+                    "Warning", "Commentaire est obligatoire");
                 return;
-              }
-              else if(listCheckList[i].eval==0){
-                Message.taskErrorOrWarning("Warning", "Le champs d'évaluation est obligatoire pour toute la liste");
+              } else if (listCheckList[i].eval == 0) {
+                Message.taskErrorOrWarning("Warning",
+                    "Le champs d'évaluation est obligatoire pour toute la liste");
                 return;
               }
             }
-            for (var i = 0; i < listCheckList.length; i++) {
-             if(kDebugMode) print('checklist : ${listCheckList[i].id}-${listCheckList[i].lib} -eval:${listCheckList[i].eval} - comment:${_controllers[i].text}');
-             await VisiteSecuriteService().saveCheckListCritere({
-                "id": listCheckList[i].id,
-                "eval": listCheckList[i].eval,
-                "commentaire": _controllers[i].text
-              }).then((resp) {
+            var connection = await Connectivity().checkConnectivity();
+            if (connection == ConnectivityResult.none) {
+              for (var i = 0; i < listCheckList.length; i++) {
+                if (kDebugMode)
+                  print(
+                      'checklist : ${listCheckList[i].id}-${listCheckList[i].lib} -eval:${listCheckList[i].eval} - comment:${_controllers[i].text}');
+                var model = CheckListCritereModel();
+                model.online = 0;
+                model.id = listCheckList[i].id;
+                model.idFiche = widget.numFiche;
+                model.idReg = listCheckList[i].idReg;
+                model.lib = listCheckList[i].lib;
+                model.eval = listCheckList[i].eval;
+                model.commentaire = _controllers[i].text;
+                //save data
+                await localVisiteSecuriteService
+                    .updateCheckListRattacher(model);
                 Get.to(VisiteSecuritePage());
-                //ShowSnackBar.snackBar("Successfully", "${listCheckList[i].lib} Added ", Colors.green);
-                //Get.find<VisiteSecuriteController>().listVisiteSecurite.clear();
-                //Get.find<VisiteSecuriteController>().getData();
-              }, onError: (err) {
-                setState(()  {
+                setState(() {
                   _isProcessing = false;
                 });
-                print('Error : ${err.toString()}');
-                ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-              });
+              }
+            } else if (connection == ConnectivityResult.wifi ||
+                connection == ConnectivityResult.mobile) {
+              for (var i = 0; i < listCheckList.length; i++) {
+                if (kDebugMode)
+                  print(
+                      'checklist : ${listCheckList[i].id}-${listCheckList[i].lib} -eval:${listCheckList[i].eval} - comment:${_controllers[i].text}');
+                await VisiteSecuriteService().saveCheckListCritere({
+                  "id": listCheckList[i].id,
+                  "eval": listCheckList[i].eval,
+                  "commentaire": _controllers[i].text
+                }).then((resp) {
+                  Get.to(VisiteSecuritePage());
+                  //ShowSnackBar.snackBar("Successfully", "${listCheckList[i].lib} Added ", Colors.green);
+                  //Get.find<VisiteSecuriteController>().listVisiteSecurite.clear();
+                  //Get.find<VisiteSecuriteController>().getData();
+                }, onError: (err) {
+                  setState(() {
+                    _isProcessing = false;
+                  });
+                  print('Error : ${err.toString()}');
+                  ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+                });
+              }
             }
           },
-            label: AnimatedSwitcher(
-              duration: Duration(seconds: 1),
-              transitionBuilder: (Widget child, Animation<double> animation) =>
-                  FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(child:
-                    child,
-                      sizeFactor: animation,
-                      axis: Axis.horizontal,
-                    ),
-                  ) ,
-              child: isExtended?
-              Icon(Icons.arrow_forward):
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 4.0),
-                    child: Icon(Icons.add),
-                  ),
-                  Text("Save")
-                ],
+          label: AnimatedSwitcher(
+            duration: Duration(seconds: 1),
+            transitionBuilder: (Widget child, Animation<double> animation) =>
+                FadeTransition(
+              opacity: animation,
+              child: SizeTransition(
+                child: child,
+                sizeFactor: animation,
+                axis: Axis.horizontal,
               ),
             ),
+            child: isExtended
+                ? Icon(Icons.arrow_forward)
+                : Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 4.0),
+                        child: Icon(Icons.add),
+                      ),
+                      Text("Save")
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -576,6 +615,7 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
       return Future.error('service : ${exception.toString()}');
     }
   }
+
   Widget _customDropDownRespect(BuildContext context, ISPSPNCModel? item) {
     if (item == null) {
       String? message_evaluation = '';
@@ -596,21 +636,25 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
           message_evaluation = "";
       }
       return Container(
-        child: Text('${message_evaluation}', style: TextStyle(color: Colors.black),),
+        child: Text(
+          '${message_evaluation}',
+          style: TextStyle(color: Colors.black),
+        ),
       );
     }
     return Container(
       child: (item.name == null)
           ? ListTile(
-        contentPadding: EdgeInsets.all(0),
-        title: Text("No item selected"),
-      )
+              contentPadding: EdgeInsets.all(0),
+              title: Text("No item selected"),
+            )
           : ListTile(
-        contentPadding: EdgeInsets.all(0),
-        title: Text('${item.name}'),
-      ),
+              contentPadding: EdgeInsets.all(0),
+              title: Text('${item.name}'),
+            ),
     );
   }
+
   Widget _customPopupItemBuilderRespect(
       BuildContext context, ISPSPNCModel? item, bool isSelected) {
     return Container(
@@ -618,10 +662,10 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item?.name ?? ''),

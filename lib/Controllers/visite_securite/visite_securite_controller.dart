@@ -16,14 +16,15 @@ import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
 class VisiteSecuriteController extends GetxController {
-
   VisiteSecuriteService visiteSecuriteService = VisiteSecuriteService();
   var listVisiteSecurite = List<VisiteSecuriteModel>.empty(growable: true).obs;
   //var listEquipeVS = List<EquipeVisiteSecuriteModel>.empty(growable: true).obs;
   var filterList = List<VisiteSecuriteModel>.empty(growable: true);
   var isDataProcessing = false.obs;
-  LocalIncidentSecuriteService localIncidentSecuriteService = LocalIncidentSecuriteService();
-  LocalVisiteSecuriteService localVisiteSecuriteService = LocalVisiteSecuriteService();
+  LocalIncidentSecuriteService localIncidentSecuriteService =
+      LocalIncidentSecuriteService();
+  LocalVisiteSecuriteService localVisiteSecuriteService =
+      LocalVisiteSecuriteService();
   final matricule = SharedPreference.getMatricule();
   //search
   TextEditingController searchNumero = TextEditingController();
@@ -45,10 +46,16 @@ class VisiteSecuriteController extends GetxController {
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 500));
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 500));
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 500));
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 500));
     }
   }
 
@@ -71,13 +78,13 @@ class VisiteSecuriteController extends GetxController {
           listVisiteSecurite.add(model);
           listVisiteSecurite.forEach((element) {
             print('element visite ${element.id} - ${element.unite}');
-
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await visiteSecuriteService.getVisiteSecurite(matricule).then((response) async {
+        await visiteSecuriteService.getVisiteSecurite(matricule).then(
+            (response) async {
           //isDataProcessing(false);
           print('response visite securite : $response');
           response.forEach((data) async {
@@ -92,7 +99,7 @@ class VisiteSecuriteController extends GetxController {
             listVisiteSecurite.forEach((element) {
               print('element visite ${element.id} - ${element.unite}');
             });
-           /*
+            /*
            //model.listEquipe = data['listEquipe'];
             if (data['listEquipe'] != null) {
              //var listEquipe = <EquipeVisiteSecuriteModel>[];
@@ -111,24 +118,21 @@ class VisiteSecuriteController extends GetxController {
             }
             */
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-              print('Error visite Securite : ${err.toString()}');
-            }
-            );
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          print('Error visite Securite : ${err.toString()}');
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
+
   void searchData() async {
     try {
       isDataProcessing.value = true;
@@ -136,7 +140,8 @@ class VisiteSecuriteController extends GetxController {
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //search local data
-        var response = await localVisiteSecuriteService.searchVisiteSecurite(searchNumero.text, searchUnite.text, searchZone.text);
+        var response = await localVisiteSecuriteService.searchVisiteSecurite(
+            searchNumero.text, searchUnite.text, searchZone.text);
         response.forEach((data) {
           var model = VisiteSecuriteModel();
           model.online = data['online'];
@@ -153,10 +158,13 @@ class VisiteSecuriteController extends GetxController {
           searchUnite.clear();
           searchZone.clear();
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await VisiteSecuriteService().searchVisiteSecurite(searchNumero.text, searchUnite.text, searchZone.text, matricule).then((resp) async {
+        await VisiteSecuriteService()
+            .searchVisiteSecurite(
+                searchNumero.text, searchUnite.text, searchZone.text, matricule)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             print('search visite securite : ${data} ');
@@ -171,23 +179,20 @@ class VisiteSecuriteController extends GetxController {
             listVisiteSecurite.forEach((element) {
               print('element visite ${element.id} - ${element.unite}');
             });
-              searchNumero.clear();
-              searchUnite.clear();
-              searchZone.clear();
+            searchNumero.clear();
+            searchUnite.clear();
+            searchZone.clear();
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
@@ -198,14 +203,16 @@ class VisiteSecuriteController extends GetxController {
       DateTime dateNow = DateTime.now();
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         await SyncDataController().syncVisiteSecuriteToSQLServer();
-       /* var response = await localVisiteSecuriteService.readVisiteSecuriteByOnline();
+        await SyncDataController().syncEquipeVSToSQLServer();
+        await SyncDataController().syncCheckListVSToSQLServer();
+        await SyncDataController().syncActionVSRattacherToSQLServer();
+        /* var response = await localVisiteSecuriteService.readVisiteSecuriteByOnline();
         response.forEach((data) async {
           print('data: $data');
 
@@ -264,7 +271,8 @@ class VisiteSecuriteController extends GetxController {
           });
         }); */
         //save data in db local
-        await visiteSecuriteService.getVisiteSecurite(matricule).then((resp) async {
+        await visiteSecuriteService.getVisiteSecurite(matricule).then(
+            (resp) async {
           resp.forEach((data) async {
             var model = VisiteSecuriteModel();
             model.online = 1;
@@ -274,28 +282,32 @@ class VisiteSecuriteController extends GetxController {
             model.unite = data['unite'];
             model.zone = data['zone'];
             //delete table
-            await localVisiteSecuriteService.deleteTableEquipeVisiteSecuriteEmploye();
+            await localVisiteSecuriteService
+                .deleteTableEquipeVisiteSecuriteEmploye();
             await localVisiteSecuriteService.deleteTableVisiteSecurite();
             //await localVisiteSecuriteService.deleteTableEquipeVisiteSecuriteOffline();
             //save data
             await localVisiteSecuriteService.saveVisiteSecurite(model);
-            print('Inserting data in table VisiteSecurite : ${model.id} - ${model.unite} - ${model.zone}');
+            print(
+                'Inserting data in table VisiteSecurite : ${model.id} - ${model.unite} - ${model.zone}');
           });
           listVisiteSecurite.clear();
           getData();
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error Visite Securite", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar(
+              "Error Visite Securite", err.toString(), Colors.red);
+        });
 
         await ApiControllersCall().getEquipeVisiteSecuriteFromAPI();
+        await ApiControllersCall().getCheckListVSRattacher();
+        await ApiControllersCall().getTauxCheckListVS();
+        await ApiControllersCall().getActionVSRattacher();
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }

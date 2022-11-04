@@ -339,39 +339,39 @@ class ActionController extends GetxController {
 
   bool _dataValidation(){
     if(actionController.text.trim()==''){
-      Message.taskErrorOrWarning("Action", "action is required");
+      Message.taskErrorOrWarning("Alert", "Designation is required");
       return false;
     }
     else if(dateController.text.trim()==''){
-      Message.taskErrorOrWarning("Date", "Date is required");
+      Message.taskErrorOrWarning("Alert", "Date is required");
       return false;
     }
     else if(typeActionModel == null){
-      Message.taskErrorOrWarning("Type Action", "Type is required");
+      Message.taskErrorOrWarning("Alert", "Type is required");
       return false;
     }
     else if(sourceActionModel == null){
-      Message.taskErrorOrWarning("Source Action", "Source is required");
+      Message.taskErrorOrWarning("Alert", "Source is required");
       return false;
     }
     else if(site_visible == 1 && site_obligatoire == 1 && siteModel == null){
-      Message.taskErrorOrWarning("Site", "Site is required");
+      Message.taskErrorOrWarning("Alert", "Site is required");
       return false;
     }
     else if(processus_visible == 1 && processus_obligatoire == 1 && processusModel == null){
-      Message.taskErrorOrWarning("Processus", "Processus is required");
+      Message.taskErrorOrWarning("Alert", "Processus is required");
       return false;
     }
     else if(direction_visible == 1 && direction_obligatoire == 1 && directionModel == null){
-      Message.taskErrorOrWarning("Direction", "Direction is required");
+      Message.taskErrorOrWarning("Alert", "Direction is required");
       return false;
     }
     else if(service_visible == 1 && service_obligatoire == 1 && serviceModel == null){
-      Message.taskErrorOrWarning("Service", "Service is required");
+      Message.taskErrorOrWarning("Alert", "Service is required");
       return false;
     }
     else if(activity_visible == 1 && activity_obligatoire == 1 && activityModel == null){
-      Message.taskErrorOrWarning("Activity", "Activity is required");
+      Message.taskErrorOrWarning("Alert", "Activity is required");
       return false;
     }
     return true;

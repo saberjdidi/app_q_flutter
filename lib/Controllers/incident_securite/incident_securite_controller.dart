@@ -11,12 +11,12 @@ import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
 class IncidentSecuriteController extends GetxController {
-
   IncidentSecuriteService incidentSecuriteService = IncidentSecuriteService();
   var listIncident = List<IncidentSecuriteModel>.empty(growable: true).obs;
   var filterIncident = List<IncidentSecuriteModel>.empty(growable: true);
   var isDataProcessing = false.obs;
-  LocalIncidentSecuriteService localIncidentSecuriteService = LocalIncidentSecuriteService();
+  LocalIncidentSecuriteService localIncidentSecuriteService =
+      LocalIncidentSecuriteService();
   final matricule = SharedPreference.getMatricule();
   //search
   TextEditingController searchNumero = TextEditingController();
@@ -39,11 +39,16 @@ class IncidentSecuriteController extends GetxController {
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 500));
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 500));
-
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 500));
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 500));
     }
   }
 
@@ -54,7 +59,8 @@ class IncidentSecuriteController extends GetxController {
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //get local data
-        var response = await localIncidentSecuriteService.readIncidentSecurite();
+        var response =
+            await localIncidentSecuriteService.readIncidentSecurite();
         response.forEach((data) {
           var model = IncidentSecuriteModel();
           model.online = data['online'];
@@ -74,11 +80,12 @@ class IncidentSecuriteController extends GetxController {
           listIncident.forEach((element) {
             print('element incident ${element.ref} - ${element.designation}');
           });
-        }); 
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        });
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await incidentSecuriteService.getIncident(matricule).then((response) async {
+        await incidentSecuriteService.getIncident(matricule).then(
+            (response) async {
           //isDataProcessing(false);
           print('response incident securite : $response');
           response.forEach((data) async {
@@ -100,26 +107,22 @@ class IncidentSecuriteController extends GetxController {
             listIncident.forEach((element) {
               print('element incident ${element.ref} - ${element.designation}');
             });
-
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-              print('Error incident Securite : ${err.toString()}');
-            }
-            );
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          print('Error incident Securite : ${err.toString()}');
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
+
   void searchIncident() async {
     try {
       isDataProcessing.value = true;
@@ -127,7 +130,9 @@ class IncidentSecuriteController extends GetxController {
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //search local data
-        var response = await localIncidentSecuriteService.searchIncidentSecurite(searchNumero.text, searchDesignation.text, searchType);
+        var response =
+            await localIncidentSecuriteService.searchIncidentSecurite(
+                searchNumero.text, searchDesignation.text, searchType);
         response.forEach((data) {
           var model = IncidentSecuriteModel();
           model.online = data['online'];
@@ -150,10 +155,13 @@ class IncidentSecuriteController extends GetxController {
           searchNumero.clear();
           searchDesignation.clear();
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await IncidentSecuriteService().searchIncident(matricule, searchNumero.text, searchDesignation.text, searchCodeType).then((resp) async {
+        await IncidentSecuriteService()
+            .searchIncident(matricule, searchNumero.text,
+                searchDesignation.text, searchCodeType)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             print('search incident : ${data} ');
@@ -175,23 +183,20 @@ class IncidentSecuriteController extends GetxController {
             listIncident.forEach((element) {
               print('element incident ${element.ref} - ${element.designation}');
             });
-              searchNumero.clear();
-              searchDesignation.clear();
-              searchCodeType = '';
+            searchNumero.clear();
+            searchDesignation.clear();
+            searchCodeType = '';
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
@@ -202,17 +207,17 @@ class IncidentSecuriteController extends GetxController {
       DateTime dateNow = DateTime.now();
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         await SyncDataController().syncIncidentSecuriteToSQLServer();
         await SyncDataController().syncTypeCauseIncSecToSQLServer();
         await SyncDataController().syncTypeConsequenceIncSecToSQLServer();
         await SyncDataController().syncCauseTypiqueIncSecToSQLServer();
         await SyncDataController().syncSiteLesionIncSecToSQLServer();
+        await SyncDataController().syncActionIncSecRattacherToSQLServer();
         //save data in db local
         await incidentSecuriteService.getIncident(matricule).then((resp) async {
           //delete table
@@ -234,25 +239,25 @@ class IncidentSecuriteController extends GetxController {
             model.secteur = data['secteur'];
             //save data
             await localIncidentSecuriteService.saveIncidentSecurite(model);
-            debugPrint('Inserting data in table IncidentSecurite : ${model.ref} - ${model.designation}');
+            debugPrint(
+                'Inserting data in table IncidentSecurite : ${model.ref} - ${model.designation}');
           });
           listIncident.clear();
           getIncident();
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-      await ApiControllersCall().getTypeCauseIncidentSecRattacher();
-      await ApiControllersCall().getTypeConsequenceIncSecRattacher();
-      await ApiControllersCall().getCauseTypiqueIncSecRattacher();
-      await ApiControllersCall().getSiteLesionIncSecRattacher();
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+        await ApiControllersCall().getTypeCauseIncidentSecRattacher();
+        await ApiControllersCall().getTypeConsequenceIncSecRattacher();
+        await ApiControllersCall().getCauseTypiqueIncSecRattacher();
+        await ApiControllersCall().getSiteLesionIncSecRattacher();
+        await ApiControllersCall().getActionIncSecRattacher();
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }

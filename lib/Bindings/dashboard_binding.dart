@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:qualipro_flutter/Controllers/document/documentation_controller.dart';
+import 'package:qualipro_flutter/Controllers/licence_controller.dart';
 import 'package:qualipro_flutter/Controllers/pnc/new_pnc_controller.dart';
 import 'package:qualipro_flutter/Controllers/pnc/pnc_controller.dart';
 import 'package:qualipro_flutter/Controllers/reunion/new_reunion_controller.dart';
@@ -23,10 +24,10 @@ import '../Controllers/visite_securite/visite_securite_controller.dart';
 class DashboardBinding extends Bindings {
   @override
   void dependencies() {
-    //Get.put(HomeController(), permanent: true);
-    Get.lazyPut(() => HomeController(), fenix: true);
+    Get.put(LicenceController(), permanent: true);
     //Get.lazyPut(() => LoginController());
     Get.put(LoginController(), permanent: true);
+    Get.lazyPut(() => HomeController(), fenix: true);
     //Get.lazyPut<NetworkController>(() => NetworkController());
     Get.lazyPut(() => NetworkController(), fenix: true);
     Get.lazyPut(() => OnBoardingController(), fenix: true);

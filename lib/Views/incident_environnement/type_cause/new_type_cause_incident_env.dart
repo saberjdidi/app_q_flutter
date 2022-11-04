@@ -48,13 +48,11 @@ class _NewTypeCauseIncidentEnvState extends State<NewTypeCauseIncidentEnv> {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: (){
             Get.back();
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Text("New Type Cause Of Incident",textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16.0)),

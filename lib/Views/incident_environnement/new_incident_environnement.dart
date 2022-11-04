@@ -42,14 +42,12 @@ class NewIncidentEnvironnementPage extends GetView<NewIncidentEnvironnementContr
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
-        leading: RaisedButton(
+        leading: TextButton(
           onPressed: (){
             Get.back();
             //controller.clearData();
           },
-          elevation: 0.0,
           child: Icon(Icons.arrow_back, color: Colors.white,),
-          color: Colors.blue,
         ),
         title: Center(
           child: Text("Ajouter Incident"),
@@ -167,7 +165,7 @@ class NewIncidentEnvironnementPage extends GetView<NewIncidentEnvironnementContr
                                       isFilteredOnline: true,
                                       compareFn: (i, s) => i?.isEqual(s) ?? false,
                                       dropdownSearchDecoration: InputDecoration(
-                                        labelText: "Lieu ${controller.lieu_obligatoire.value==1?'*':''}",
+                                        labelText: "Lieu ${controller.lieu_obligatoire==1?'*':''}",
                                         contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                                         border: OutlineInputBorder(),
                                       ),
@@ -185,7 +183,7 @@ class NewIncidentEnvironnementPage extends GetView<NewIncidentEnvironnementContr
                                       dropdownBuilder: controller.customDropDownLieu,
                                       popupItemBuilder: controller.customPopupItemBuilderLieu,
                                       validator: (u) =>
-                                      (controller.lieu_obligatoire.value==1 && controller.lieuModel==null) ? "Lieu is required " : null,
+                                      (controller.lieu_obligatoire==1 && controller.lieuModel==null) ? "Lieu is required " : null,
                                     )
                                 ),
                                 SizedBox(height: 10.0,),

@@ -163,7 +163,7 @@ class _ActionListState extends State<ActionList> {
                   )..show();
                 }
             ),
-            new FlatButton(
+            new TextButton(
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();

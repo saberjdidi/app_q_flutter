@@ -22,7 +22,7 @@ class LoginScreen extends GetView<LoginController> {
                   Image.asset(
                     "assets/images/logo.png",
                   ),
-                /*  SizedBox(
+                  /*  SizedBox(
                     height: 20,
                   ),
                   Text(
