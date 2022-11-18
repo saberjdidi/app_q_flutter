@@ -50,6 +50,8 @@ import '../Models/action/action_realisation_model.dart';
 import '../Models/activity_model.dart';
 import '../Models/audit/audit_model.dart';
 import '../Models/audit/auditeur_model.dart';
+import '../Models/audit/check_list_model.dart';
+import '../Models/audit/critere_checklist_audit_model.dart';
 import '../Models/documentation/documentation_model.dart';
 import '../Models/fournisseur_model.dart';
 import '../Models/incident_environnement/champ_obligatore_incident_env_model.dart';
@@ -106,6 +108,7 @@ import '../Utils/snack_bar.dart';
 class ApiControllersCall extends GetxController {
   var isDataProcessing = false.obs;
   final matricule = SharedPreference.getMatricule();
+  final langue = SharedPreference.getLangue();
   LocalActionService localActionService = LocalActionService();
   LocalPNCService localPNCService = LocalPNCService();
   LocalReunionService localReunionService = LocalReunionService();
@@ -1114,13 +1117,12 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await PNCService().getTypesCausesToAdded(0).then((resp) async {
+        //delete table
+        await localPNCService.deleteTableTypeCausePNCARattacher();
         resp.forEach((data) async {
           var model = TypeCausePNCModel();
           model.codetypecause = data['codeTypeCause'];
           model.typecause = data['typeCause'];
-
-          //delete table
-          await localPNCService.deleteTableTypeCausePNCARattacher();
           //save data
           await localPNCService.saveTypeCausePNCARattacher(model);
           print(
@@ -1133,6 +1135,43 @@ class ApiControllersCall extends GetxController {
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getAllTypeProductPNC() async {
+    try {
+      isDataProcessing(true);
+      //rest api
+      await PNCService().getTypeProductNC(0, 0, matricule).then(
+          (response) async {
+        //delete table
+        await localPNCService.deleteTableTypeProductNNC();
+        response.forEach((data) async {
+          var model = TypePNCModel();
+          model.online = 1;
+          model.nnc = data['nnc'];
+          model.idProduct = data['id_produit'];
+          model.idTabNcProductType = data['id_tab_nc_produit_type'];
+          model.codeTypeNC = data['codeTypeNC'];
+          model.typeNC = data['typeNC'];
+          model.color = data['color'];
+          model.pourcentage = data['pourcentage'];
+          //save data
+          await localPNCService.saveTypeProductPNC(model);
+          debugPrint(
+              'Inserting data in table TypeProductPNC : ${model.nnc} - ${model.idProduct} - ${model.typeNC}');
+        });
+      }, onError: (err) {
+        isDataProcessing(false);
+        ShowSnackBar.snackBar(
+            "Error TypeProductPNC", err.toString(), Colors.red);
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception TypeProductPNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1205,6 +1244,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getTypePNC().then((resp) async {
+        //delete table
+        await localPNCService.deleteTableTypePNC();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = TypePNCModel();
@@ -1212,8 +1253,6 @@ class ApiControllersCall extends GetxController {
           model.typeNC = data['typeNC'];
           model.color = data['color'];
 
-          //delete table
-          await localPNCService.deleteTableTypePNC();
           //save data
           await localPNCService.saveTypePNC(model);
           print('Inserting data in table TypePNC : ${model.typeNC} ');
@@ -1224,7 +1263,8 @@ class ApiControllersCall extends GetxController {
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypePNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3308,16 +3348,16 @@ class ApiControllersCall extends GetxController {
   Future<void> getTypeConstatAudit() async {
     try {
       await AuditService().getTypeConstatAudit().then((response) async {
+        //delete table local
+        await localAuditService.deleteTableTypeConstatAudit();
         response.forEach((element) async {
           var model = TypeAuditModel();
           model.codeType = element['codeTypeE'];
           model.type = element['typeE'];
-
-          //delete table local
-          await localAuditService.deleteTableTypeConstatAudit();
           //save data in db local
           await localAuditService.saveTypeConstatAudit(model);
-          print('Inserting data in table TypeConstatAudit : ${model.type}');
+          debugPrint(
+              'Inserting data in table TypeConstatAudit : ${model.type}');
         });
       }, onError: (error) {
         if (kDebugMode) {
@@ -3330,6 +3370,171 @@ class ApiControllersCall extends GetxController {
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getCheckListAudit() async {
+    try {
+      isDataProcessing(true);
+      await AuditService().getCheckListByRefAudit(0, 0).then((response) async {
+        await localAuditService.deleteTableCheckListAudit();
+        response.forEach((data) async {
+          var model = new CheckListAuditModel();
+          model.online = 1;
+          model.refAudit = data['refAudit'];
+          model.codeChamp = data['code_champ'];
+          model.champ = data['champ'];
+          model.tauxEval = data['taux_eval'];
+          model.tauxConf = data['taux_conf'];
+          model.nbConst = data['nb_const'];
+          await localAuditService.saveCheckListAudit(model);
+          debugPrint(
+              'Inserting data in table CheckListAudit : ${model.refAudit} - ${model.champ}');
+        });
+      }, onError: (error) {
+        isDataProcessing(false);
+        ShowSnackBar.snackBar(
+            "Error CheckList Audit", error.toString(), Colors.red);
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception CheckList Audit", exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getCritereCheckListAudit() async {
+    try {
+      isDataProcessing(true);
+      await AuditService().getCritereOfCheckList(0, 0, 0).then(
+          (response) async {
+        await localAuditService.deleteTableCritereCheckListAudit();
+        response.forEach((data) async {
+          var model = CritereChecklistAuditModel();
+          model.online = 1;
+          model.refAudit = data['refAudit'];
+          model.idChamp = data['id_champ'];
+          model.idCrit = data['id_crit'];
+          model.critere = data['critere'];
+          model.evaluation = data['evaluation'];
+          model.commentaire = data['commentaire'];
+          await localAuditService.saveCritereCheckListAudit(model);
+          debugPrint(
+              'Inserting data in table CritereCheckListAudit : ${model.refAudit} - ${model.idChamp} - ${model.critere}');
+        });
+      }, onError: (error) {
+        isDataProcessing(false);
+        ShowSnackBar.snackBar(
+            "Error CritereCheckListAudit", error.toString(), Colors.red);
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception CritereCheckListAudit", exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getAuditeurExterneRattacher() async {
+    try {
+      await AuditService().getAuditeurExterne(0, langue).then((response) async {
+        //delete table local
+        await localAuditService.deleteTableAuditeurExterneRattacher();
+        response.forEach((data) async {
+          var model = AuditeurModel();
+          model.online = 1;
+          model.refAudit = data['refAudit'];
+          model.affectation = data['affectation'];
+          model.code = data['codeAuditeur'];
+          model.mat = data['organisme'];
+          model.nompre = data['nomPre'];
+          //save data in db local
+          await localAuditService.saveAuditeurExterneRattacher(model);
+          debugPrint(
+              'Inserting data in table AuditeurExterneRattacher : ${model.refAudit} - ${model.nompre}');
+        });
+      }, onError: (error) {
+        if (kDebugMode) {
+          print('error : ${error.toString()}');
+        }
+        isDataProcessing(false);
+        ShowSnackBar.snackBar(
+            "Error AuditeurExterneRattacher", error.toString(), Colors.red);
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar("Exception AuditeurExterneRattacher",
+          exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getAllAuditeursExterne() async {
+    try {
+      await AuditService().getAllAuditeursExterne().then((response) async {
+        //delete table local
+        await localAuditService.deleteTableAuditeursExterne();
+        response.forEach((data) async {
+          var model = AuditeurModel();
+          model.code = data['codeAuditeur'];
+          model.mat = data['organisme'];
+          model.nompre = data['nomPre'];
+          //save data in db local
+          await localAuditService.saveAllAuditeursExterne(model);
+          debugPrint(
+              'Inserting data in table AllAuditeursExterne : ${model.code} - ${model.nompre}');
+        });
+      }, onError: (error) {
+        if (kDebugMode) {
+          print('error : ${error.toString()}');
+        }
+        isDataProcessing(false);
+        ShowSnackBar.snackBar(
+            "Error AllAuditeursExterne", error.toString(), Colors.red);
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception AllAuditeursExterne", exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getEmployeHabiliteAudit() async {
+    try {
+      await AuditService().getEmployeHabiliteAudit(0).then((response) async {
+        //delete table local
+        await localAuditService.deleteTableEmployeHabiliteAudit();
+        response.forEach((data) async {
+          var model = AuditeurModel();
+          model.online = 1;
+          model.refAudit = data['refaudit'];
+          model.mat = data['mat'];
+          model.nompre = data['nompre'];
+          //save data in db local
+          await localAuditService.saveEmployeHabiliteAudit(model);
+          debugPrint(
+              'Inserting data in table EmployeHabiliteAudit : ${model.refAudit} - ${model.nompre}');
+        });
+      }, onError: (error) {
+        if (kDebugMode) {
+          print('error : ${error.toString()}');
+        }
+        isDataProcessing(false);
+        ShowSnackBar.snackBar(
+            "Error EmployeHabiliteAudit", error.toString(), Colors.red);
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception EmployeHabiliteAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }

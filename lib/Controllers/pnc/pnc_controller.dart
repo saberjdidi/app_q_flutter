@@ -12,7 +12,6 @@ import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
 class PNCController extends GetxController {
-
   var listPNC = List<PNCModel>.empty(growable: true).obs;
   var filterPNC = List<PNCModel>.empty(growable: true);
   var isDataProcessing = false.obs;
@@ -30,11 +29,12 @@ class PNCController extends GetxController {
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -70,12 +70,12 @@ class PNCController extends GetxController {
           model.site = data['site'];
           model.fournisseur = data['fournisseur'];
           listPNC.add(model);
-         /* listPNC.forEach((element) {
+          /* listPNC.forEach((element) {
             print('element nc ${element.nc}');
           }); */
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
         await PNCService().getPNC(matricule).then((resp) async {
           //isDataProcessing(false);
@@ -100,24 +100,20 @@ class PNCController extends GetxController {
             model.fournisseur = data['frs'];
 
             listPNC.add(model);
-           /* listPNC.forEach((element) {
+            /* listPNC.forEach((element) {
               print('element nc ${element.nc}');
             }); */
-
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
@@ -127,12 +123,11 @@ class PNCController extends GetxController {
     try {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         /*   var response = await localPNCService.readPNCByOnline();
         response.forEach((data) async{
           print('data: ${data['nc']}');
@@ -205,40 +200,11 @@ class PNCController extends GetxController {
         await SyncDataController().syncPNCToSQLServer();
         await SyncDataController().syncProductPNCToSQLServer();
         await SyncDataController().syncTypeCausePNCToSQLServer();
-       /* var responseProduct = await LocalPNCService().readProductPNCByOnline();
-        responseProduct.forEach((data) async {
-          await PNCService().addProductNC({
-            "nnc": data['nnc'],
-            "codeProduit": data['codeProduit'],
-            "qDetect":data['qdetect'],
-            "unite": data['unite'],
-            "nof": data['numOf'],
-            "lot": data['numLot'],
-            "qProd": data['qprod']
-          }).then((resp) async {
-            if(kDebugMode) print('product : ${data['nnc']} - ${data['codeProduit']}');
-          }, onError: (err) {
-            if(kDebugMode) print('error product : ${err.toString()}');
-            ShowSnackBar.snackBar("Error product : ", err.toString(), Colors.red);
-          });
-        });
-        //save type cause in DB
-       var responseTypeCause = await LocalPNCService().readTypeCauseByOnline();
-        responseTypeCause.forEach((data) async {
-          await PNCService().addTypeCauseByNNC({
-            "nnc": data['nnc'],
-            "codetypecause": data['codetypecause']
-          }).then((resp) async {
-            if(kDebugMode) print('type cause : ${data['nnc']} - ${data['codetypecause']}');
-          }, onError: (err) {
-            if(kDebugMode) print('error type cause : ${err.toString()}');
-            ShowSnackBar.snackBar("Error type cause : ", err.toString(), Colors.red);
-          });
-        }); */
+        await SyncDataController().syncTypeProductPNCToSQLServer();
         //save pnc data in db local
-        //delete table
-        await localPNCService.deleteTablePNC();
         await PNCService().getPNC(matricule).then((resp) async {
+          //delete table
+          await localPNCService.deleteTablePNC();
           resp.forEach((data) async {
             //print('get site : ${data} ');
             var model = PNCModel();
@@ -258,10 +224,9 @@ class PNCController extends GetxController {
             model.numeroOf = data['numOf'];
             model.numeroLot = data['nlot'];
             model.rapportT = data['rapportT'];
-            if(data['typeNC'] == null){
+            if (data['typeNC'] == null) {
               model.typeNC = '';
-            }
-            else {
+            } else {
               model.typeNC = data['typeNC'];
             }
             model.produit = data['produit'];
@@ -270,24 +235,33 @@ class PNCController extends GetxController {
 
             //save data
             await localPNCService.savePNC(model);
-            print('Inserting data in table PNC : ${model.nnc}-${model.nc}-${model.produit}');
+            print(
+                'Inserting data in table PNC : ${model.nnc}-${model.nc}-${model.produit}');
           });
           listPNC.clear();
           getPNC();
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        });
 
         await ApiControllersCall().getAllProductsPNC();
         await ApiControllersCall().getAllTypeCausePNC();
+        await PNCService().parametrageProduct().then((param) {
+          Future oneProduct =
+              SharedPreference.setIsOneProduct(param['seulProduit']);
+          if (param['seulProduit'] == 0) {
+            ApiControllersCall().getAllTypeProductPNC();
+          }
+        }, onError: (error) {
+          ShowSnackBar.snackBar(
+              'Error one product', error.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }

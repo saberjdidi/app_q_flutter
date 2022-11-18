@@ -18,7 +18,6 @@ import '../../../Widgets/loading_widget.dart';
 import 'remplir_action_realisation.dart';
 
 class ActionSuiteAuditPage extends StatefulWidget {
-
   ActionSuiteAuditPage({Key? key}) : super(key: key);
 
   @override
@@ -26,11 +25,11 @@ class ActionSuiteAuditPage extends StatefulWidget {
 }
 
 class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
-
   LocalActionService localService = LocalActionService();
   final matricule = SharedPreference.getMatricule();
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
-  List<ActionSuiteAudit> listAction = List<ActionSuiteAudit>.empty(growable: true);
+  List<ActionSuiteAudit> listAction =
+      List<ActionSuiteAudit>.empty(growable: true);
   List<ActionSuiteAudit> listFiltered = [];
   TextEditingController controller = TextEditingController();
   String _searchResult = '';
@@ -44,10 +43,10 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
   void getActionsSuiteAudit() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
+      if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         var response = await localService.readActionSuiteAudit();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = ActionSuiteAudit();
             model.nact = data['nAct'];
@@ -62,8 +61,8 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
             });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //rest api
         await ActionService().getActionSuiteAudit(matricule).then((resp) async {
@@ -82,15 +81,13 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
               });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -105,17 +102,20 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
             'Actions suite à audit ${listAction.length}',
@@ -126,130 +126,148 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listAction.isNotEmpty ?
-            RefreshWidget(
-              keyRefresh: keyRefresh,
-              onRefresh: () async {
-                controller.clear();
-                listAction.clear();
-                getActionsSuiteAudit();
-              },
-              child: Column(
-                children: <Widget>[
-                  Card(
-                    //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: InkWell(
-                            onTap: (){
-                              setState(() {
-                                controller.clear();
-                                _searchResult = '';
-                                listFiltered = listAction;
-                              });
-                            },
-                            child: controller.text.trim()=='' ?Text('') :Icon(Icons.cancel),
-                          ),
-                          hintText: 'Search',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: Colors.blue)
-                          )
-                      ),
-                      onChanged: (value){
-                        setState(() {
-                          _searchResult = value;
-                          listFiltered = listAction.where((user) => user.nact.toString().contains(_searchResult)
-                              || user.act!.toLowerCase().contains(_searchResult)
-                          ).toList();
-                        });
-                      },
-                    ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      itemCount: listFiltered.length,
-                      itemBuilder: (context, index) {
-                        final num_action = listFiltered[index].nact;
-                        return
-                          Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                ' Action N° ${num_action}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          WidgetSpan(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                              child: Icon(Icons.calendar_today),
-                                            ),
-                                          ),
-                                          TextSpan(text: '${listFiltered[index].datsuivPrv}'),
-                                        ],
-                                      ),
-                                    ),
-                                    ReadMoreText(
-                                      "${listFiltered[index].act}",
-                                      style: TextStyle(
-                                          color: Color(0xFF3B465E),
-                                          fontWeight: FontWeight.bold),
-                                      trimLines: 3,
-                                      colorClickableText: CustomColors.bleuCiel,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: 'more',
-                                      trimExpandedText: 'less',
-                                      moreStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: CustomColors.bleuCiel),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.only(top: 25.0),
-                                child: IconButton(
-                                  onPressed: () async {
-                                    Get.to(SousActionPage(), arguments: {
-                                      "id_action" : num_action
+            child: listAction.isNotEmpty
+                ? RefreshWidget(
+                    keyRefresh: keyRefresh,
+                    onRefresh: () async {
+                      controller.clear();
+                      listAction.clear();
+                      getActionsSuiteAudit();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Card(
+                          //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                          child: TextField(
+                            controller: controller,
+                            decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.clear();
+                                      _searchResult = '';
+                                      listFiltered = listAction;
                                     });
                                   },
-                                  icon: Icon(Icons.remove_red_eye, color: Colors.blue,),
+                                  child: controller.text.trim() == ''
+                                      ? Text('')
+                                      : Icon(Icons.cancel),
                                 ),
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.0,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        );
-                      },
-                      //itemCount: actionsList.length + 1,
+                                hintText: 'Search',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue))),
+                            onChanged: (value) {
+                              setState(() {
+                                _searchResult = value;
+                                listFiltered = listAction
+                                    .where((user) =>
+                                        user.nact
+                                            .toString()
+                                            .contains(_searchResult) ||
+                                        user.act!
+                                            .toLowerCase()
+                                            .contains(_searchResult))
+                                    .toList();
+                              });
+                            },
+                          ),
+                        ),
+                        Flexible(
+                          child: ListView.builder(
+                            itemCount: listFiltered.length,
+                            itemBuilder: (context, index) {
+                              final num_action = listFiltered[index].nact;
+                              return Card(
+                                color: Color(0xF2F2F2F2),
+                                clipBehavior: Clip.antiAlias,
+                                child: ListTile(
+                                  title: Text(
+                                    ' Action N° ${num_action}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5.0),
+                                          child: RichText(
+                                            text: TextSpan(
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge,
+                                              children: [
+                                                WidgetSpan(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 2.0),
+                                                    child: Icon(
+                                                        Icons.calendar_today),
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                    text:
+                                                        '${listFiltered[index].datsuivPrv}'),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        ReadMoreText(
+                                          "${listFiltered[index].act}",
+                                          style: TextStyle(
+                                              color: Color(0xFF2F6AA8),
+                                              fontWeight: FontWeight.bold),
+                                          trimLines: 3,
+                                          colorClickableText:
+                                              CustomColors.bleuCiel,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'more',
+                                          trimExpandedText: 'less',
+                                          moreStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: CustomColors.bleuCiel),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  trailing: Container(
+                                    padding: EdgeInsets.only(top: 25.0),
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        Get.to(SousActionPage(), arguments: {
+                                          "id_action": num_action
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.remove_red_eye,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            //itemCount: actionsList.length + 1,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : const Center(
+                    child: Text('Empty List',
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
       ),
     );
   }
-
 }

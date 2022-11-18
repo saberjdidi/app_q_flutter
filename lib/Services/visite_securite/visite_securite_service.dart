@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+
 import '../../Utils/constants.dart';
 import 'package:http/http.dart' as http;
 
@@ -330,6 +332,42 @@ class VisiteSecuriteService {
       }
     } catch (exception) {
       return Future.error('service Inc Securite : ${exception.toString()}');
+    }
+  }
+
+  Future<dynamic> uploadImageVisiteSec(Map data) async {
+    try {
+      debugPrint('data : ${json.encode(data)}');
+      var response = await http.post(
+          Uri.parse('${AppConstants.UPLOAD_URL}/uploadPhotoVisiteSec'),
+          body: json.encode(data),
+          headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error(exception.toString());
+    }
+  }
+
+  Future<List<dynamic>> getImageVisiteSec(idFiche) async {
+    try {
+      debugPrint(
+          '${AppConstants.UPLOAD_URL}/getImageVisiteSec?idFiche=$idFiche');
+      var response = await http.get(
+          Uri.parse(
+              '${AppConstants.UPLOAD_URL}/getImageVisiteSec?idFiche=$idFiche'),
+          headers: {'Content-Type': 'application/json'});
+      debugPrint('response image visite sec : $response');
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error(exception.toString());
     }
   }
 }

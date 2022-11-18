@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Models/pnc/pnc_model.dart';
 import 'package:readmore/readmore.dart';
 import 'dart:ui' as ui;
-import '../../Models/action/action_model.dart';
 import '../../Utils/custom_colors.dart';
 
 class PNCWidget extends StatelessWidget {
   final PNCModel pncModel;
   final Color color;
-  const PNCWidget({Key? key, required this.pncModel, required this.color}) : super(key: key);
+  const PNCWidget({Key? key, required this.pncModel, required this.color})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,67 +21,65 @@ class PNCWidget extends StatelessWidget {
 
     switch (status) {
       case 3:
-        message_status = "En attente de validation";
+        message_status = 'en_attente_de_validation'.tr;
         color_status = Color(0xff14b843);
         break;
       case 4:
-        message_status = "En attente de validation de decision";
+        message_status = 'en_attente_de_validation_de_decision'.tr;
         color_status = Color(0xff03c781);
         break;
       case 5:
-        message_status = "Fiche refusée";
+        message_status = 'fiche_refuse'.tr;
         color_status = Color(0xffd00e38);
         break;
       case 6:
-        message_status = "En attente de correction";
+        message_status = 'en_attente_de_correction'.tr;
         color_status = Color(0xff0759ee);
         break;
       case 7:
-        message_status = "En attente de décision";
+        message_status = 'en_attente_de_decision'.tr;
         color_status = Color(0xff0da0db);
         break;
       case 8:
-        message_status = "En attente de traitement";
+        message_status = 'en_attente_de_traitement'.tr;
         color_status = Color(0xff0ec4c4);
         break;
       case 9:
-        message_status = "En attente de cloture";
+        message_status = 'en_attente_de_cloture'.tr;
         color_status = Color(0xffc96b80);
         break;
       case 8:
-        message_status = "Cloturée";
+        message_status = 'cloture'.tr;
         color_status = Color(0xffd20835);
         break;
       default:
-      message_status = "";
-      color_status = Color(0xff898f97);
+        message_status = "";
+        color_status = Color(0xff898f97);
     }
     return Card(
       shadowColor: Color(0xFFedf0f8),
-      /* child: Container(
-            width: double.maxFinite,
-            height: MediaQuery.of(context).size.height/14,
-            decoration: BoxDecoration(
-                color: Color(0xFFedf0f8),
-                borderRadius: BorderRadius.circular(0)
-            ),*/
       child: ListTile(
-        title:  Row(
+        title: Row(
           children: [
             Expanded(
               flex: 2,
-              child: Text("PNC N° ${pncModel.nnc} ${pncModel.online == 1 ?'' :'*'}",
+              child: Text(
+                  "PNC N° ${pncModel.nnc} ${pncModel.online == 1 ? '' : '*'}",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontFamily: "Brand-Regular",
                       fontSize: 15.0,
-                      color: Colors.blue)),),
+                      color: Colors.blue)),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
-              child: Text(message_status, style:
-              TextStyle(fontWeight: FontWeight.bold,
-                  color: color_status,
-                  fontFamily: "Brand-Bold"),),
+              child: Text(
+                message_status,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: color_status,
+                    fontFamily: "Brand-Bold"),
+              ),
             )
           ],
         ),
@@ -95,29 +92,32 @@ class PNCWidget extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 2,
-                  child: Text("${pncModel.dateDetect}", style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontFamily: "Brand-Bold"),),
+                  child: Text(
+                    "Date detect : ${pncModel.dateDetect}",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                        fontFamily: "Brand-Bold"),
+                  ),
                 ),
-
-                Text('traited'.tr, textAlign: TextAlign.right
-                  , style: TextStyle(fontWeight: FontWeight.bold,
-                      color: pncModel.traitee==1 ?Colors.blue :Colors.black54 ,
-                      fontFamily: "Brand-Bold"),),
+                Text(
+                  'traited'.tr,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color:
+                          pncModel.traitee == 1 ? Colors.blue : Colors.black54,
+                      fontFamily: "Brand-Bold"),
+                ),
                 Switch(
-                    value: pncModel.traitee==1 ?true :false,
-                    onChanged: (value){
-
-                    }),
-
-
-
+                    value: pncModel.traitee == 1 ? true : false,
+                    onChanged: (value) {}),
               ],
             ),
             ReadMoreText(
-              "Non Conformité : ${pncModel.nc}",
+              "${'non_conformite'.tr} : ${pncModel.nc}",
               style: TextStyle(
-                  color: Color(0xFF3B465E),
-                  fontWeight: FontWeight.bold),
+                  color: Color(0xFF3B465E), fontWeight: FontWeight.bold),
               trimLines: 3,
               colorClickableText: CustomColors.bleuCiel,
               trimMode: TrimMode.Line,
@@ -130,17 +130,31 @@ class PNCWidget extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Text('Produit : ${pncModel.produit}', style: TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w400),),
+              child: Text(
+                '${'product'.tr} : ${pncModel.produit}',
+                style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400),
+              ),
             ),
-            Text('Type : ${pncModel.typeNC}', style: TextStyle(color: Colors.black87, fontSize: 15),),
+            Text(
+              'Type : ${pncModel.typeNC}',
+              style: TextStyle(color: Colors.black87, fontSize: 15),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Text('Fournisseur : ${pncModel.fournisseur}', style: TextStyle(color: Colors.black87, fontSize: 15),),
+              child: Text(
+                '${'fournisseur'.tr} : ${pncModel.fournisseur}',
+                style: TextStyle(color: Colors.black87, fontSize: 15),
+              ),
             ),
             (pncModel.site == '' || pncModel.site!.isEmpty)
                 ? Text('')
-                : Text('Site : ${pncModel.site}', style: TextStyle(color: Colors.black87, fontSize: 15),),
-
+                : Text(
+                    'Site : ${pncModel.site}',
+                    style: TextStyle(color: Colors.black87, fontSize: 15),
+                  ),
           ],
         ),
       ),

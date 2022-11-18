@@ -29,6 +29,10 @@ class LocalReunionService {
     return await dbHelper.readReunion();
   }
 
+  searchReunion(nReunion, type, order) async {
+    return await dbHelper.searchReunion(nReunion, type, order);
+  }
+
   readReunionByOnline() async {
     return await dbHelper.readReunionByOnline();
   }

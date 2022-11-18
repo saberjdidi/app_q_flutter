@@ -13,6 +13,7 @@ import '../../Widgets/refresh_widget.dart';
 import 'action/action_visite_securite_page.dart';
 import 'checklist/checklist_critere_page.dart';
 import 'equipe/equipe_visite_sec_page.dart';
+import 'image_visite_sec.dart';
 import 'new_visite_sec_page.dart';
 import 'new_visite_securite.dart';
 import 'visite_securite_widget.dart';
@@ -24,7 +25,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
     const Color lightPrimary = Colors.white;
     const Color darkPrimary = Colors.white;
     return Scaffold(
-       drawer: NavigationDrawerWidget(),
+      drawer: NavigationDrawerWidget(),
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -59,61 +60,266 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                 shrinkWrap: true,
                 itemCount: controller.listVisiteSecurite.length,
                 itemBuilder: (BuildContext context, int index) {
-                 // return Text('${controller.listVisiteSecurite[index].designation}');
-                   return Container(
-                        margin: EdgeInsets.only(left: 5, right: 5, bottom: 0.0),
-                        child: Slidable(
-                          //direction: Axis.vertical,
-                          key: const ValueKey(0),
-                          child: VisiteSecuriteWidget(model: controller.listVisiteSecurite[index]),
-                          // The start action pane is the one at the left or the top side.
-                          startActionPane: ActionPane(
-                            // A motion is a widget used to control how the pane animates.
-                            motion: const ScrollMotion(),
+                  // return Text('${controller.listVisiteSecurite[index].designation}');
+                  return Container(
+                    margin: EdgeInsets.only(left: 5, right: 5, bottom: 0.0),
+                    child: Slidable(
+                      //direction: Axis.vertical,
+                      key: const ValueKey(0),
+                      child: VisiteSecuriteWidget(
+                          model: controller.listVisiteSecurite[index]),
+                      // The start action pane is the one at the left or the top side.
+                      startActionPane: ActionPane(
+                        // A motion is a widget used to control how the pane animates.
+                        motion: const ScrollMotion(),
 
-                            // All actions are defined in the children parameter.
-                            children: [
-
-                              SlidableAction(
-                                onPressed: (context) {
-                                  Get.to(CheckListCriterePage(numFiche: controller.listVisiteSecurite[index].id));
-                                },
-                                backgroundColor: Color(0xFF21B7CA),
-                                foregroundColor: Colors.white,
-                                //icon: Icons.list,
-                                label: 'Check-\nlist',
-                              ),
-
-                              SlidableAction(
-                                onPressed: (context) {
-                                  Get.to(EquipeVisiteSecPage(numFiche: controller.listVisiteSecurite[index].id));
-                                },
-                                backgroundColor: Color(0xFF6D28CD),
-                                foregroundColor: Colors.white,
-                                //icon: Icons.list,
-                                label: 'Equipe',
-                              ),
-                            ],
+                        // All actions are defined in the children parameter.
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(30))),
+                                  builder: (context) =>
+                                      DraggableScrollableSheet(
+                                        expand: false,
+                                        initialChildSize: 0.6,
+                                        maxChildSize: 0.8,
+                                        minChildSize: 0.4,
+                                        builder: (context, scrollController) =>
+                                            SingleChildScrollView(
+                                          child: ListBody(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  'Visite Securite N°${controller.listVisiteSecurite[index].id}',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontFamily: "Brand-Bold",
+                                                      color: Color(0xFF0769D2),
+                                                      fontSize: 20.0),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 20.0,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        BoxConstraints.tightFor(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                1.1,
+                                                            height: 50),
+                                                    child: ElevatedButton.icon(
+                                                      style: ButtonStyle(
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all(CustomColors
+                                                                    .googleBackground),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all(EdgeInsets
+                                                                    .all(14)),
+                                                      ),
+                                                      icon: Icon(Icons.person),
+                                                      label: Text(
+                                                        'Equipe',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onPressed: () {
+                                                        Get.to(EquipeVisiteSecPage(
+                                                            numFiche: controller
+                                                                .listVisiteSecurite[
+                                                                    index]
+                                                                .id));
+                                                      },
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        BoxConstraints.tightFor(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                1.1,
+                                                            height: 50),
+                                                    child: ElevatedButton.icon(
+                                                      style: ButtonStyle(
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all(Color(
+                                                                    0xFF0DBD90)),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all(EdgeInsets
+                                                                    .all(14)),
+                                                      ),
+                                                      icon: Icon(
+                                                          Icons.library_books),
+                                                      label: Text(
+                                                        'Check-List',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onPressed: () {
+                                                        Get.to(CheckListCriterePage(
+                                                            numFiche: controller
+                                                                .listVisiteSecurite[
+                                                                    index]
+                                                                .id));
+                                                      },
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        BoxConstraints.tightFor(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                1.1,
+                                                            height: 50),
+                                                    child: ElevatedButton.icon(
+                                                      style: ButtonStyle(
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all(Color(
+                                                                    0xFF0D33BD)),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all(EdgeInsets
+                                                                    .all(14)),
+                                                      ),
+                                                      icon: Icon(Icons
+                                                          .photo_camera_back_rounded),
+                                                      label: Text(
+                                                        'Images',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onPressed: () {
+                                                        Get.to(ImageVisiteSecurite(
+                                                            numFiche: controller
+                                                                .listVisiteSecurite[
+                                                                    index]
+                                                                .id));
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ));
+                            },
+                            backgroundColor: Color(0xFF21B7CA),
+                            foregroundColor: Colors.white,
+                            //icon: Icons.list,
+                            label: 'Details',
                           ),
-                          // The end action pane is the one at the right or the bottom side.
-                          endActionPane: ActionPane(
-                            motion: ScrollMotion(),
-                            children: [
-                              SlidableAction(
-                                // An action can be bigger than the others.
-                                flex: 2,
-                                onPressed: (context) {
-                                  Get.to(ActionVisiteSecuritePage(numFiche: controller.listVisiteSecurite[index].id));
-                                },
-                                backgroundColor: Color(0xFF0DBD90),
-                                foregroundColor: Colors.white,
-                                icon: Icons.library_books,
-                                label: 'Actions',
-                              ),
-                            ],
+                          /*
+                          SlidableAction(
+                            onPressed: (context) {
+                              Get.to(CheckListCriterePage(
+                                  numFiche:
+                                      controller.listVisiteSecurite[index].id));
+                            },
+                            backgroundColor: Color(0xFF21B7CA),
+                            foregroundColor: Colors.white,
+                            //icon: Icons.list,
+                            label: 'Check-\nlist',
                           ),
-                        ),
-                      );
+                          SlidableAction(
+                            onPressed: (context) {
+                              Get.to(EquipeVisiteSecPage(
+                                  numFiche:
+                                      controller.listVisiteSecurite[index].id));
+                            },
+                            backgroundColor: Color(0xFF6D28CD),
+                            foregroundColor: Colors.white,
+                            //icon: Icons.list,
+                            label: 'Equipe',
+                          ),
+                          */
+                        ],
+                      ),
+                      // The end action pane is the one at the right or the bottom side.
+                      endActionPane: ActionPane(
+                        motion: ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            // An action can be bigger than the others.
+                            flex: 2,
+                            onPressed: (context) {
+                              Get.to(ActionVisiteSecuritePage(
+                                  numFiche:
+                                      controller.listVisiteSecurite[index].id));
+                            },
+                            backgroundColor: Color(0xFF0DBD90),
+                            foregroundColor: Colors.white,
+                            icon: Icons.library_books,
+                            label: 'Actions',
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 },
               ),
             );
@@ -141,28 +347,31 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               onTap: () async {
-              //await LocalVisiteSecuriteService().deleteTableEquipeVisiteSecurite();
-              // await Get.to(()=>NewVisiteSecuritePage(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
-                await Get.to(()=>NewVisiteSecuPage());
-              }
-          ),
+                //await LocalVisiteSecuriteService().deleteTableEquipeVisiteSecurite();
+                // await Get.to(()=>NewVisiteSecuritePage(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
+                await Get.to(() => NewVisiteSecuPage());
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
               label: '${'search'.tr} Visite Securite',
-              onTap: (){
-              showDialog<void>(
+              onTap: () {
+                showDialog<void>(
                   context: context,
                   barrierDismissible: false, // user must tap button!
                   builder: (BuildContext context) {
                     return AlertDialog(
                       scrollable: true,
                       title: const Center(
-                        child: Text('Search Visite Securite', style: TextStyle(
-                            fontWeight: FontWeight.w500, fontFamily: "Signatra",
-                            color: Color(0xFF0769D2), fontSize: 30.0
-                        ),),
+                        child: Text(
+                          'Search Visite Securite',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Signatra",
+                              color: Color(0xFF0769D2),
+                              fontSize: 30.0),
+                        ),
                       ),
                       titlePadding: EdgeInsets.only(top: 2.0),
                       content: SingleChildScrollView(
@@ -173,13 +382,13 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                               child: new ListTile(
                                 leading: new Icon(Icons.search),
                                 title: new TextField(
-                                    controller: controller.searchNumero,
-                                    keyboardType: TextInputType.number,
-                                    textInputAction: TextInputAction.next,
-                                    decoration: new InputDecoration(
-                                        hintText: 'Numero',
-                                        border: InputBorder.none),
-                                    ),
+                                  controller: controller.searchNumero,
+                                  keyboardType: TextInputType.number,
+                                  textInputAction: TextInputAction.next,
+                                  decoration: new InputDecoration(
+                                      hintText: 'Numero',
+                                      border: InputBorder.none),
+                                ),
                                 trailing: new IconButton(
                                   icon: Icon(Icons.cancel),
                                   onPressed: () {
@@ -188,7 +397,9 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 5.0,),
+                            SizedBox(
+                              height: 5.0,
+                            ),
                             Card(
                               color: Color(0xffa5e1f5),
                               child: new ListTile(
@@ -209,7 +420,9 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 5.0,),
+                            SizedBox(
+                              height: 5.0,
+                            ),
                             Card(
                               color: Color(0xffa5e1f5),
                               child: new ListTile(
@@ -244,7 +457,9 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                         ),
                         ElevatedButton(
                           onPressed: () async {
-                            Get.find<VisiteSecuriteController>().listVisiteSecurite.clear();
+                            Get.find<VisiteSecuriteController>()
+                                .listVisiteSecurite
+                                .clear();
                             Get.find<VisiteSecuriteController>().searchData();
                             Get.back();
                           },
@@ -260,7 +475,8 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child: Text('Search',
+                            child: Text(
+                              'Search',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -274,20 +490,17 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                     );
                   },
                 );
-              }
-          ),
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.sync, color: Colors.blue, size: 32),
               label: 'Synchronisation',
-              onTap: (){
+              onTap: () {
                 controller.syncVisiteSecuriteToWebService();
-              }
-          )
+              })
         ],
       ),
     );
   }
-
 }

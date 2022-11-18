@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
-import 'package:qualipro_flutter/Route/app_route.dart';
-
 import '../../../Controllers/action/sous_action_controller.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Widgets/loading_widget.dart';
 import '../../../Widgets/refresh_widget.dart';
-import '../action_page.dart';
 import 'intervenant_page.dart';
 import 'new_sous_action.dart';
 import 'sous_action_widget.dart';
@@ -24,14 +21,16 @@ class SousActionPage extends GetView<SousActionController> {
       appBar: AppBar(
         centerTitle: true,
         leading: TextButton(
-          onPressed: (){
+          onPressed: () {
             Get.back();
             //Get.offAll(ActionPage());
             //Get.toNamed(AppRoute.action);
             //Get.offAllNamed(AppRoute.action);
           },
-          child: Icon(Icons.arrow_back, color: Colors.blue,),
-
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.blue,
+          ),
         ),
         title: Text(
           'Action N° ${controller.id_action}',
@@ -72,7 +71,10 @@ class SousActionPage extends GetView<SousActionController> {
                       child: Slidable(
                         key: const ValueKey(0),
                         //child: Text('${controller.listSousAction[index].nSousAct}'),
-                        child: SousActionWidget(sousActionModel: controller.listSousAction[index], color: Colors.blueGrey,),
+                        child: SousActionWidget(
+                          sousActionModel: controller.listSousAction[index],
+                          color: Colors.blueGrey,
+                        ),
                         startActionPane: ActionPane(
                           motion: const ScrollMotion(),
 
@@ -100,7 +102,12 @@ class SousActionPage extends GetView<SousActionController> {
                               onPressed: (context) {
                                 //print('id action:${controller.listSousAction[index].nAct}');
                                 // print('id sous action:${controller.listSousAction[index].nSousAct}');
-                                Get.to(IntervenantsPage(idAction: controller.listSousAction[index].nAct, idSousAction: controller.listSousAction[index].nSousAct,));
+                                Get.to(IntervenantsPage(
+                                  idAction:
+                                      controller.listSousAction[index].nAct,
+                                  idSousAction:
+                                      controller.listSousAction[index].nSousAct,
+                                ));
                               },
                               backgroundColor: Color(0xFF0DBD90),
                               foregroundColor: Colors.white,
@@ -134,18 +141,17 @@ class SousActionPage extends GetView<SousActionController> {
         children: [
           SpeedDialChild(
               child: Icon(Icons.add, color: Colors.blue, size: 32),
-              label: 'New Sous Action',
+              label: '${'new'.tr} Sous Action',
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
-              onTap: (){
-                Get.to(()=>NewSousActionPage(), transition: Transition.zoom, duration: Duration(milliseconds: 500),
-                    arguments: {
-                      "id_action" : controller.id_action
-                    });
+              onTap: () {
+                Get.to(() => NewSousActionPage(),
+                    transition: Transition.zoom,
+                    duration: Duration(milliseconds: 500),
+                    arguments: {"id_action": controller.id_action});
                 //Get.to(()=>AddAction(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
-              }
-          ),
-        /*  SpeedDialChild(
+              }),
+          /*  SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
@@ -161,15 +167,13 @@ class SousActionPage extends GetView<SousActionController> {
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.sync, color: Colors.blue, size: 32),
-              label: 'Synchronisation',//controller.countSousActionLocal ==0 ? 'No data exist to synchronized' : 'Synchronisation',
-              onTap: (){
+              label:
+                  'Synchronisation', //controller.countSousActionLocal ==0 ? 'No data exist to synchronized' : 'Synchronisation',
+              onTap: () {
                 controller.syncSousActionToWebService();
-              }
-          )
+              })
         ],
       ),
     );
   }
-
-
 }

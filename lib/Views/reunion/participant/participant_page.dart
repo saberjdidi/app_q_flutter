@@ -1,26 +1,15 @@
 import 'dart:ffi';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Models/employe_model.dart';
-import 'package:qualipro_flutter/Models/product_model.dart';
-import 'package:qualipro_flutter/Services/pnc/pnc_service.dart';
 import 'package:qualipro_flutter/Services/reunion/local_reunion_service.dart';
 import 'package:qualipro_flutter/Services/reunion/reunion_service.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
-import 'package:readmore/readmore.dart';
 import '../../../Controllers/api_controllers_call.dart';
-import '../../../Controllers/pnc/pnc_controller.dart';
 import '../../../Controllers/reunion/reunion_controller.dart';
 import '../../../Models/reunion/participant_reunion_model.dart';
-import '../../../Models/type_cause_model.dart';
 import '../../../Route/app_route.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
-import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import 'new_participant.dart';
@@ -133,7 +122,7 @@ class _ParticipantPageState extends State<ParticipantPage> {
             ),
           ),
           title: Text(
-            'Participants of Reunion N°${widget.nReunion}',
+            'Participants ${'of'.tr} ${'reunion'.tr} N°${widget.nReunion}',
             style: TextStyle(color: Colors.black, fontSize: 17),
           ),
           backgroundColor: (lightPrimary),
@@ -250,11 +239,11 @@ class _ParticipantPageState extends State<ParticipantPage> {
         dialogType: DialogType.ERROR,
         body: Center(
           child: Text(
-            'Are you sure to delete this item ${mat}',
+            '${'delete_item'.tr} ${mat}',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
-        title: 'Delete',
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -317,7 +306,7 @@ class _ParticipantPageState extends State<ParticipantPage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Cancel',
+              'cancel'.tr,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

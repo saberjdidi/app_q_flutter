@@ -2,10 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Controllers/incident_environnement/incident_environnement_controller.dart';
 import 'package:qualipro_flutter/Models/incident_environnement/type_cause_incident_model.dart';
-import 'package:qualipro_flutter/Services/incident_environnement/incident_environnement_service.dart';
 import 'package:qualipro_flutter/Services/incident_securite/incident_securite_service.dart';
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Controllers/incident_securite/incident_securite_controller.dart';
@@ -18,16 +15,19 @@ import 'new_type_cause_incident_securite.dart';
 class TypeCauseIncidentSecuritePage extends StatefulWidget {
   final numIncident;
 
- const TypeCauseIncidentSecuritePage({Key? key, required this.numIncident}) : super(key: key);
+  const TypeCauseIncidentSecuritePage({Key? key, required this.numIncident})
+      : super(key: key);
 
   @override
-  State<TypeCauseIncidentSecuritePage> createState() => _TypeCauseIncidentSecuritePageState();
+  State<TypeCauseIncidentSecuritePage> createState() =>
+      _TypeCauseIncidentSecuritePageState();
 }
 
-class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecuritePage> {
-  
+class _TypeCauseIncidentSecuritePageState
+    extends State<TypeCauseIncidentSecuritePage> {
   final matricule = SharedPreference.getMatricule();
-  List<TypeCauseIncidentModel> listType = List<TypeCauseIncidentModel>.empty(growable: true);
+  List<TypeCauseIncidentModel> listType =
+      List<TypeCauseIncidentModel>.empty(growable: true);
 
   bool isVisibleBtnDelete = true;
 
@@ -36,13 +36,15 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
     super.initState();
     getTypeCause();
   }
+
   void getTypeCause() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         isVisibleBtnDelete = false;
-        final response = await LocalIncidentSecuriteService().readTypeCauseIncSecRattacher(widget.numIncident);
-        response.forEach((data){
+        final response = await LocalIncidentSecuriteService()
+            .readTypeCauseIncSecRattacher(widget.numIncident);
+        response.forEach((data) {
           setState(() {
             var model = TypeCauseIncidentModel();
             model.online = data['online'];
@@ -53,11 +55,13 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
             listType.add(model);
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         isVisibleBtnDelete = true;
         //rest api
-        await IncidentSecuriteService().getTypeCauseIncSecRattacher(widget.numIncident, matricule, 1).then((resp) async {
+        await IncidentSecuriteService()
+            .getTypeCauseIncSecRattacher(widget.numIncident, matricule, 1)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -70,15 +74,13 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
               listType.add(model);
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -93,23 +95,26 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               //Get.back();
               Get.find<IncidentSecuriteController>().listIncident.clear();
               Get.find<IncidentSecuriteController>().getIncident();
               Get.toNamed(AppRoute.incident_securite);
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
-            'Type Cause of Incident N°${widget.numIncident}',
+            'Type Cause Incident N°${widget.numIncident}',
             style: TextStyle(color: Colors.black, fontSize: 17),
           ),
           backgroundColor: (lightPrimary),
@@ -117,80 +122,75 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listType.isNotEmpty ?
-            Container(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return
-                    Card(
-                      color: Color(0xFFE9EAEE),
-                      child: ListTile(
-                        leading: Text(
-                          '${listType[index].idTypeCause}',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-                        ),
-                        title: Text(
-                          '${listType[index].typeCause}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      /*  subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: RichText(
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              children: [
-                                TextSpan(text: '${listType[index].typeCause}'),
-
-                                //TextSpan(text: '${action.declencheur}'),
-                              ],
-
+            child: listType.isNotEmpty
+                ? Container(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Card(
+                          color: Color(0xFFE9EAEE),
+                          child: ListTile(
+                            leading: Text(
+                              '${listType[index].idTypeCause}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.lightBlue),
+                            ),
+                            title: Text(
+                              '${listType[index].typeCause}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Visibility(
+                              visible: isVisibleBtnDelete,
+                              child: InkWell(
+                                  onTap: () {
+                                    deleteTypeCause(
+                                        context, listType[index].idTypeCause);
+                                  },
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  )),
                             ),
                           ),
-                        ), */
-                        trailing: Visibility(
-                          visible: isVisibleBtnDelete,
-                          child: InkWell(
-                              onTap: (){
-                                deleteTypeCause(context, listType[index].idTypeCause);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red,)
-                          ),
-                        ),
-                      ),
-                    );
-                },
-                itemCount: listType.length,
-              ),
-            )
-                : Center(child: Text('empty_list'.tr, style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                        );
+                      },
+                      itemCount: listType.length,
+                    ),
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-             Get.to(NewTypeCauseIncidentSecurite(numIncident: widget.numIncident));
+          onPressed: () {
+            Get.to(
+                NewTypeCauseIncidentSecurite(numIncident: widget.numIncident));
           },
           child: const Icon(
             Icons.add,
             color: Colors.white,
-            size: 32,),
+            size: 32,
+          ),
           backgroundColor: Colors.blue,
         ),
       ),
     );
   }
+
   //delete item
-  deleteTypeCause(context, id){
+  deleteTypeCause(context, id) {
     AwesomeDialog(
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          'Are you sure to delete this item ${id}',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
-        title: 'Delete',
+        body: Center(
+          child: Text(
+            '${'delete_item'.tr} ${id}',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -203,9 +203,11 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
             ),
           ),
           onPressed: () async {
-
-            await IncidentSecuriteService().deleteTypeCauseIncidentById(widget.numIncident, id).then((resp) async {
-              ShowSnackBar.snackBar("Successfully", "Type Cause Deleted", Colors.green);
+            await IncidentSecuriteService()
+                .deleteTypeCauseIncidentById(widget.numIncident, id)
+                .then((resp) async {
+              ShowSnackBar.snackBar(
+                  "Successfully", "Type Cause Deleted", Colors.green);
               listType.removeWhere((element) => element.idTypeCause == id);
               setState(() {});
               await ApiControllersCall().getTypeCauseIncidentSecRattacher();
@@ -217,7 +219,8 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Ok',
+            child: Text(
+              'Ok',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -227,7 +230,10 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
             ),
           ),
         ),
-        closeIcon: Icon(Icons.close, color: Colors.red,),
+        closeIcon: Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
         btnCancel: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -244,7 +250,8 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Cancel',
+            child: Text(
+              'cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -253,7 +260,7 @@ class _TypeCauseIncidentSecuritePageState extends State<TypeCauseIncidentSecurit
               ),
             ),
           ),
-        )
-    )..show();
+        ))
+      ..show();
   }
 }

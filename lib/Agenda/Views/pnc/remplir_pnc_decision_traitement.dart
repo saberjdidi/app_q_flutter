@@ -32,13 +32,17 @@ import 'responsable_traitement/new_responsable_traitement.dart';
 class RemplirPNCTraitementDecision extends StatefulWidget {
   TraitementDecisionModel traitementDecisionModel;
 
-  RemplirPNCTraitementDecision({Key? key, required this.traitementDecisionModel}) : super(key: key);
+  RemplirPNCTraitementDecision(
+      {Key? key, required this.traitementDecisionModel})
+      : super(key: key);
 
   @override
-  State<RemplirPNCTraitementDecision> createState() => _RemplirPNCTraitementDecisionState();
+  State<RemplirPNCTraitementDecision> createState() =>
+      _RemplirPNCTraitementDecisionState();
 }
 
-class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecision> {
+class _RemplirPNCTraitementDecisionState
+    extends State<RemplirPNCTraitementDecision> {
   final _addItemFormKey = GlobalKey<FormState>();
   final _addItemFormKeyResponsableTraitement = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
@@ -47,8 +51,8 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
   final matricule = SharedPreference.getMatricule();
 
   DateTime dateTime = DateTime.now();
-  TextEditingController  dateSaisieDecisionController = TextEditingController();
-  TextEditingController  causeNCController = TextEditingController();
+  TextEditingController dateSaisieDecisionController = TextEditingController();
+  TextEditingController causeNCController = TextEditingController();
 
   EmployeModel? responsableSuiviModel = null;
   String? responsableSuiviMatricule = "";
@@ -63,19 +67,24 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
   final _contentStyle = const TextStyle(
       color: Color(0xff0c2d5e), fontSize: 14, fontWeight: FontWeight.normal);
 
-  List<ResponsableTraitementModel> respTraitementList = List<ResponsableTraitementModel>.empty(growable: true);
+  List<ResponsableTraitementModel> respTraitementList =
+      List<ResponsableTraitementModel>.empty(growable: true);
   void getResponsableTraitement() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-        Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Mode Offline",
+            colorText: Colors.blue,
+            snackPosition: SnackPosition.BOTTOM,
+            duration: Duration(milliseconds: 900));
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
         //rest api
         //getResponsableTraitementByNNC(153)
-        await PNCService().getResponsableTraitementByNNC(widget.traitementDecisionModel.nnc).then((resp) async {
+        await PNCService()
+            .getResponsableTraitementByNNC(widget.traitementDecisionModel.nnc)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -92,30 +101,28 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
               respTraitementList.add(model);
 
               respTraitementList.forEach((element) {
-                print('element resp traitement ${element.nompre}, resptrait : ${element.resptrait}');
+                print(
+                    'element resp traitement ${element.nompre}, resptrait : ${element.resptrait}');
               });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
 
-  bool _dataValidation(){
-    if(respTraitementList.isEmpty || respTraitementList == []){
-      Message.taskErrorOrWarning("Alert", "Veuillez Ajouter au moins responsable de traitement");
+  bool _dataValidation() {
+    if (respTraitementList.isEmpty || respTraitementList == []) {
+      Message.taskErrorOrWarning(
+          "Alert", "Veuillez Ajouter au moins responsable de traitement");
       return false;
-    }
-   else if(responsableSuiviModel == null){
+    } else if (responsableSuiviModel == null) {
       Message.taskErrorOrWarning("Alert", "Responsable Suivi is required");
       return false;
     }
@@ -123,16 +130,17 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
   }
 
   @override
-  void initState(){
-    dateSaisieDecisionController.text = DateFormat('yyyy-MM-dd').format(dateTime);
+  void initState() {
+    dateSaisieDecisionController.text =
+        DateFormat('yyyy-MM-dd').format(dateTime);
     super.initState();
     getResponsableTraitement();
     print('list resp : $respTraitementList');
     //add reponsable traitement
     dateTraitementController.text = DateFormat('yyyy-MM-dd').format(dateTime);
-    if(SharedPreference.getLangue() == null){
+    if (SharedPreference.getLangue() == null) {
       language = "";
-    }else {
+    } else {
       language = SharedPreference.getLangue();
     }
   }
@@ -143,11 +151,14 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       key: _globalKey,
       appBar: AppBar(
         leading: TextButton(
-          onPressed: (){
+          onPressed: () {
             Get.back();
             //Get.to(PNCTraitementDecisionPage());
           },
-          child: Icon(Icons.arrow_back, color: Colors.white,),
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           //color: Colors.blue,
         ),
         title: Center(
@@ -157,173 +168,195 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       ),
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: SingleChildScrollView(
-                child: Form(
-                    key: _addItemFormKey,
-                    child: Padding(
-                        padding: EdgeInsets.all(25.0),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: CheckboxListTile(
-                                title: const Text('Nécessite Investigation'),
-                                value: checkWithInvestigation,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    checkWithInvestigation = value!;
-                                    if(checkWithInvestigation == true){
-                                      withInvestigation = 1;
-                                      Get.to(RemplirPNCInvestigationAEffectuer(nnc: widget.traitementDecisionModel.nnc),
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: SingleChildScrollView(
+            child: Form(
+                key: _addItemFormKey,
+                child: Padding(
+                    padding: EdgeInsets.all(25.0),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: CheckboxListTile(
+                            title: const Text('Nécessite Investigation'),
+                            value: checkWithInvestigation,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                checkWithInvestigation = value!;
+                                if (checkWithInvestigation == true) {
+                                  withInvestigation = 1;
+                                  Get.to(
+                                      RemplirPNCInvestigationAEffectuer(
+                                          nnc: widget
+                                              .traitementDecisionModel.nnc),
                                       //Get.to(RemplirPNCInvestigationApprouver(nnc: widget.traitementDecisionModel.nnc),
                                       arguments: {
-                                        "necessite_investigation":1
+                                        "necessite_investigation": 1
                                       });
-                                    }
-                                    else {
-                                      withInvestigation = 0;
-                                    }
-                                    //print('avec investigation ${withInvestigation}');
-                                  });
-
-                                },
-                                activeColor: Colors.blue,
-                                //secondary: const Icon(Icons.hourglass_empty),
-                              ),
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: TextFormField(
-                                enabled: false,
-                                controller: dateSaisieDecisionController,
-                                keyboardType: TextInputType.text,
-                                textInputAction: TextInputAction.next,
-                                validator: (value) => Validator.validateField(
-                                    value: value!
+                                } else {
+                                  withInvestigation = 0;
+                                }
+                                //print('avec investigation ${withInvestigation}');
+                              });
+                            },
+                            activeColor: Colors.blue,
+                            //secondary: const Icon(Icons.hourglass_empty),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: TextFormField(
+                            enabled: false,
+                            controller: dateSaisieDecisionController,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) =>
+                                Validator.validateField(value: value!),
+                            decoration: InputDecoration(
+                                labelText: 'Date Saisie Decision',
+                                hintText: 'date',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
                                 ),
-                                decoration: InputDecoration(
-                                    labelText: 'Date Saisie Decision',
-                                    hintText: 'date',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    suffixIcon: InkWell(
-                                      onTap: (){
-
-                                      },
-                                      child: Icon(Icons.calendar_today),
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    )
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
                                 ),
-                                style: TextStyle(fontSize: 14.0),
+                                suffixIcon: InkWell(
+                                  onTap: () {},
+                                  child: Icon(Icons.calendar_today),
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                            visible: true,
+                            child: TextFormField(
+                              controller: causeNCController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              decoration: InputDecoration(
+                                labelText: 'Cause NC',
+                                hintText: 'Cause NC',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
                               ),
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                                visible: true,
-                                child: TextFormField(
-                                  controller: causeNCController,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Cause NC',
-                                    hintText: 'Cause NC',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    ),
-                                  ),
-                                  style: TextStyle(fontSize: 14.0),
-                                  minLines: 2,
-                                  maxLines: 5,
-                                )
-                            ),
-                            SizedBox(height: 10.0,),
-                            DropdownSearch<TypeTraitementModel>(
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: true,
-                              isFilteredOnline: true,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Type Traitement",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
-                              ),
-                              onFind: (String? filter) => getTypeTraitement(filter),
-                              onChanged: (data) {
-                                selectCodeTypeTraitement = data?.codeTypeT;
-                                print('type traitement: ${data?.typeT}, mat: ${selectCodeTypeTraitement}');
-                              },
-                              dropdownBuilder: customDropDownTypeTraitement,
-                              popupItemBuilder: customPopupItemBuilderTypeTraitement,
-                            ),
-                            SizedBox(height: 10.0,),
-                            DropdownSearch<EmployeModel>(
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: true,
-                              isFilteredOnline: true,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Responsable Suivi *",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
-                              ),
-                              onFind: (String? filter) => getResponsableSuivi(filter),
-                              onChanged: (data) {
-                                responsableSuiviModel = data;
-                                responsableSuiviMatricule = data?.mat;
-                                print('responsable suivi: ${data?.nompre}, mat: ${responsableSuiviMatricule}');
-                              },
-                              dropdownBuilder: customDropDownResponsableSuivi,
-                              popupItemBuilder: customPopupItemBuilderResponsableSuivi,
-                              validator: (u) =>
-                              u == null ? "Responsable suivi is required " : null,
-                            ),
-                            SizedBox(height: 15.0,),
-
-                            Center(child: Text('responsable Traitement',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: DataTable(
-                                  sortAscending: true,
-                                  sortColumnIndex: 1,
-                                  dataRowHeight: 40,
-                                  showBottomBorder: false,
-                                  columns: [
-                                    DataColumn(
-                                        label: Text('id', style: _contentStyleHeader),
-                                        numeric: true),
-                                    DataColumn(
-                                        label: Text('Nom Prenom', style: _contentStyleHeader)),
-                                    DataColumn(
-                                        label: InkWell(
-                                          onTap: (){
-                                            //Get.to(NewResponsableTraitement(traitementDecisionModel: widget.traitementDecisionModel));
-                                            addResponsableTraitement(context);
-                                           /* DateTime dateTime = DateTime.now();
+                              style: TextStyle(fontSize: 14.0),
+                              minLines: 2,
+                              maxLines: 5,
+                            )),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        DropdownSearch<TypeTraitementModel>(
+                          showSelectedItems: true,
+                          showClearButton: true,
+                          showSearchBox: true,
+                          isFilteredOnline: true,
+                          compareFn: (i, s) => i?.isEqual(s) ?? false,
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "Type Traitement",
+                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                            border: OutlineInputBorder(),
+                          ),
+                          onFind: (String? filter) => getTypeTraitement(filter),
+                          onChanged: (data) {
+                            selectCodeTypeTraitement = data?.codeTypeT;
+                            print(
+                                'type traitement: ${data?.typeT}, mat: ${selectCodeTypeTraitement}');
+                          },
+                          dropdownBuilder: customDropDownTypeTraitement,
+                          popupItemBuilder:
+                              customPopupItemBuilderTypeTraitement,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        DropdownSearch<EmployeModel>(
+                          showSelectedItems: true,
+                          showClearButton: true,
+                          showSearchBox: true,
+                          isFilteredOnline: true,
+                          compareFn: (i, s) => i?.isEqual(s) ?? false,
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "Responsable Suivi *",
+                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                            border: OutlineInputBorder(),
+                          ),
+                          onFind: (String? filter) =>
+                              getResponsableSuivi(filter),
+                          onChanged: (data) {
+                            responsableSuiviModel = data;
+                            responsableSuiviMatricule = data?.mat;
+                            print(
+                                'responsable suivi: ${data?.nompre}, mat: ${responsableSuiviMatricule}');
+                          },
+                          dropdownBuilder: customDropDownResponsableSuivi,
+                          popupItemBuilder:
+                              customPopupItemBuilderResponsableSuivi,
+                          validator: (u) => u == null
+                              ? "Responsable suivi is required "
+                              : null,
+                        ),
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        Center(
+                          child: Text(
+                            'responsable Traitement',
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                                sortAscending: true,
+                                sortColumnIndex: 1,
+                                dataRowHeight: 40,
+                                showBottomBorder: false,
+                                columns: [
+                                  DataColumn(
+                                      label: Text('id',
+                                          style: _contentStyleHeader),
+                                      numeric: true),
+                                  DataColumn(
+                                      label: Text('Nom Prenom',
+                                          style: _contentStyleHeader)),
+                                  DataColumn(
+                                    label: InkWell(
+                                      onTap: () {
+                                        //Get.to(NewResponsableTraitement(traitementDecisionModel: widget.traitementDecisionModel));
+                                        addResponsableTraitement(context);
+                                        /* DateTime dateTime = DateTime.now();
                                             TextEditingController  dateTraitementController = TextEditingController();
                                             TextEditingController  traitementNCController = TextEditingController();
                                             String? employeMatricule = "";
@@ -624,23 +657,37 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
                                                   ),
                                                 )
                                             ); */
-                                          },
-                                          child: Icon(Icons.add, color: Colors.indigoAccent, size: 30,),
-                                        ),)
-                                  ],
-                                  rows: respTraitementList.map<DataRow>((element) => DataRow(cells: [
-                                        DataCell(Text(element.id_resptrait.toString(), style: _contentStyle, textAlign: TextAlign.right)),
-                                    DataCell(Text('${element.nompre}', style: _contentStyle, textAlign: TextAlign.right)),
-                                    DataCell(
-                                        InkWell(
-                                      onTap: (){
-                                        deleteResponsableTraitement(context, element.id_resptrait);
                                       },
-                                        child: Icon(Icons.delete, color: Colors.red,)
-                                      )
+                                      child: Icon(
+                                        Icons.add,
+                                        color: Colors.indigoAccent,
+                                        size: 30,
+                                      ),
                                     ),
-                                      ])).toList()
-                                  /*rows: [
+                                  )
+                                ],
+                                rows: respTraitementList
+                                    .map<DataRow>((element) => DataRow(cells: [
+                                          DataCell(Text(
+                                              element.id_resptrait.toString(),
+                                              style: _contentStyle,
+                                              textAlign: TextAlign.right)),
+                                          DataCell(Text('${element.nompre}',
+                                              style: _contentStyle,
+                                              textAlign: TextAlign.right)),
+                                          DataCell(InkWell(
+                                              onTap: () {
+                                                deleteResponsableTraitement(
+                                                    context,
+                                                    element.id_resptrait);
+                                              },
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ))),
+                                        ]))
+                                    .toList()
+                                /*rows: [
                                     DataRow(
                                       cells: [
                                         DataCell(Text('1',
@@ -680,61 +727,59 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
                                     ),
                                   ], */
                                 ),
-                              ),
-                            ),
-
-                            SizedBox(height: 15.0,),
-                            _isProcessing
-                                ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  CustomColors.firebaseOrange,
-                                ),
-                              ),
-                            )
-                                :
-                            ElevatedButton(
-                              onPressed: () async {
-                                saveBtn();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  CustomColors.googleBackground,
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        _isProcessing
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    CustomColors.firebaseOrange,
                                   ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Text('Save',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: CustomColors.firebaseWhite,
-                                    letterSpacing: 2,
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  saveBtn();
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    CustomColors.googleBackground,
+                                  ),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                ),
-              ),
-            ),
-          )
-      ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Text(
+                                    'Save',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: CustomColors.firebaseWhite,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                ),
+                              )
+                      ],
+                    ))),
+          ),
+        ),
+      )),
     );
   }
 
   Future saveBtn() async {
-    if(_dataValidation() && _addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && _addItemFormKey.currentState!.validate()) {
       try {
-        setState(()  {
+        setState(() {
           _isProcessing = true;
         });
 
@@ -744,29 +789,31 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
           "codeTypeTraitement": selectCodeTypeTraitement.toString(),
           "causeNC": causeNCController.text
         }).then((resp) async {
-          ShowSnackBar.snackBar("Successfully", "Decision Traitement success", Colors.green);
+          ShowSnackBar.snackBar(
+              "Successfully", "Decision Traitement success", Colors.green);
           //Get.back();
           Get.to(PNCTraitementDecisionPage());
           await ApiControllersCall().getPNCDecision();
         }, onError: (err) {
-          setState(()  {
+          setState(() {
             _isProcessing = false;
           });
           ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
         });
-      }
-      catch (ex){
-        setState(()  {
+      } catch (ex) {
+        setState(() {
           _isProcessing = false;
         });
         AwesomeDialog(
           context: context,
           animType: AnimType.SCALE,
           dialogType: DialogType.ERROR,
-          body: Center(child: Text(
-            ex.toString(),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),),
+          body: Center(
+            child: Text(
+              ex.toString(),
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
           title: 'Error',
           btnCancel: Text('Cancel'),
           btnOkOnPress: () {
@@ -775,9 +822,8 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
         )..show();
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
-      }
-      finally{
-        setState(()  {
+      } finally {
+        setState(() {
           _isProcessing = false;
         });
       }
@@ -787,10 +833,12 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
   //getResponsableSuivi
   Future<List<EmployeModel>> getResponsableSuivi(filter) async {
     try {
-      List<EmployeModel> employeList = await List<EmployeModel>.empty(growable: true);
-      List<EmployeModel>employeFilter = await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeList =
+          await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeFilter =
+          await List<EmployeModel>.empty(growable: true);
       var response = await LocalActionService().readEmploye();
-      response.forEach((data){
+      response.forEach((data) {
         var model = EmployeModel();
         model.mat = data['mat'];
         model.nompre = data['nompre'];
@@ -799,8 +847,7 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       employeFilter = employeList.where((u) {
         var name = u.mat.toString().toLowerCase();
         var description = u.nompre!.toLowerCase();
-        return name.contains(filter) ||
-            description.contains(filter);
+        return name.contains(filter) || description.contains(filter);
       }).toList();
       return employeFilter;
     } catch (exception) {
@@ -808,11 +855,12 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       return Future.error('service : ${exception.toString()}');
     }
   }
-  Widget customDropDownResponsableSuivi(BuildContext context, EmployeModel? item) {
+
+  Widget customDropDownResponsableSuivi(
+      BuildContext context, EmployeModel? item) {
     if (item == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -821,6 +869,7 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       );
     }
   }
+
   Widget customPopupItemBuilderResponsableSuivi(
       BuildContext context, EmployeModel item, bool isSelected) {
     return Container(
@@ -828,10 +877,10 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item.nompre ?? ''),
@@ -839,11 +888,14 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       ),
     );
   }
+
   //Type Traitement
   Future<List<TypeTraitementModel>> getTypeTraitement(filter) async {
     try {
-      List<TypeTraitementModel> typeList = await List<TypeTraitementModel>.empty(growable: true);
-      List<TypeTraitementModel> typeFilter = await List<TypeTraitementModel>.empty(growable: true);
+      List<TypeTraitementModel> typeList =
+          await List<TypeTraitementModel>.empty(growable: true);
+      List<TypeTraitementModel> typeFilter =
+          await List<TypeTraitementModel>.empty(growable: true);
 
       await PNCService().getTypeTraitement().then((resp) async {
         resp.forEach((data) async {
@@ -853,16 +905,14 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
           model.valid = data['valid'];
           typeList.add(model);
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
 
       typeFilter = typeList.where((u) {
         var name = u.codeTypeT.toString().toLowerCase();
         var description = u.typeT!.toLowerCase();
-        return name.contains(filter) ||
-            description.contains(filter);
+        return name.contains(filter) || description.contains(filter);
       }).toList();
       return typeFilter;
     } catch (exception) {
@@ -870,11 +920,12 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       return Future.error('service : ${exception.toString()}');
     }
   }
-  Widget customDropDownTypeTraitement(BuildContext context, TypeTraitementModel? item) {
+
+  Widget customDropDownTypeTraitement(
+      BuildContext context, TypeTraitementModel? item) {
     if (item == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -883,6 +934,7 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       );
     }
   }
+
   Widget customPopupItemBuilderTypeTraitement(
       BuildContext context, TypeTraitementModel item, bool isSelected) {
     return Container(
@@ -890,10 +942,10 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item.typeT ?? ''),
@@ -903,34 +955,37 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
   }
 
   //add responsable traitement
-  TextEditingController  dateTraitementController = TextEditingController();
-  TextEditingController  traitementNCController = TextEditingController();
+  TextEditingController dateTraitementController = TextEditingController();
+  TextEditingController traitementNCController = TextEditingController();
   String? employeMatricule = "";
   bool checkFirstResponsable = false;
   String firstResponsable = "0";
-  String? language ="";
+  String? language = "";
 
   selectedDate(BuildContext context) async {
     var datePicker = await showDatePicker(
         context: context,
         initialDate: dateTime,
         firstDate: DateTime(2000),
-        lastDate: DateTime(2050)
-    );
-    if(datePicker != null){
+        lastDate: DateTime(2050));
+    if (datePicker != null) {
       setState(() {
         dateTime = datePicker;
-        dateTraitementController.text = DateFormat('yyyy-MM-dd').format(datePicker);
+        dateTraitementController.text =
+            DateFormat('yyyy-MM-dd').format(datePicker);
       });
     }
   }
+
   //getEmploye
   Future<List<EmployeModel>> getEmploye(filter) async {
     try {
-      List<EmployeModel> employeList = await List<EmployeModel>.empty(growable: true);
-      List<EmployeModel>employeFilter = await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeList =
+          await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeFilter =
+          await List<EmployeModel>.empty(growable: true);
       var response = await LocalActionService().readEmploye();
-      response.forEach((data){
+      response.forEach((data) {
         var model = EmployeModel();
         model.mat = data['mat'];
         model.nompre = data['nompre'];
@@ -939,8 +994,7 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       employeFilter = employeList.where((u) {
         var name = u.mat.toString().toLowerCase();
         var description = u.nompre!.toLowerCase();
-        return name.contains(filter) ||
-            description.contains(filter);
+        return name.contains(filter) || description.contains(filter);
       }).toList();
       return employeFilter;
     } catch (exception) {
@@ -948,11 +1002,11 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       return Future.error('service : ${exception.toString()}');
     }
   }
+
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
     if (item == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -961,6 +1015,7 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       );
     }
   }
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, EmployeModel item, bool isSelected) {
     return Container(
@@ -968,10 +1023,10 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item.nompre ?? ''),
@@ -979,7 +1034,8 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       ),
     );
   }
-  addResponsableTraitement(context){
+
+  addResponsableTraitement(context) {
     showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -989,138 +1045,148 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
           actionsAlignment: MainAxisAlignment.center,
           insetPadding: EdgeInsets.all(10),
           title: const Center(
-            child: Text('New Responsable Traitement', style: TextStyle(
-                fontWeight: FontWeight.w500, fontFamily: "Brand-Bold",
-                color: Color(0xFF0769D2), fontSize: 16.0
-            ),),
+            child: Text(
+              'New Responsable Traitement',
+              style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontFamily: "Brand-Bold",
+                  color: Color(0xFF0769D2),
+                  fontSize: 16.0),
+            ),
           ),
           titlePadding: EdgeInsets.only(top: 2.0, bottom: 5.0),
-          content: SingleChildScrollView (
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState){
-                  return Form(
-                    key: _addItemFormKeyResponsableTraitement,
-                    child: ListBody(
-                      children: <Widget>[
-                        Visibility(
-                          visible: true,
-                          child: TextFormField(
-                            controller: dateTraitementController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (value){
-                              selectedDate(context);
-                            },
-                            decoration: InputDecoration(
-                                labelText: 'Delai Traitement *',
-                                hintText: 'date',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                suffixIcon: InkWell(
-                                  onTap: (){
-                                    selectedDate(context);
-                                  },
-                                  child: Icon(Icons.calendar_today),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                )
+          content: SingleChildScrollView(child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Form(
+                key: _addItemFormKeyResponsableTraitement,
+                child: ListBody(
+                  children: <Widget>[
+                    Visibility(
+                      visible: true,
+                      child: TextFormField(
+                        controller: dateTraitementController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (value) {
+                          selectedDate(context);
+                        },
+                        decoration: InputDecoration(
+                            labelText: 'Delai Traitement *',
+                            hintText: 'date',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
                             ),
-                            style: TextStyle(fontSize: 14.0),
-                          ),
-                        ),
-                        SizedBox(height: 10.0,),
-                        Visibility(
-                            visible: true,
-                            child: TextFormField(
-                              controller: traitementNCController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: 'Traitement N.C *',
-                                hintText: 'Traitement NC',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                              ),
-                              validator: (value) => Validator.validateField(
-                                  value: value!
-                              ),
-                              style: TextStyle(fontSize: 14.0),
-                              minLines: 2,
-                              maxLines: 5,
-                            )
-                        ),
-                        SizedBox(height: 10.0,),
-                        DropdownSearch<EmployeModel>(
-                          showSelectedItems: true,
-                          showClearButton: true,
-                          showSearchBox: true,
-                          isFilteredOnline: true,
-                          compareFn: (i, s) => i?.isEqual(s) ?? false,
-                          dropdownSearchDecoration: InputDecoration(
-                            labelText: "Responsable Traitement *",
-                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                            border: OutlineInputBorder(),
-                          ),
-                          onFind: (String? filter) => getEmploye(filter),
-                          onChanged: (data) {
-                            employeMatricule = data?.mat;
-                            print('Responsable Traitement: ${data?.nompre}, mat: ${employeMatricule}');
-                          },
-                          dropdownBuilder: customDropDownEmploye,
-                          popupItemBuilder: customPopupItemBuilderEmploye,
-                          validator: (u) =>
-                          u == null ? "Responsable Traitementl is required " : null,
-                        ),
-                        SizedBox(height: 10.0,),
-                        Visibility(
-                          visible: true,
-                          child: CheckboxListTile(
-                            title: const Text('Premier Responsable'),
-                            value: checkFirstResponsable,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                checkFirstResponsable = value!;
-                                if(checkFirstResponsable == true){
-                                  firstResponsable = "1";
-                                }
-                                else {
-                                  firstResponsable = "0";
-                                }
-                                print('Premier Responsable ${firstResponsable}');
-                              });
-
-                            },
-                            activeColor: Colors.blue,
-                            //secondary: const Icon(Icons.hourglass_empty),
-                          ),
-                        ),
-                      ],
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                selectedDate(context);
+                              },
+                              child: Icon(Icons.calendar_today),
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)))),
+                        style: TextStyle(fontSize: 14.0),
+                      ),
                     ),
-                  );
-                },
-              )
-          ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Visibility(
+                        visible: true,
+                        child: TextFormField(
+                          controller: traitementNCController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: 'Traitement N.C *',
+                            hintText: 'Traitement NC',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          validator: (value) =>
+                              Validator.validateField(value: value!),
+                          style: TextStyle(fontSize: 14.0),
+                          minLines: 2,
+                          maxLines: 5,
+                        )),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    DropdownSearch<EmployeModel>(
+                      showSelectedItems: true,
+                      showClearButton: true,
+                      showSearchBox: true,
+                      isFilteredOnline: true,
+                      compareFn: (i, s) => i?.isEqual(s) ?? false,
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: "Responsable Traitement *",
+                        contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                        border: OutlineInputBorder(),
+                      ),
+                      onFind: (String? filter) => getEmploye(filter),
+                      onChanged: (data) {
+                        employeMatricule = data?.mat;
+                        print(
+                            'Responsable Traitement: ${data?.nompre}, mat: ${employeMatricule}');
+                      },
+                      dropdownBuilder: customDropDownEmploye,
+                      popupItemBuilder: customPopupItemBuilderEmploye,
+                      validator: (u) => u == null
+                          ? "Responsable Traitementl is required "
+                          : null,
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Visibility(
+                      visible: true,
+                      child: CheckboxListTile(
+                        title: const Text('Premier Responsable'),
+                        value: checkFirstResponsable,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            checkFirstResponsable = value!;
+                            if (checkFirstResponsable == true) {
+                              firstResponsable = "1";
+                            } else {
+                              firstResponsable = "0";
+                            }
+                            print('Premier Responsable ${firstResponsable}');
+                          });
+                        },
+                        activeColor: Colors.blue,
+                        //secondary: const Icon(Icons.hourglass_empty),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          )),
           contentPadding: EdgeInsets.only(right: 5.0, left: 5.0, top: 5.0),
           actionsPadding: EdgeInsets.all(1.0),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.red),),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -1130,9 +1196,9 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
                 //Get.find<ActionController>().listAction.clear();
                 //Get.find<ActionController>().getActions();
                 //Get.back();
-                if(_addItemFormKeyResponsableTraitement.currentState!.validate()){
+                if (_addItemFormKeyResponsableTraitement.currentState!
+                    .validate()) {
                   try {
-
                     await pncService.addResponsableTraitement({
                       "nnc": widget.traitementDecisionModel.nnc.toString(),
                       "mat": employeMatricule,
@@ -1145,23 +1211,26 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
                       respTraitementList.clear();
                       getResponsableTraitement();
                       traitementNCController.text = '';
-                      ShowSnackBar.snackBar("Successfully", "Responsable added", Colors.green);
+                      ShowSnackBar.snackBar(
+                          "Successfully", "Responsable added", Colors.green);
                     }, onError: (err) {
-                      if(kDebugMode){
+                      if (kDebugMode) {
                         print('error : ${err.toString()}');
                       }
-                      ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+                      ShowSnackBar.snackBar(
+                          "Error", err.toString(), Colors.red);
                     });
-                  }
-                  catch (ex){
+                  } catch (ex) {
                     AwesomeDialog(
                       context: context,
                       animType: AnimType.SCALE,
                       dialogType: DialogType.ERROR,
-                      body: Center(child: Text(
-                        ex.toString(),
-                        style: TextStyle(fontStyle: FontStyle.italic),
-                      ),),
+                      body: Center(
+                        child: Text(
+                          ex.toString(),
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
                       title: 'Error',
                       btnCancel: Text('Cancel'),
                       btnOkOnPress: () {
@@ -1185,7 +1254,8 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
               ),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: Text('Save',
+                child: Text(
+                  'Save',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -1200,16 +1270,19 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
       },
     );
   }
+
   //delete responsable traitement
-  deleteResponsableTraitement(context, position){
+  deleteResponsableTraitement(context, position) {
     AwesomeDialog(
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          'Are you sure to delete this item ${position}',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            'Are you sure to delete this item ${position}',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Delete',
         btnOk: ElevatedButton(
           style: ButtonStyle(
@@ -1223,14 +1296,16 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
             ),
           ),
           onPressed: () async {
-
-            await pncService.deleteResponsableTraitementByID(position).then((resp) async {
-              ShowSnackBar.snackBar("Successfully", "Responsable Traitement Deleted", Colors.green);
-              respTraitementList.removeWhere((element) => element.id_resptrait == position);
+            await pncService.deleteResponsableTraitementByID(position).then(
+                (resp) async {
+              ShowSnackBar.snackBar("Successfully",
+                  "Responsable Traitement Deleted", Colors.green);
+              respTraitementList
+                  .removeWhere((element) => element.id_resptrait == position);
               setState(() {});
               Navigator.of(context).pop();
             }, onError: (err) {
-              setState(()  {
+              setState(() {
                 _isProcessing = false;
               });
               ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
@@ -1238,7 +1313,8 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Ok',
+            child: Text(
+              'Ok',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1248,7 +1324,10 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
             ),
           ),
         ),
-        closeIcon: Icon(Icons.close, color: Colors.red,),
+        closeIcon: Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
         btnCancel: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -1265,7 +1344,8 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Cancel',
+            child: Text(
+              'Cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1274,7 +1354,7 @@ class _RemplirPNCTraitementDecisionState extends State<RemplirPNCTraitementDecis
               ),
             ),
           ),
-        )
-    )..show();
+        ))
+      ..show();
   }
 }

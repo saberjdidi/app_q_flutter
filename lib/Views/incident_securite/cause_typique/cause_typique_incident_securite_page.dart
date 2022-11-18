@@ -2,7 +2,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:qualipro_flutter/Models/incident_securite/cause_typique_model.dart';
 import 'package:qualipro_flutter/Services/incident_securite/incident_securite_service.dart';
 import 'package:qualipro_flutter/Services/incident_securite/local_incident_securite_service.dart';
@@ -16,16 +15,19 @@ import 'new_cause_typique_incident_securite.dart';
 class CauseTypiqueIncidentSecuritePage extends StatefulWidget {
   final numIncident;
 
- const CauseTypiqueIncidentSecuritePage({Key? key, required this.numIncident}) : super(key: key);
+  const CauseTypiqueIncidentSecuritePage({Key? key, required this.numIncident})
+      : super(key: key);
 
   @override
-  State<CauseTypiqueIncidentSecuritePage> createState() => _CauseTypiqueIncidentSecuritePageState();
+  State<CauseTypiqueIncidentSecuritePage> createState() =>
+      _CauseTypiqueIncidentSecuritePageState();
 }
 
-class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentSecuritePage> {
-  
+class _CauseTypiqueIncidentSecuritePageState
+    extends State<CauseTypiqueIncidentSecuritePage> {
   final matricule = SharedPreference.getMatricule();
-  List<CauseTypiqueModel> listType = List<CauseTypiqueModel>.empty(growable: true);
+  List<CauseTypiqueModel> listType =
+      List<CauseTypiqueModel>.empty(growable: true);
 
   bool isVisibleBtnDelete = true;
 
@@ -34,13 +36,15 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
     super.initState();
     getData();
   }
+
   void getData() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         isVisibleBtnDelete = false;
-        final response = await LocalIncidentSecuriteService().readCauseTypiqueIncSecRattacher(widget.numIncident);
-        response.forEach((data){
+        final response = await LocalIncidentSecuriteService()
+            .readCauseTypiqueIncSecRattacher(widget.numIncident);
+        response.forEach((data) {
           setState(() {
             var model = CauseTypiqueModel();
             model.online = data['online'];
@@ -51,11 +55,13 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
             listType.add(model);
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         isVisibleBtnDelete = true;
         //rest api
-        await IncidentSecuriteService().getCauseTypiqueIncSecRattacher(widget.numIncident, matricule, 1).then((resp) async {
+        await IncidentSecuriteService()
+            .getCauseTypiqueIncSecRattacher(widget.numIncident, matricule, 1)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -66,18 +72,15 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
               model.idCauseTypique = data['id_CauseTypique'];
               model.idIncident = data['id_incident'];
               listType.add(model);
-
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-     }
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -92,24 +95,27 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               //Get.back();
               Get.find<IncidentSecuriteController>().listIncident.clear();
               Get.find<IncidentSecuriteController>().getIncident();
               Get.toNamed(AppRoute.incident_securite);
               //Get.offAllNamed(AppRoute.reunion);
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
-            'Cause Typique of Incident N°${widget.numIncident}',
+            'Cause Typique Incident N°${widget.numIncident}',
             style: TextStyle(color: Colors.black, fontSize: 17),
           ),
           backgroundColor: (lightPrimary),
@@ -117,23 +123,24 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listType.isNotEmpty ?
-            Container(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return
-                    Card(
-                      color: Color(0xFFE9EAEE),
-                      child: ListTile(
-                        leading: Text(
-                          '${listType[index].idCauseTypique}',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-                        ),
-                        title: Text(
-                          '${listType[index].causeTypique}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      /*  subtitle: Padding(
+            child: listType.isNotEmpty
+                ? Container(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Card(
+                          color: Color(0xFFE9EAEE),
+                          child: ListTile(
+                            leading: Text(
+                              '${listType[index].idCauseTypique}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.lightBlue),
+                            ),
+                            title: Text(
+                              '${listType[index].causeTypique}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            /*  subtitle: Padding(
                           padding: const EdgeInsets.only(top: 5.0),
                           child: RichText(
                             text: TextSpan(
@@ -147,51 +154,59 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
                             ),
                           ),
                         ), */
-                        trailing: Visibility(
-                          visible: isVisibleBtnDelete,
-                          child: InkWell(
-                              onTap: (){
-                                deleteData(context, listType[index].idCauseTypique);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red,)
+                            trailing: Visibility(
+                              visible: isVisibleBtnDelete,
+                              child: InkWell(
+                                  onTap: () {
+                                    deleteData(context,
+                                        listType[index].idCauseTypique);
+                                  },
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  )),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                },
-                itemCount: listType.length,
-                //itemCount: actionsList.length + 1,
-              ),
-            )
-                : Center(child: Text('empty_list'.tr, style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                        );
+                      },
+                      itemCount: listType.length,
+                      //itemCount: actionsList.length + 1,
+                    ),
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            Get.to(NewCauseTypiqueIncidentSecurite(numIncident: widget.numIncident));
+          onPressed: () {
+            Get.to(NewCauseTypiqueIncidentSecurite(
+                numIncident: widget.numIncident));
           },
           child: const Icon(
             Icons.add,
             color: Colors.white,
-            size: 32,),
+            size: 32,
+          ),
           backgroundColor: Colors.blue,
         ),
       ),
     );
   }
+
   //delete item
-  deleteData(context, id){
+  deleteData(context, id) {
     AwesomeDialog(
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          'Are you sure to delete this item ${id}',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
-        title: 'Delete',
+        body: Center(
+          child: Text(
+            '${'delete_item'.tr} ${id}',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -204,9 +219,11 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
             ),
           ),
           onPressed: () async {
-
-            await IncidentSecuriteService().deleteCauseTypiqueIncidentById(widget.numIncident, id).then((resp) async {
-              ShowSnackBar.snackBar("Successfully", "Cause Typique Deleted", Colors.green);
+            await IncidentSecuriteService()
+                .deleteCauseTypiqueIncidentById(widget.numIncident, id)
+                .then((resp) async {
+              ShowSnackBar.snackBar(
+                  "Successfully", "Cause Typique Deleted", Colors.green);
               listType.removeWhere((element) => element.idCauseTypique == id);
               setState(() {});
               await ApiControllersCall().getCauseTypiqueIncSecRattacher();
@@ -218,7 +235,8 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Ok',
+            child: Text(
+              'Ok',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -228,7 +246,10 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
             ),
           ),
         ),
-        closeIcon: Icon(Icons.close, color: Colors.red,),
+        closeIcon: Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
         btnCancel: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -245,16 +266,17 @@ class _CauseTypiqueIncidentSecuritePageState extends State<CauseTypiqueIncidentS
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Cancel',
+            child: Text(
+              'cancel',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 letterSpacing: 2,
               ),
             ),
           ),
-        )
-    )..show();
+        ))
+      ..show();
   }
 }

@@ -90,7 +90,8 @@ class NewAuditController extends GetxController {
 
   //domaine affectation
   getDomaineAffectation() async {
-    List<DomaineAffectationModel> domaineList = await List<DomaineAffectationModel>.empty(growable: true);
+    List<DomaineAffectationModel> domaineList =
+        await List<DomaineAffectationModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
       var response = await localActionService.readDomaineAffectationByModule(
@@ -125,18 +126,18 @@ class NewAuditController extends GetxController {
         site_visible.value = model.vSite!;
         processus_visible.value = model.vProcessus!;
         activity_visible.value = model.vDomaine!;
-        direction_visible.value  = model.vDirection!;
-        service_visible.value  = model.vService!;
+        direction_visible.value = model.vDirection!;
+        service_visible.value = model.vService!;
 
         site_obligatoire.value = model.oSite!;
-        processus_obligatoire.value  = model.oProcessus!;
-        activity_obligatoire.value  = model.oDomaine!;
-        direction_obligatoire.value  = model.oDirection!;
-        service_obligatoire.value  = model.oService!;
-        print('fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+        processus_obligatoire.value = model.oProcessus!;
+        activity_obligatoire.value = model.oDomaine!;
+        direction_obligatoire.value = model.oDirection!;
+        service_obligatoire.value = model.oService!;
+        print(
+            'fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
       });
-    }
-    else if (connection == ConnectivityResult.wifi ||
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
       await ApiServicesCall().getDomaineAffectation().then((resp) async {
         resp.forEach((data) async {
@@ -169,65 +170,73 @@ class NewAuditController extends GetxController {
             site_visible.value = model.vSite!;
             processus_visible.value = model.vProcessus!;
             activity_visible.value = model.vDomaine!;
-            direction_visible.value  = model.vDirection!;
-            service_visible.value  = model.vService!;
+            direction_visible.value = model.vDirection!;
+            service_visible.value = model.vService!;
 
             site_obligatoire.value = model.oSite!;
-            processus_obligatoire.value  = model.oProcessus!;
-            activity_obligatoire.value  = model.oDomaine!;
-            direction_obligatoire.value  = model.oDirection!;
-            service_obligatoire.value  = model.oService!;
-            print('fiche: ${model
-                .fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+            processus_obligatoire.value = model.oProcessus!;
+            activity_obligatoire.value = model.oDomaine!;
+            direction_obligatoire.value = model.oDirection!;
+            service_obligatoire.value = model.oService!;
+            print(
+                'fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
           }
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error Domaine Affectation", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar(
+            "Error Domaine Affectation", err.toString(), Colors.red);
+      });
     }
   }
 
   bool _dataValidation() {
-    if (datePickerDebut.isAfter(datePickerFin) && datePickerDebut != datePickerFin) {
-      Message.taskErrorOrWarning("Warning", "La date Fin doit être supérieure ou égale à la date Début");
+    if (datePickerDebut.isAfter(datePickerFin) &&
+        datePickerDebut != datePickerFin) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, 'date_fin_supérieure_egale_date_debut'.tr);
       return false;
-    }
-    else if(dateDebutController.text.trim() == ''){
-      Message.taskErrorOrWarning("Warning", "Date début est obligatoire");
-    }
-    else if(dateFinController.text.trim() == ''){
-      Message.taskErrorOrWarning("Warning", "Date fin est obligatoire");
-    }
-    else if (typeAuditModel == null) {
-      Message.taskErrorOrWarning("Warning", "Type audit est obligatoire");
+    } else if (dateDebutController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'date_debut_prevue'.tr} ${'is_required'.tr}");
+    } else if (dateFinController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'date_fin_prevue'.tr} ${'is_required'.tr}");
+    } else if (typeAuditModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Type audit ${'is_required'.tr}");
       return false;
-    }
-    else if (codeChampAuditList == null || codeChampAuditList == [] || codeChampAuditList.isEmpty || champAuditList.isEmpty) {
-      Message.taskErrorOrWarning("Warning", "Champ Audit est obligatoire");
+    } else if (codeChampAuditList == null ||
+        codeChampAuditList == [] ||
+        codeChampAuditList.isEmpty ||
+        champAuditList.isEmpty) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'champ_audit'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (site_visible.value == 1 && site_obligatoire.value == 1 && siteModel == null) {
-      Message.taskErrorOrWarning("Warning", "Site est obligatoire");
+    } else if (site_visible.value == 1 &&
+        site_obligatoire.value == 1 &&
+        siteModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Site ${'is_required'.tr}");
       return false;
-    }
-    else if (processus_visible.value == 1 && processus_obligatoire.value == 1 && processusModel == null) {
-      Message.taskErrorOrWarning("Warning", "Processus est obligatoire");
+    } else if (processus_visible.value == 1 &&
+        processus_obligatoire.value == 1 &&
+        processusModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Processus ${'is_required'.tr}");
       return false;
-    }
-    else if (direction_visible.value == 1 && direction_obligatoire.value == 1 &&
+    } else if (direction_visible.value == 1 &&
+        direction_obligatoire.value == 1 &&
         directionModel == null) {
-      Message.taskErrorOrWarning("Warning", "Direction est obligatoire");
+      Message.taskErrorOrWarning('warning'.tr, "Direction ${'is_required'.tr}");
       return false;
-    }
-    else if (service_visible.value == 1 && service_obligatoire.value == 1 &&
+    } else if (service_visible.value == 1 &&
+        service_obligatoire.value == 1 &&
         serviceModel == null) {
-      Message.taskErrorOrWarning("Warning", "Service est obligatoire");
+      Message.taskErrorOrWarning('warning'.tr, "Service ${'is_required'.tr}");
       return false;
-    }
-    else if (activity_visible.value == 1 && activity_obligatoire.value == 1 &&
+    } else if (activity_visible.value == 1 &&
+        activity_obligatoire.value == 1 &&
         activityModel == null) {
-      Message.taskErrorOrWarning("Warning", "Activity est obligatoire");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'activity'.tr} ${'is_required'.tr}");
       return false;
     }
 
@@ -248,10 +257,11 @@ class NewAuditController extends GetxController {
         initialDate: datePickerDebut,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //lastDate: DateTime.now()
-    ))!;
-    if(datePickerDebut != null){
-      dateDebutController.text = DateFormat('yyyy-MM-dd').format(datePickerDebut);
+        //lastDate: DateTime.now()
+        ))!;
+    if (datePickerDebut != null) {
+      dateDebutController.text =
+          DateFormat('yyyy-MM-dd').format(datePickerDebut);
       //dateDebutController.text = DateFormat.yMMMMd().format(datePickerDebut);
     }
   }
@@ -262,26 +272,27 @@ class NewAuditController extends GetxController {
         initialDate: datePickerFin,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //firstDate: datePickerDebut,
-      //lastDate: DateTime.now()
-    ))!;
-    if(datePickerFin != null){
+        //firstDate: datePickerDebut,
+        //lastDate: DateTime.now()
+        ))!;
+    if (datePickerFin != null) {
       dateFinController.text = DateFormat('yyyy-MM-dd').format(datePickerFin);
     }
   }
-  
-  Future saveBtn() async {
 
-    if(_dataValidation() && addItemFormKey.currentState!.validate()) {
+  Future saveBtn() async {
+    if (_dataValidation() && addItemFormKey.currentState!.validate()) {
       try {
         int? max_idAudit = await localAuditService.getMaxNumAudit();
         int? idAuditMax = max_idAudit! + 1;
-        String refAuditMax = '00000'+idAuditMax.toString();
-        if(kDebugMode) print('max_idAudit : $idAuditMax, refAuditMax :$refAuditMax');
+        String refAuditMax = '00000' + idAuditMax.toString();
+        if (kDebugMode)
+          print('max_idAudit : $idAuditMax, refAuditMax :$refAuditMax');
 
         var connection = await Connectivity().checkConnectivity();
-        if(connection == ConnectivityResult.none){
-          Uint8List? bytesCodeChampList = Uint8List.fromList(codeChampAuditList);
+        if (connection == ConnectivityResult.none) {
+          Uint8List? bytesCodeChampList =
+              Uint8List.fromList(codeChampAuditList);
           var model = AuditModel();
           model.online = 0;
           model.idAudit = idAuditMax;
@@ -307,12 +318,15 @@ class NewAuditController extends GetxController {
           model.champ = champAuditList.toString();
           model.listCodeChamp = bytesCodeChampList;
 
-          if(kDebugMode) print('audit : ${idAuditMax}-${refAuditMax}-${model.champ}-${model.listCodeChamp}-${model.audit}-Processus:$selectedCodeProcessus');
-          
+          if (kDebugMode)
+            print(
+                'audit : ${idAuditMax}-${refAuditMax}-${model.champ}-${model.listCodeChamp}-${model.audit}-Processus:$selectedCodeProcessus');
+
           await localAuditService.saveAuditSync(model);
 
           listChampAudit.forEach((element) async {
-            debugPrint('champ audit : ${refAuditMax} - ${element.codeChamp} - ${element.champ}');
+            debugPrint(
+                'champ audit : ${refAuditMax} - ${element.codeChamp} - ${element.champ}');
             var modelChampAudit = ChampAuditModel();
             modelChampAudit.online = 0;
             modelChampAudit.codeChamp = element.codeChamp;
@@ -327,9 +341,9 @@ class NewAuditController extends GetxController {
           ShowSnackBar.snackBar("Successfully", "Audit Added ", Colors.green);
           Get.find<AuditController>().listAudit.clear();
           Get.find<AuditController>().getData();
-        }
-        else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile){
-       // print('codeChampAuditList : $codeChampAuditList');
+        } else if (connection == ConnectivityResult.wifi ||
+            connection == ConnectivityResult.mobile) {
+          // print('codeChampAuditList : $codeChampAuditList');
           await AuditService().saveAudit({
             "descriptionAudit": descriptionController.text,
             "dateDebutPrev": dateDebutController.text,
@@ -347,53 +361,54 @@ class NewAuditController extends GetxController {
           }).then((response) async {
             String? refAudit = response['refAudit'];
             print('refAudit : $refAudit');
-             //geeting employes of type audit
-              await AuditService().verifierRapportAuditParMode({
-                "refAudit": "",
-                "mat": "",
-                "codeChamp": selectedCodeTypeAudit.toString(),
-                "mode": "Cons_Param_valid"
-              }).then((response2) async {
-                  //insert employe validation
-                response2.forEach((element) async {
-                     var employe = new EmployeModel();
-                     employe.mat = element['matricule'];
-                     employe.nompre = element['nompre'];
-                     listEmployeValidation.add(employe);
-                     print('Matricule : ${element['matricule']} - Nompre : ${element['nompre']}');
+            //geeting employes of type audit
+            await AuditService().verifierRapportAuditParMode({
+              "refAudit": "",
+              "mat": "",
+              "codeChamp": selectedCodeTypeAudit.toString(),
+              "mode": "Cons_Param_valid"
+            }).then((response2) async {
+              //insert employe validation
+              response2.forEach((element) async {
+                var employe = new EmployeModel();
+                employe.mat = element['matricule'];
+                employe.nompre = element['nompre'];
+                listEmployeValidation.add(employe);
+                print(
+                    'Matricule : ${element['matricule']} - Nompre : ${element['nompre']}');
 
-                     await AuditService().ajoutEnregEmpValidAudit({
-                       "refAudit": refAudit,
-                       "mat": element['matricule'].toString(),
-                       "codeChamp": '',
-                       "mode": "Ajout_enreg_empvalid"
-                     }).then((value) async {
-                       //Get.back();
-                       //ShowSnackBar.snackBar("Successfully", "responsable validation ${element['matricule']} added", Colors.green);
-
-                     }, onError: (error){
-                       ShowSnackBar.snackBar("error inserting employes validation : ", error.toString(), Colors.red);
-                     });
-                   });
-              }, onError: (error){
-                ShowSnackBar.snackBar("error getting employe by TypeAudit : ", error.toString(), Colors.red);
+                await AuditService().ajoutEnregEmpValidAudit({
+                  "refAudit": refAudit,
+                  "mat": element['matricule'].toString(),
+                  "codeChamp": '',
+                  "mode": "Ajout_enreg_empvalid"
+                }).then((value) async {
+                  //Get.back();
+                  //ShowSnackBar.snackBar("Successfully", "responsable validation ${element['matricule']} added", Colors.green);
+                }, onError: (error) {
+                  ShowSnackBar.snackBar(
+                      "error inserting employes validation : ",
+                      error.toString(),
+                      Colors.red);
+                });
               });
+            }, onError: (error) {
+              ShowSnackBar.snackBar("error getting employe by TypeAudit : ",
+                  error.toString(), Colors.red);
+            });
 
             Get.back();
             ShowSnackBar.snackBar("Successfully", "Audit Added ", Colors.green);
             Get.find<AuditController>().listAudit.clear();
             Get.find<AuditController>().getData();
             await ApiControllersCall().getAudits();
-          },
-              onError: (error){
-                isDataProcessing(false);
-                print('Error : ${error.toString()}');
-                ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
-              });
-
+          }, onError: (error) {
+            isDataProcessing(false);
+            print('Error : ${error.toString()}');
+            ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
+          });
         }
-      }
-      catch (ex){
+      } catch (ex) {
         Get.defaultDialog(
             title: "Exception",
             backgroundColor: Colors.lightBlue,
@@ -406,8 +421,10 @@ class NewAuditController extends GetxController {
             buttonColor: Colors.red,
             barrierDismissible: false,
             radius: 50,
-            content: Text('${ex.toString()}', style: TextStyle(color: Colors.black),)
-        );
+            content: Text(
+              '${ex.toString()}',
+              style: TextStyle(color: Colors.black),
+            ));
         //ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
@@ -420,16 +437,19 @@ class NewAuditController extends GetxController {
   Widget customDropDownType(BuildContext context, TypeAuditModel? item) {
     if (typeAuditModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${typeAuditModel?.type}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${typeAuditModel?.type}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderType(
       BuildContext context, typeAuditModel, bool isSelected) {
     return Container(
@@ -437,10 +457,10 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(typeAuditModel?.type ?? ''),
@@ -448,6 +468,7 @@ class NewAuditController extends GetxController {
       ),
     );
   }
+
   //champ audit
   Widget customDropDownMultiSelectionChampAudit(
       BuildContext context, List<ChampAuditModel?> selectedItems) {
@@ -474,13 +495,13 @@ class NewAuditController extends GetxController {
                 e?.mat.toString() ?? '',
               ),*/
               title: Text(e?.champ ?? ''),
-
             ),
           ),
         );
       }).toList(),
     );
   }
+
   Widget customPopupItemBuilderChampAudit(
       BuildContext context, ChampAuditModel? item, bool isSelected) {
     /*if(isSelected == true){
@@ -491,35 +512,39 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item?.champ ?? ''),
         subtitle: Text(item?.codeChamp?.toString() ?? ''),
         leading: CircleAvatar(
-          // this does not work - throws 404 error
-          // backgroundImage: NetworkImage(item.avatar ?? ''),
-        ),
+            // this does not work - throws 404 error
+            // backgroundImage: NetworkImage(item.avatar ?? ''),
+            ),
       ),
     );
   }
- //site
+
+  //site
   Widget customDropDownSite(BuildContext context, SiteModel? item) {
     if (siteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${siteModel?.site}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${siteModel?.site}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderSite(
       BuildContext context, siteModel, bool isSelected) {
     return Container(
@@ -527,10 +552,10 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(siteModel?.site ?? ''),
@@ -538,20 +563,24 @@ class NewAuditController extends GetxController {
       ),
     );
   }
+
   //processus
   Widget customDropDownProcessus(BuildContext context, ProcessusModel? item) {
     if (processusModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${processusModel?.processus}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${processusModel?.processus}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderProcessus(
       BuildContext context, processusModel, bool isSelected) {
     return Container(
@@ -559,10 +588,10 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
@@ -570,12 +599,12 @@ class NewAuditController extends GetxController {
       ),
     );
   }
+
   //Activity
   Widget customDropDownActivity(BuildContext context, ActivityModel? item) {
     if (activityModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -584,6 +613,7 @@ class NewAuditController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderActivity(
       BuildContext context, activityModel, bool isSelected) {
     return Container(
@@ -591,10 +621,10 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(activityModel?.domaine ?? ''),
@@ -602,20 +632,24 @@ class NewAuditController extends GetxController {
       ),
     );
   }
+
   //direction
   Widget customDropDownDirection(BuildContext context, DirectionModel? item) {
     if (directionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${directionModel?.direction}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${directionModel?.direction}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDirection(
       BuildContext context, directionModel, bool isSelected) {
     return Container(
@@ -623,10 +657,10 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(directionModel?.direction ?? ''),
@@ -634,20 +668,24 @@ class NewAuditController extends GetxController {
       ),
     );
   }
+
   //service
   Widget customDropDownService(BuildContext context, ServiceModel? item) {
     if (serviceModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${serviceModel?.service}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${serviceModel?.service}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderService(
       BuildContext context, serviceModel, bool isSelected) {
     return Container(
@@ -655,10 +693,10 @@ class NewAuditController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(serviceModel?.service ?? ''),

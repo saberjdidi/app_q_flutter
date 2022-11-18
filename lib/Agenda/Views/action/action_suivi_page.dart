@@ -18,7 +18,6 @@ import 'remplir_action_realisation.dart';
 import 'remplir_action_suivi.dart';
 
 class ActionSuiviPage extends StatefulWidget {
-
   ActionSuiviPage({Key? key}) : super(key: key);
 
   @override
@@ -29,11 +28,11 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
   LocalActionService localService = LocalActionService();
   final matricule = SharedPreference.getMatricule();
-  List<ActionSuiviModel> listActionSuivi = List<ActionSuiviModel>.empty(growable: true);
+  List<ActionSuiviModel> listActionSuivi =
+      List<ActionSuiviModel>.empty(growable: true);
   List<ActionSuiviModel> listFiltered = [];
   TextEditingController controller = TextEditingController();
   String _searchResult = '';
-
 
   @override
   void initState() {
@@ -41,23 +40,26 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
     //checkConnectivity();
     getActionsSuivi();
   }
+
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue, snackPosition: SnackPosition.TOP);
     }
   }
+
   void getActionsSuivi() async {
     try {
-
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
+      if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         var response = await localService.readActionSuivi();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = ActionSuiviModel();
             model.nSousAct = data['nSousAct'];
@@ -84,8 +86,8 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
             });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
         //rest api
@@ -127,15 +129,13 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
               });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -150,17 +150,20 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
             'Actions à suivre ${listActionSuivi.length}',
@@ -171,17 +174,17 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listActionSuivi.isNotEmpty ?
-            RefreshWidget(
-              keyRefresh: keyRefresh,
-              onRefresh: () async {
-                controller.clear();
-                listActionSuivi.clear();
-                getActionsSuivi();
-              },
-              child: Column(
-                children: <Widget>[
-                 /* Card(
+            child: listActionSuivi.isNotEmpty
+                ? RefreshWidget(
+                    keyRefresh: keyRefresh,
+                    onRefresh: () async {
+                      controller.clear();
+                      listActionSuivi.clear();
+                      getActionsSuivi();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        /* Card(
                     child: new ListTile(
                       leading: new Icon(Icons.search),
                       title: new TextField(
@@ -211,148 +214,178 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                       ),
                     ),
                   ), */
-                  Card(
-                    //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: InkWell(
-                          onTap: (){
-                            setState(() {
-                              controller.clear();
-                              _searchResult = '';
-                              listFiltered = listActionSuivi;
-                            });
-                          },
-                          child: controller.text.trim()=='' ?Text('') :Icon(Icons.cancel),
-                        ),
-                        hintText: 'Search',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(color: Colors.blue)
-                        )
-                      ),
-                      onChanged: (value){
-                        setState(() {
-                          _searchResult = value;
-                          listFiltered = listActionSuivi.where((user) => user.nAct.toString().contains(_searchResult)
-                              || user.nomprerr!.toLowerCase().contains(_searchResult)
-                          ).toList();
-                        });
-                      },
-                    ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        final num_action = listFiltered[index].nAct;
-                        final num_sous_action = listFiltered[index].nSousAct;
-                        return
-                          Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                ' Action: ${num_action}   \n Sous Action: ${num_sous_action}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5.0,),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          WidgetSpan(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                              child: Icon(Icons.calendar_today),
-                                            ),
-                                          ),
-                                          TextSpan(text: '${listFiltered[index].dateSuivi}'),
-
-                                          //TextSpan(text: '${action.declencheur}'),
-                                        ],
-
-                                      ),
-                                    ),
-                                    RichText(
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          WidgetSpan(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                              child: Icon(Icons.person),
-                                            ),
-                                          ),
-                                          TextSpan(text: '${listFiltered[index].nomprerr}'),
-
-                                          //TextSpan(text: '${action.declencheur}'),
-                                        ],
-
-                                      ),
-                                    ),
-                                    Text('Taux real : ${listFiltered[index].pourcentReal} %',
-                                    style: TextStyle(color: Color(0xff111558), fontSize: 15),),
-                                    listFiltered[index].rapportEff == ''
-                                    ? Text('')
-                                    : ReadMoreText(
-                                      "Rapport : ${listFiltered[index].rapportEff}",
-                                      style: TextStyle(
-                                          color: Color(0xFF3B465E),
-                                          fontWeight: FontWeight.bold),
-                                      trimLines: 2,
-                                      colorClickableText: CustomColors.bleuCiel,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: 'more',
-                                      trimExpandedText: 'less',
-                                      moreStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: CustomColors.bleuCiel),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.only(top: 25.0),
-                                child: IconButton(
-                                  onPressed: () async {
-                                    Get.to(RemplirActionSuivi(actionsuivi: listFiltered[index]));
+                        Card(
+                          //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                          child: TextField(
+                            controller: controller,
+                            decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.clear();
+                                      _searchResult = '';
+                                      listFiltered = listActionSuivi;
+                                    });
                                   },
-                                  icon: Icon(Icons.edit, color: Colors.green,),
+                                  child: controller.text.trim() == ''
+                                      ? Text('')
+                                      : Icon(Icons.cancel),
                                 ),
-                              ),
-                              /// this function uses to navigate (move to next screen) User Details page and pass user objects into the User Details page. ///
-                              onTap: () {
-                                Get.to(RemplirActionSuivi(actionsuivi: listFiltered[index]));
-                              },
-                            ),
-                            Divider(
-                              thickness: 1.0,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        );
-                      },
-                      itemCount: listFiltered.length,
-                      //itemCount: actionsList.length + 1,
+                                hintText: 'Search',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue))),
+                            onChanged: (value) {
+                              setState(() {
+                                _searchResult = value;
+                                listFiltered = listActionSuivi
+                                    .where((user) =>
+                                        user.nAct
+                                            .toString()
+                                            .contains(_searchResult) ||
+                                        user.nomprerr!
+                                            .toLowerCase()
+                                            .contains(_searchResult))
+                                    .toList();
+                              });
+                            },
+                          ),
+                        ),
+                        Flexible(
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              final num_action = listFiltered[index].nAct;
+                              final num_sous_action =
+                                  listFiltered[index].nSousAct;
+                              return Card(
+                                color: Color(0xF2F2F2F2),
+                                child: ListTile(
+                                  title: Text(
+                                    ' Action: ${num_action}   \n Sous Action: ${num_sous_action}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 5.0,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        RichText(
+                                          text: TextSpan(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                            children: [
+                                              WidgetSpan(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 2.0),
+                                                  child: Icon(
+                                                      Icons.calendar_today),
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      '${listFiltered[index].dateSuivi}'),
+
+                                              //TextSpan(text: '${action.declencheur}'),
+                                            ],
+                                          ),
+                                        ),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                            children: [
+                                              WidgetSpan(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 2.0),
+                                                  child: Icon(Icons.person),
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      '${listFiltered[index].nomprerr}'),
+
+                                              //TextSpan(text: '${action.declencheur}'),
+                                            ],
+                                          ),
+                                        ),
+                                        Text(
+                                          'Taux real : ${listFiltered[index].pourcentReal} %',
+                                          style: TextStyle(
+                                              color: Color(0xff111558),
+                                              fontSize: 15),
+                                        ),
+                                        listFiltered[index].rapportEff == ''
+                                            ? Text('')
+                                            : ReadMoreText(
+                                                "Rapport : ${listFiltered[index].rapportEff}",
+                                                style: TextStyle(
+                                                    color: Color(0xFF3B465E),
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                trimLines: 2,
+                                                colorClickableText:
+                                                    CustomColors.bleuCiel,
+                                                trimMode: TrimMode.Line,
+                                                trimCollapsedText: 'more',
+                                                trimExpandedText: 'less',
+                                                moreStyle: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        CustomColors.bleuCiel),
+                                              )
+                                      ],
+                                    ),
+                                  ),
+                                  trailing: Container(
+                                    padding: EdgeInsets.only(top: 25.0),
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        Get.to(RemplirActionSuivi(
+                                            actionsuivi: listFiltered[index]));
+                                      },
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// this function uses to navigate (move to next screen) User Details page and pass user objects into the User Details page. ///
+                                  onTap: () {
+                                    Get.to(RemplirActionSuivi(
+                                        actionsuivi: listFiltered[index]));
+                                  },
+                                ),
+                              );
+                            },
+                            itemCount: listFiltered.length,
+                            //itemCount: actionsList.length + 1,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : const Center(
+                    child: Text('Empty List',
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
       ),
     );
   }
-
 }

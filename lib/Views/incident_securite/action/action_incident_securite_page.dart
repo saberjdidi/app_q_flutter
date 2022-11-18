@@ -3,16 +3,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:qualipro_flutter/Services/visite_securite/visite_securite_service.dart';
-import '../../../Controllers/incident_securite/incident_securite_controller.dart';
-import '../../../Controllers/visite_securite/visite_securite_controller.dart';
-import '../../../Models/action/action_model.dart';
 import '../../../Models/incident_securite/action_inc_sec.dart';
-import '../../../Models/type_cause_model.dart';
-import '../../../Route/app_route.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Services/incident_securite/incident_securite_service.dart';
 import '../../../Services/incident_securite/local_incident_securite_service.dart';
 import '../../../Utils/custom_colors.dart';
@@ -143,7 +135,7 @@ class _ActionIncidentSecuritePageState
             ),
           ),
           title: Text(
-            'Actions of Incident Securite N°${widget.numFiche}',
+            'Actions Incident Securite N°${widget.numFiche}',
             style: TextStyle(color: Colors.black, fontSize: 17),
           ),
           backgroundColor: (lightPrimary),
@@ -299,7 +291,7 @@ class _ActionIncidentSecuritePageState
                             ),
                             Center(
                               child: Text(
-                                'Ajouter Action',
+                                '${'new'.tr} Action',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "Brand-Bold",
@@ -336,14 +328,14 @@ class _ActionIncidentSecuritePageState
                                         actionModel = data;
                                         selectedNAction = data?.nAct;
                                         selectedAction = data?.act;
-                                        print(
+                                        debugPrint(
                                             'Action: $selectedAction, num: ${selectedNAction}');
                                       },
                                       dropdownBuilder: _customDropDownAction,
                                       popupItemBuilder:
                                           _customPopupItemBuilderAction,
                                       validator: (u) => u == null
-                                          ? "Action est obligatoire "
+                                          ? "Action ${'is_required'.tr}"
                                           : null,
                                     ),
                                   ),
@@ -372,7 +364,7 @@ class _ActionIncidentSecuritePageState
                                       ),
                                       icon: Icon(Icons.cancel),
                                       label: Text(
-                                        'Cancel',
+                                        'cancel'.tr,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
                                       ),
@@ -406,7 +398,7 @@ class _ActionIncidentSecuritePageState
                                       ),
                                       icon: Icon(Icons.save),
                                       label: Text(
-                                        'Save',
+                                        'save'.tr,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
                                       ),
@@ -500,11 +492,11 @@ class _ActionIncidentSecuritePageState
         dialogType: DialogType.ERROR,
         body: Center(
           child: Text(
-            'Are you sure to delete this item ${id}',
+            '${'delete_item'.tr} ${id}',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
-        title: 'Delete',
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -564,7 +556,7 @@ class _ActionIncidentSecuritePageState
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Cancel',
+              'cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

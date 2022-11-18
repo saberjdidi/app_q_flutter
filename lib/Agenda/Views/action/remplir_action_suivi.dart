@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
 
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Models/action/action_suivi_model.dart';
+import '../../../Models/image_model.dart';
 import '../../../Services/action/action_service.dart';
 import '../../../Services/action/local_action_service.dart';
 import '../../../Utils/custom_colors.dart';
@@ -22,6 +24,7 @@ import '../../../Utils/utility_file.dart';
 import '../../../Validators/validator.dart';
 import 'action_realisation_page.dart';
 import 'update_taux_realisation.dart';
+import 'package:path/path.dart' as mypath;
 
 class RemplirActionSuivi extends StatefulWidget {
   ActionSuiviModel actionsuivi;
@@ -52,8 +55,13 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
   //image picker
   final ImagePicker imagePicker = ImagePicker();
   List<XFile> imageFileList = [];
-  List<String> base64List = [];
-  String base64String = '';
+  List<ImageModel> base64List = [];
+  //String base64String = '';
+  //random data
+  var _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  Random _rnd = Random();
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
   @override
   void initState() {
@@ -614,11 +622,15 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
         //print('images list ${imageFileList}');
         for (var i = 0; i < selectedImages.length; i++) {
           final byteData = await selectedImages[i].readAsBytes();
-          print('byte image from gallery :$byteData');
-          base64String = base64Encode(byteData);
-          //print('base64String ${base64String}');
-          base64List.add(base64String);
-          print('list from gallery ${base64List}');
+          debugPrint('byte image from gallery :$byteData');
+          setState(() {
+            var modelImage = ImageModel();
+            modelImage.image = base64Encode(byteData);
+            modelImage.fileName =
+                '${getRandomString(5)}_($matricule)_${selectedImages[i].name}';
+            base64List.add(modelImage);
+            debugPrint('list from gallery ${base64List}');
+          });
         }
       }
       setState(() {});
@@ -651,9 +663,13 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
       final tempImage = File(photo.path);
       imageFileList.add(photo);
       setState(() {
-        //pickedImage = tempImage;
-        base64String = UtilityFile.base64String(tempImage.readAsBytesSync());
-        base64List.add(base64String);
+        // base64String = UtilityFile.base64String(tempImage.readAsBytesSync());
+        var modelImage = ImageModel();
+        modelImage.image =
+            UtilityFile.base64String(tempImage.readAsBytesSync());
+        modelImage.fileName =
+            '${getRandomString(5)}_($matricule)_${mypath.basename(tempImage.path)}';
+        base64List.add(modelImage);
         print('list from camera ${base64List}');
       });
 
@@ -711,9 +727,9 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
           await actionService.uploadImageSousAction({
             "nact": widget.actionsuivi.nAct.toString(),
             "nsousact": widget.actionsuivi.nSousAct.toString(),
-            "base64photo": element.toString(),
+            "base64photo": element.image.toString(),
             "nomp": "",
-            "objp": "",
+            "objp": element.fileName.toString(),
             "mat": matricule.toString()
           }).then((resp) async {
             //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);

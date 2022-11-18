@@ -7,6 +7,7 @@ import '../../Models/category_model.dart';
 import '../../Models/gravite_model.dart';
 import '../../Models/incident_environnement/cout_estime_inc_env_model.dart';
 import '../../Models/incident_environnement/type_cause_incident_model.dart';
+import '../../Models/incident_environnement/upload_image_model.dart';
 import '../../Models/incident_securite/action_inc_sec.dart';
 import '../../Models/incident_securite/champ_obligatore_incident_securite_model.dart';
 import '../../Models/incident_securite/evenement_declencheur_model.dart';
@@ -330,6 +331,22 @@ class LocalIncidentSecuriteService {
 
   getMaxNumSiteLesionIncSecRattacher() async {
     return await dbHelper.getMaxNumSiteLesionIncSecRattacher();
+  }
+
+  //upload image
+  Future<List<UploadImageModel>> readImagesIncidentSecurite() async {
+    final response = await dbHelper.readImagesIncidentSecurite();
+    final List result = response;
+    return result.map(((e) => UploadImageModel.fromDBLocal(e))).toList();
+  }
+
+  uploadImageIncidentSecurite(UploadImageModel model) async {
+    return await dbHelper.uploadImageIncidentSecurite(
+        DBTable.upload_image_inc_sec, model.dataMap());
+  }
+
+  deleteTableImageIncidentSecurite() async {
+    return await dbHelper.deleteTableImageIncidentSecurite();
   }
 
   //gravite

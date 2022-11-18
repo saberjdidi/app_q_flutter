@@ -15,19 +15,20 @@ import '../../../Views/home_page.dart';
 import 'remplir_pnc_decision_validation.dart';
 
 class PNCValiderDecisionTraitementPage extends StatefulWidget {
-
   PNCValiderDecisionTraitementPage({Key? key}) : super(key: key);
 
   @override
-  State<PNCValiderDecisionTraitementPage> createState() => _PNCValiderDecisionTraitementPageState();
+  State<PNCValiderDecisionTraitementPage> createState() =>
+      _PNCValiderDecisionTraitementPageState();
 }
 
-class _PNCValiderDecisionTraitementPageState extends State<PNCValiderDecisionTraitementPage> {
-
+class _PNCValiderDecisionTraitementPageState
+    extends State<PNCValiderDecisionTraitementPage> {
   PNCService localService = PNCService();
   final matricule = SharedPreference.getMatricule();
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
-  List<PNCValidationTraitementModel> listPNC = List<PNCValidationTraitementModel>.empty(growable: true);
+  List<PNCValidationTraitementModel> listPNC =
+      List<PNCValidationTraitementModel>.empty(growable: true);
   List<PNCValidationTraitementModel> listFiltered = [];
   TextEditingController controller = TextEditingController();
   String _searchResult = '';
@@ -41,10 +42,10 @@ class _PNCValiderDecisionTraitementPageState extends State<PNCValiderDecisionTra
   void getPNCValideDecisionTraitement() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-       // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-       var response = await LocalPNCService().readPNCDecisionValidation();
-        response.forEach((data){
+      if (connection == ConnectivityResult.none) {
+        // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+        var response = await LocalPNCService().readPNCDecisionValidation();
+        response.forEach((data) {
           setState(() {
             var model = PNCValidationTraitementModel();
             model.nnc = data['nnc'];
@@ -62,11 +63,12 @@ class _PNCValiderDecisionTraitementPageState extends State<PNCValiderDecisionTra
             });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-       //rest api
-        await PNCService().getPNCValiderDecisionTraitement(matricule).then((resp) async {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+        //rest api
+        await PNCService().getPNCValiderDecisionTraitement(matricule).then(
+            (resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -86,16 +88,13 @@ class _PNCValiderDecisionTraitementPageState extends State<PNCValiderDecisionTra
               });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-    }
-
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -110,18 +109,21 @@ class _PNCValiderDecisionTraitementPageState extends State<PNCValiderDecisionTra
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
             'Validation de Decision ${listPNC.length}',
@@ -132,146 +134,167 @@ class _PNCValiderDecisionTraitementPageState extends State<PNCValiderDecisionTra
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listPNC.isNotEmpty ?
-            RefreshWidget(
-              keyRefresh: keyRefresh,
-              onRefresh: () async {
-                controller.clear();
-                listPNC.clear();
-                getPNCValideDecisionTraitement();
-              },
-              child: Column(
-                children: <Widget>[
-                  Card(
-                    //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: InkWell(
-                            onTap: (){
+            child: listPNC.isNotEmpty
+                ? RefreshWidget(
+                    keyRefresh: keyRefresh,
+                    onRefresh: () async {
+                      controller.clear();
+                      listPNC.clear();
+                      getPNCValideDecisionTraitement();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Card(
+                          //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                          child: TextField(
+                            controller: controller,
+                            decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.clear();
+                                      _searchResult = '';
+                                      listFiltered = listPNC;
+                                    });
+                                  },
+                                  child: controller.text.trim() == ''
+                                      ? Text('')
+                                      : Icon(Icons.cancel),
+                                ),
+                                hintText: 'Search',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue))),
+                            onChanged: (value) {
                               setState(() {
-                                controller.clear();
-                                _searchResult = '';
-                                listFiltered = listPNC;
+                                _searchResult = value;
+                                listFiltered = listPNC
+                                    .where((user) =>
+                                        user.nnc
+                                            .toString()
+                                            .contains(_searchResult) ||
+                                        user.nc!
+                                            .toLowerCase()
+                                            .contains(_searchResult) ||
+                                        user.typeNC!
+                                            .toLowerCase()
+                                            .contains(_searchResult))
+                                    .toList();
                               });
                             },
-                            child: controller.text.trim()=='' ?Text('') :Icon(Icons.cancel),
                           ),
-                          hintText: 'Search',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: Colors.blue)
-                          )
-                      ),
-                      onChanged: (value){
-                        setState(() {
-                          _searchResult = value;
-                          listFiltered = listPNC.where((user) =>
-                          user.nnc.toString().contains(_searchResult)
-                              || user.nc!.toLowerCase().contains(_searchResult)
-                              || user.typeNC!.toLowerCase().contains(_searchResult)
-                          ).toList();
-                        });
-                      },
-                    ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        final num_pnc = listFiltered[index].nnc;
-                        return Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                'PNC N°${num_pnc}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          WidgetSpan(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                              child: Icon(Icons.calendar_today),
-                                            ),
+                        ),
+                        Flexible(
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              final num_pnc = listFiltered[index].nnc;
+                              return Card(
+                                color: Color(0xFFFCF9F9),
+                                child: ListTile(
+                                  title: Text(
+                                    'PNC N°${num_pnc}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        RichText(
+                                          text: TextSpan(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                            children: [
+                                              WidgetSpan(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 2.0),
+                                                  child: Icon(
+                                                      Icons.calendar_today),
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      '${listFiltered[index].dateDetect}'),
+
+                                              //TextSpan(text: '${action.declencheur}'),
+                                            ],
                                           ),
-                                          TextSpan(text: '${listFiltered[index].dateDetect}'),
-
-                                          //TextSpan(text: '${action.declencheur}'),
-                                        ],
-
-                                      ),
+                                        ),
+                                        RichText(
+                                          textAlign: TextAlign.start,
+                                          text: TextSpan(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                            children: [
+                                              TextSpan(
+                                                  text:
+                                                      'Type : ${listFiltered[index].typeNC}'),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 5, bottom: 5),
+                                          child: Text(
+                                              'Produit : ${listFiltered[index].produit}',
+                                              style: TextStyle(
+                                                  color: Colors.blueAccent)),
+                                        ),
+                                        ReadMoreText(
+                                          "Designation : ${listFiltered[index].nc}",
+                                          style: TextStyle(
+                                              color: Color(0xFF3B465E),
+                                              fontWeight: FontWeight.bold),
+                                          trimLines: 3,
+                                          colorClickableText:
+                                              CustomColors.bleuCiel,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'more',
+                                          trimExpandedText: 'less',
+                                          moreStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: CustomColors.bleuCiel),
+                                        )
+                                      ],
                                     ),
-
-                                    RichText(
-                                      textAlign: TextAlign.start,
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          TextSpan(text: 'Type : ${listFiltered[index].typeNC}'),
-                                        ],
-
-                                      ),
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () async {
+                                      Get.to(RemplirPNCDecisionValidation(
+                                        pncModel: listFiltered[index],
+                                      ));
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                      child: Text('Produit : ${listFiltered[index].produit}',
-                                          style: TextStyle(color: Colors.blueAccent)),
-                                    ),
-                                    ReadMoreText(
-                                      "Designation : ${listFiltered[index].nc}",
-                                      style: TextStyle(
-                                          color: Color(0xFF3B465E),
-                                          fontWeight: FontWeight.bold),
-                                      trimLines: 3,
-                                      colorClickableText: CustomColors.bleuCiel,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: 'more',
-                                      trimExpandedText: 'less',
-                                      moreStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: CustomColors.bleuCiel),
-                                    )
-                                  ],
+                                    tooltip: 'validation decision',
+                                  ),
                                 ),
-                              ),
-                              trailing: IconButton(
-                                onPressed: () async {
-                                  Get.to(RemplirPNCDecisionValidation(pncModel: listFiltered[index],));
-                                },
-                                icon: Icon(Icons.edit, color: Colors.green,),
-                                tooltip: 'validation decision',
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.0,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        );
-                      },
-                      itemCount: listFiltered.length,
-                      //itemCount: actionsList.length + 1,
+                              );
+                            },
+                            itemCount: listFiltered.length,
+                            //itemCount: actionsList.length + 1,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : const Center(
+                    child: Text('Empty List',
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
       ),
     );
   }
-
 }

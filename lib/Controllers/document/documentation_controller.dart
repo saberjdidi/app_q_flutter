@@ -5,30 +5,22 @@ import 'package:get/get.dart';
 import 'package:qualipro_flutter/Models/documentation/type_document_model.dart';
 import 'package:qualipro_flutter/Services/document/documentation_service.dart';
 import 'package:qualipro_flutter/Services/document/local_documentation_service.dart';
-import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
-
 import '../../Models/documentation/documentation_model.dart';
-import '../../Models/pnc/pnc_model.dart';
-import '../../Models/reunion/reunion_model.dart';
-import '../../Services/pnc/pnc_service.dart';
-import '../../Services/reunion/local_reunion_service.dart';
-import '../../Services/reunion/reunion_service.dart';
-import '../../Utils/constants.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
 
 class DocumentationController extends GetxController {
-
   var listDocument = List<DocumentationModel>.empty(growable: true).obs;
   var filterDocument = List<DocumentationModel>.empty(growable: true);
   var isDataProcessing = false.obs;
-  LocalDocumentationService localDocumentationService = LocalDocumentationService();
+  LocalDocumentationService localDocumentationService =
+      LocalDocumentationService();
   final matricule = SharedPreference.getMatricule();
   //search
   TextEditingController searchLibelle = TextEditingController();
   TextEditingController searchCode = TextEditingController();
-  String? searchType = "";
-  String? searchTypeOffline = "";
+  var searchType = ''.obs;
+  String searchTypeOffline = '';
   TypeDocumentModel? typeDocumentModel = null;
 
   @override
@@ -37,7 +29,7 @@ class DocumentationController extends GetxController {
     super.onInit();
     searchLibelle.text = '';
     searchCode.text = '';
-    searchType = '';
+    searchType.value = '';
     searchTypeOffline = '';
     getDocument();
     //checkConnectivity();
@@ -46,11 +38,12 @@ class DocumentationController extends GetxController {
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -89,10 +82,11 @@ class DocumentationController extends GetxController {
             print('element document ${element.cdi} - ${element.libelle}');
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
-        await DocumentationService().getDocument(matricule).then((response) async {
+        await DocumentationService().getDocument(matricule).then(
+            (response) async {
           print('response doc : $response');
           //isDataProcessing(false);
           response.forEach((data) async {
@@ -113,7 +107,7 @@ class DocumentationController extends GetxController {
             model.mail = data['mail'];
             model.mailBoolean = data['mail_boolean'];
             model.dateCreat = data['date_creat'];
-            if(model.dateCreat == null){
+            if (model.dateCreat == null) {
               model.dateCreat = "";
             }
             model.dateRevue = data['dateRevue'];
@@ -121,7 +115,7 @@ class DocumentationController extends GetxController {
             model.nbrVers = data['nbr_vers'];
             model.superv = data['superv'];
             model.sitesuperv = data['sitesuperv'];
-            if(model.sitesuperv == null){
+            if (model.sitesuperv == null) {
               model.sitesuperv = "";
             }
             model.important = data['important'];
@@ -132,22 +126,18 @@ class DocumentationController extends GetxController {
             listDocument.forEach((element) {
               //print('element document ${element.cdi} - ${element.libelle}');
             });
-
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              //ShowSnackBar.snackBar("Error documentation", err.toString(), Colors.red);
-              print('Error documentation : ${err.toString()}');
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          //ShowSnackBar.snackBar("Error documentation", err.toString(), Colors.red);
+          print('Error documentation : ${err.toString()}');
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
@@ -157,14 +147,15 @@ class DocumentationController extends GetxController {
       isDataProcessing.value = true;
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        if(kDebugMode) {
+        if (kDebugMode) {
           print('search libelle : ${searchLibelle.text}');
           print('search code : ${searchCode.text}');
           print('search type : ${searchTypeOffline}');
         }
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //get local data
-        var response = await localDocumentationService.searchDocumentation(searchCode.text, searchLibelle.text, searchTypeOffline);
+        var response = await localDocumentationService.searchDocumentation(
+            searchCode.text, searchLibelle.text, searchTypeOffline);
         response.forEach((data) {
           var model = DocumentationModel();
           model.online = data['online'];
@@ -194,15 +185,14 @@ class DocumentationController extends GetxController {
           searchLibelle.clear();
           searchCode.clear();
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
-        if(kDebugMode) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        if (kDebugMode) {
           print('search libelle : ${searchLibelle.text}');
           print('search code : ${searchCode.text}');
-          print('search type : ${searchType}');
+          print('search type : ${searchType.value}');
         }
-       /* var URL = '${AppConstants.DOCUMENTATION_URL}/getListeDocument?mat=${matricule}'.obs;
+        /* var URL = '${AppConstants.DOCUMENTATION_URL}/getListeDocument?mat=${matricule}'.obs;
         if(searchLibelle.text != '' && searchCode.text != ''){
           URL.value = '${AppConstants.DOCUMENTATION_URL}/getListeDocument?mat=${matricule}&libelle=${searchLibelle.text}&Code=${searchCode.text}';
          }
@@ -217,7 +207,10 @@ class DocumentationController extends GetxController {
         } */
 
         //rest api
-        await DocumentationService().searchDocument(matricule, searchCode.text, searchLibelle.text, searchType).then((response) async {
+        await DocumentationService()
+            .searchDocument(matricule, searchCode.text, searchLibelle.text,
+                searchType.value)
+            .then((response) async {
           print('response doc : $response');
           //isDataProcessing(false);
           response.forEach((data) async {
@@ -238,7 +231,7 @@ class DocumentationController extends GetxController {
             model.mail = data['mail'];
             model.mailBoolean = data['mail_boolean'];
             model.dateCreat = data['date_creat'];
-            if(model.dateCreat == null){
+            if (model.dateCreat == null) {
               model.dateCreat = "";
             }
             model.dateRevue = data['dateRevue'];
@@ -246,7 +239,7 @@ class DocumentationController extends GetxController {
             model.nbrVers = data['nbr_vers'];
             model.superv = data['superv'];
             model.sitesuperv = data['sitesuperv'];
-            if(model.sitesuperv == null){
+            if (model.sitesuperv == null) {
               model.sitesuperv = "";
             }
             model.important = data['important'];
@@ -257,23 +250,20 @@ class DocumentationController extends GetxController {
             listDocument.forEach((element) {
               //print('element document ${element.cdi} - ${element.libelle}');
             });
-              searchLibelle.clear();
-              searchCode.clear();
+            searchLibelle.clear();
+            searchCode.clear();
           });
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              //ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-              print('error : ${err.toString()}');
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          //ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          print('error : ${err.toString()}');
+        });
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
@@ -283,12 +273,11 @@ class DocumentationController extends GetxController {
     try {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //save data in db local
         await DocumentationService().getDocument(matricule).then((resp) async {
           resp.forEach((data) async {
@@ -307,14 +296,14 @@ class DocumentationController extends GetxController {
             model.favorisEtat = data['favoris_etat'];
             model.mail = data['mail'];
             model.dateCreat = data['date_creat'];
-            if(model.dateCreat == null){
+            if (model.dateCreat == null) {
               model.dateCreat = "";
             }
             model.dateRevue = data['dateRevue'];
             model.dateprochRevue = data['dateprochRevue'];
             model.superv = data['superv'];
             model.sitesuperv = data['sitesuperv'];
-            if(model.sitesuperv == null){
+            if (model.sitesuperv == null) {
               model.sitesuperv = "";
             }
             model.important = data['important'];
@@ -324,20 +313,18 @@ class DocumentationController extends GetxController {
             await localDocumentationService.deleteTableDocumentation();
             //save data
             await localDocumentationService.saveDocumentation(model);
-            print('Inserting data in table Documentation : ${model.cdi} - ${model.libelle}');
+            print(
+                'Inserting data in table Documentation : ${model.cdi} - ${model.libelle}');
           });
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }

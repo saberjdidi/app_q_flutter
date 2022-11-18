@@ -17,19 +17,19 @@ import 'remplir_pnc_approbation_finale.dart';
 import 'remplir_pnc_suivre.dart';
 
 class PNCApprobationFinalePage extends StatefulWidget {
-
   PNCApprobationFinalePage({Key? key}) : super(key: key);
 
   @override
-  State<PNCApprobationFinalePage> createState() => _PNCApprobationFinalePageState();
+  State<PNCApprobationFinalePage> createState() =>
+      _PNCApprobationFinalePageState();
 }
 
 class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
-
   PNCService localService = PNCService();
   final matricule = SharedPreference.getMatricule();
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
-  List<PNCSuivreModel> listApprobationFinale = List<PNCSuivreModel>.empty(growable: true);
+  List<PNCSuivreModel> listApprobationFinale =
+      List<PNCSuivreModel>.empty(growable: true);
   List<PNCSuivreModel> listFiltered = [];
   TextEditingController controller = TextEditingController();
   String _searchResult = '';
@@ -43,10 +43,10 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
   void getApprobationFinale() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
+      if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
         var response = await LocalPNCService().readPNCApprobationFinale();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = PNCSuivreModel();
             model.nnc = data['nnc'];
@@ -65,10 +65,10 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
             });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-       //rest api
+        //rest api
         await PNCService().getApprobationFinale(matricule).then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
@@ -90,16 +90,13 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
               });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-    }
-
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -114,18 +111,21 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
             'Approbation Finale : ${listApprobationFinale.length}',
@@ -136,140 +136,160 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listApprobationFinale.isNotEmpty ?
-            RefreshWidget(
-              keyRefresh: keyRefresh,
-              onRefresh: () async {
-                controller.clear();
-                listApprobationFinale.clear();
-                getApprobationFinale();
-              },
-              child: Column(
-                children: <Widget>[
-                  Card(
-                    //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: InkWell(
-                            onTap: (){
+            child: listApprobationFinale.isNotEmpty
+                ? RefreshWidget(
+                    keyRefresh: keyRefresh,
+                    onRefresh: () async {
+                      controller.clear();
+                      listApprobationFinale.clear();
+                      getApprobationFinale();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Card(
+                          //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                          child: TextField(
+                            controller: controller,
+                            decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.clear();
+                                      _searchResult = '';
+                                      listFiltered = listApprobationFinale;
+                                    });
+                                  },
+                                  child: controller.text.trim() == ''
+                                      ? Text('')
+                                      : Icon(Icons.cancel),
+                                ),
+                                hintText: 'Search',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue))),
+                            onChanged: (value) {
                               setState(() {
-                                controller.clear();
-                                _searchResult = '';
-                                listFiltered = listApprobationFinale;
+                                _searchResult = value;
+                                listFiltered = listApprobationFinale
+                                    .where((user) =>
+                                        user.nnc
+                                            .toString()
+                                            .contains(_searchResult) ||
+                                        user.produit!
+                                            .toLowerCase()
+                                            .contains(_searchResult) ||
+                                        user.typeNC!
+                                            .toLowerCase()
+                                            .contains(_searchResult))
+                                    .toList();
                               });
                             },
-                            child: controller.text.trim()=='' ?Text('') :Icon(Icons.cancel),
                           ),
-                          hintText: 'Search',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: Colors.blue)
-                          )
-                      ),
-                      onChanged: (value){
-                        setState(() {
-                          _searchResult = value;
-                          listFiltered = listApprobationFinale.where((user) =>
-                          user.nnc.toString().contains(_searchResult)
-                              || user.produit!.toLowerCase().contains(_searchResult)
-                              || user.typeNC!.toLowerCase().contains(_searchResult)
-                          ).toList();
-                        });
-                      },
-                    ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        final num_pnc = listFiltered[index].nnc;
+                        ),
+                        Flexible(
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              final num_pnc = listFiltered[index].nnc;
 
-                        return Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                'PNC N°${num_pnc}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          WidgetSpan(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                              child: Icon(Icons.calendar_today),
-                                            ),
+                              return Card(
+                                color: Color(0xFFFCF9F9),
+                                child: ListTile(
+                                  title: Text(
+                                    'PNC N°${num_pnc}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        RichText(
+                                          text: TextSpan(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                            children: [
+                                              WidgetSpan(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 2.0),
+                                                  child: Icon(
+                                                      Icons.calendar_today),
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      '${listFiltered[index].dateDetect}'),
+
+                                              //TextSpan(text: '${action.declencheur}'),
+                                            ],
                                           ),
-                                          TextSpan(text: '${listFiltered[index].dateDetect}'),
-
-                                          //TextSpan(text: '${action.declencheur}'),
-                                        ],
-
-                                      ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 5, bottom: 5),
+                                          child: Text(
+                                              'Produit : ${listFiltered[index].produit}',
+                                              style: TextStyle(
+                                                  color: Colors.blueAccent)),
+                                        ),
+                                        ReadMoreText(
+                                          "Type : ${listFiltered[index].typeNC}",
+                                          style: TextStyle(
+                                              color: Color(0xFF3B465E),
+                                              fontWeight: FontWeight.bold),
+                                          trimLines: 3,
+                                          colorClickableText:
+                                              CustomColors.bleuCiel,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'more',
+                                          trimExpandedText: 'less',
+                                          moreStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: CustomColors.bleuCiel),
+                                        )
+                                      ],
                                     ),
-
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                      child: Text('Produit : ${listFiltered[index].produit}',
-                                          style: TextStyle(color: Colors.blueAccent)),
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () async {
+                                      Get.to(RemplirPNCApprobationFinale(
+                                        nnc: listFiltered[index].nnc,
+                                      ));
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
                                     ),
-                                    ReadMoreText(
-                                      "Type : ${listFiltered[index].typeNC}",
-                                      style: TextStyle(
-                                          color: Color(0xFF3B465E),
-                                          fontWeight: FontWeight.bold),
-                                      trimLines: 3,
-                                      colorClickableText: CustomColors.bleuCiel,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: 'more',
-                                      trimExpandedText: 'less',
-                                      moreStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: CustomColors.bleuCiel),
-                                    )
-                                  ],
+                                    tooltip: 'approbation finale',
+                                  ),
+                                  onTap: () {
+                                    Get.to(RemplirPNCApprobationFinale(
+                                      nnc: listFiltered[index].nnc,
+                                    ));
+                                  },
                                 ),
-                              ),
-                              trailing: IconButton(
-                                onPressed: () async {
-                                  Get.to(RemplirPNCApprobationFinale(nnc: listFiltered[index].nnc,));
-                                },
-                                icon: Icon(Icons.edit, color: Colors.green,),
-                                tooltip: 'approbation finale',
-                              ),
-                              onTap: () {
-                                Get.to(RemplirPNCApprobationFinale(nnc: listFiltered[index].nnc,));
-                              },
-                            ),
-                            Divider(
-                              thickness: 1.0,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        );
-                      },
-                      itemCount: listFiltered.length,
-                      //itemCount: actionsList.length + 1,
+                              );
+                            },
+                            itemCount: listFiltered.length,
+                            //itemCount: actionsList.length + 1,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : const Center(
+                    child: Text('Empty List',
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
       ),
     );
   }
-
 }

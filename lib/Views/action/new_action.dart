@@ -44,7 +44,7 @@ class NewActionPage extends GetView<ActionController> {
           ),
         ),
         title: Center(
-          child: Text("Ajouter Action"),
+          child: Text("${'new'.tr} Action"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -99,8 +99,8 @@ class NewActionPage extends GetView<ActionController> {
                               validator: (value) =>
                                   Validator.validateField(value: value!),
                               decoration: InputDecoration(
-                                labelText: 'Designation *',
-                                hintText: 'designation',
+                                labelText: '${'designation'.tr} *',
+                                hintText: '${'designation'.tr}',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -181,8 +181,8 @@ class NewActionPage extends GetView<ActionController> {
                                 keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
                                 decoration: InputDecoration(
-                                    labelText: 'Ref. interne',
-                                    hintText: 'Ref. interne',
+                                    labelText: 'ref_interne'.tr,
+                                    hintText: 'ref_interne'.tr,
                                     labelStyle: TextStyle(
                                       fontSize: 14.0,
                                     ),
@@ -201,37 +201,43 @@ class NewActionPage extends GetView<ActionController> {
                             SizedBox(
                               height: 10.0,
                             ),
-                            TextFormField(
-                              controller: controller.dateController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              validator: (value) =>
-                                  Validator.validateField(value: value!),
-                              onChanged: (value) {
+                            InkWell(
+                              onTap: () {
                                 controller.selectedDate(context);
                               },
-                              decoration: InputDecoration(
-                                  labelText: 'Date creation',
-                                  hintText: 'date',
-                                  labelStyle: TextStyle(
-                                    fontSize: 14.0,
-                                  ),
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 10.0,
-                                  ),
-                                  suffixIcon: InkWell(
-                                    onTap: () {
-                                      controller.selectedDate(context);
-                                    },
-                                    child: Icon(Icons.calendar_today),
-                                  ),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.lightBlue, width: 1),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10)))),
-                              style: TextStyle(fontSize: 14.0),
+                              child: TextFormField(
+                                enabled: false,
+                                controller: controller.dateController,
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.next,
+                                validator: (value) =>
+                                    Validator.validateField(value: value!),
+                                onChanged: (value) {
+                                  controller.selectedDate(context);
+                                },
+                                decoration: InputDecoration(
+                                    labelText: 'creation_date'.tr,
+                                    hintText: 'date',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14.0,
+                                    ),
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 10.0,
+                                    ),
+                                    suffixIcon: InkWell(
+                                      onTap: () {
+                                        controller.selectedDate(context);
+                                      },
+                                      child: Icon(Icons.calendar_today),
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.lightBlue, width: 1),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)))),
+                                style: TextStyle(fontSize: 14.0),
+                              ),
                             ),
                             SizedBox(
                               height: 10.0,
@@ -251,8 +257,8 @@ class NewActionPage extends GetView<ActionController> {
                                   controller.selectedDate(context);
                                 },
                                 decoration: InputDecoration(
-                                    labelText: 'Date saisie',
-                                    hintText: 'date saisie',
+                                    labelText: 'date_saisie'.tr,
+                                    hintText: 'date',
                                     labelStyle: TextStyle(
                                       fontSize: 14.0,
                                     ),
@@ -309,8 +315,9 @@ class NewActionPage extends GetView<ActionController> {
                                       controller.customDropDownType,
                                   popupItemBuilder:
                                       controller.customPopupItemBuilderType,
-                                  validator: (u) =>
-                                      u == null ? "type is required " : null,
+                                  validator: (u) => u == null
+                                      ? "type ${'is_required'.tr} "
+                                      : null,
                                 )),
 
                             SizedBox(
@@ -350,8 +357,9 @@ class NewActionPage extends GetView<ActionController> {
                                       controller.customDropDownSource,
                                   popupItemBuilder:
                                       controller.customPopupItemBuilderSource,
-                                  validator: (u) =>
-                                      u == null ? "source is required " : null,
+                                  validator: (u) => u == null
+                                      ? "source ${'is_required'.tr} "
+                                      : null,
                                 )),
 
                             SizedBox(
@@ -437,7 +445,7 @@ class NewActionPage extends GetView<ActionController> {
                                     validator: (u) =>
                                         (controller.site_obligatoire == 1 &&
                                                 controller.siteModel == null)
-                                            ? "site is required "
+                                            ? "site ${'is_required'.tr}"
                                             : null,
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
@@ -519,7 +527,7 @@ class NewActionPage extends GetView<ActionController> {
                                                     .processus_obligatoire ==
                                                 1 &&
                                             controller.processusModel == null)
-                                        ? "processus is required "
+                                        ? "processus ${'is_required'.tr} "
                                         : null,
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
@@ -571,7 +579,7 @@ class NewActionPage extends GetView<ActionController> {
                                     isFilteredOnline: true,
                                     compareFn: (i, s) => i?.isEqual(s) ?? false,
                                     dropdownSearchDecoration: InputDecoration(
-                                      labelText: "Responsable Cloture",
+                                      labelText: 'resp_cloture'.tr,
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
@@ -637,7 +645,7 @@ class NewActionPage extends GetView<ActionController> {
                                     isFilteredOnline: true,
                                     compareFn: (i, s) => i?.isEqual(s) ?? false,
                                     dropdownSearchDecoration: InputDecoration(
-                                      labelText: "Responsable Suivi",
+                                      labelText: 'resp_suivi'.tr,
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
@@ -706,7 +714,7 @@ class NewActionPage extends GetView<ActionController> {
                                     isFilteredOnline: true,
                                     compareFn: (i, s) => i?.isEqual(s) ?? false,
                                     dropdownSearchDecoration: InputDecoration(
-                                      labelText: "A l'origine de l'action",
+                                      labelText: 'origine_action'.tr,
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
@@ -801,7 +809,7 @@ class NewActionPage extends GetView<ActionController> {
                                                     .direction_obligatoire ==
                                                 1 &&
                                             controller.directionModel == null)
-                                        ? "direction is required "
+                                        ? "direction ${'is_required'.tr} "
                                         : null,
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
@@ -876,7 +884,7 @@ class NewActionPage extends GetView<ActionController> {
                                                     .serviceModel ==
                                                 null &&
                                             controller.service_obligatoire == 1)
-                                        ? "service is required "
+                                        ? "service ${'is_required'.tr} "
                                         : null,
                                     //u == null ? "service is required " : null,
                                     onBeforeChange: (a, b) {
@@ -928,7 +936,7 @@ class NewActionPage extends GetView<ActionController> {
                                     compareFn: (i, s) => i?.isEqual(s) ?? false,
                                     dropdownSearchDecoration: InputDecoration(
                                       labelText:
-                                          "Activity ${controller.activity_obligatoire == 1 ? '*' : ''}",
+                                          "${'activity'.tr} ${controller.activity_obligatoire == 1 ? '*' : ''}",
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
@@ -953,7 +961,7 @@ class NewActionPage extends GetView<ActionController> {
                                         (controller.activity_obligatoire == 1 &&
                                                 controller.activityModel ==
                                                     null)
-                                            ? "activity is required "
+                                            ? "activity ${'is_required'.tr} "
                                             : null,
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
@@ -997,8 +1005,8 @@ class NewActionPage extends GetView<ActionController> {
                                   keyboardType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
                                   decoration: InputDecoration(
-                                    labelText: 'Commentaire',
-                                    hintText: 'commentaire',
+                                    labelText: 'comment'.tr,
+                                    hintText: 'comment'.tr,
                                     labelStyle: TextStyle(
                                       fontSize: 14.0,
                                     ),
@@ -1028,8 +1036,8 @@ class NewActionPage extends GetView<ActionController> {
                                   keyboardType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
                                   decoration: InputDecoration(
-                                    labelText: 'Objectif',
-                                    hintText: 'Objectif',
+                                    labelText: 'Objective',
+                                    hintText: 'Objective',
                                     labelStyle: TextStyle(
                                       fontSize: 14.0,
                                     ),
@@ -1170,7 +1178,7 @@ class NewActionPage extends GetView<ActionController> {
                             ),
                             ConstrainedBox(
                               constraints: BoxConstraints.tightFor(
-                                  width: 130, height: 50),
+                                  width: Get.width * 0.5, height: 50),
                               child: ElevatedButton.icon(
                                 style: ButtonStyle(
                                   shape: MaterialStateProperty.all(
@@ -1184,12 +1192,17 @@ class NewActionPage extends GetView<ActionController> {
                                       EdgeInsets.all(14)),
                                 ),
                                 icon: controller.isDataProcessing.value
-                                    ? CircularProgressIndicator()
-                                    : Icon(Icons.save),
+                                    ? CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                    : Icon(
+                                        Icons.save,
+                                        color: Colors.white,
+                                      ),
                                 label: Text(
                                   controller.isDataProcessing.value
-                                      ? 'Processing'
-                                      : 'Save',
+                                      ? 'processing'.tr
+                                      : 'save'.tr,
                                   style: TextStyle(
                                       fontSize: 16, color: Colors.white),
                                 ),
@@ -1713,13 +1726,31 @@ class NewActionPage extends GetView<ActionController> {
           await List<EmployeModel>.empty(growable: true);
       List<EmployeModel> employeFilter =
           await List<EmployeModel>.empty(growable: true);
-      var response = await controller.localActionService.readEmploye();
-      response.forEach((data) {
-        var model = EmployeModel();
-        model.mat = data['mat'];
-        model.nompre = data['nompre'];
-        employeList.add(model);
-      });
+      var connection = await Connectivity().checkConnectivity();
+      if (connection == ConnectivityResult.none) {
+        var response = await controller.localActionService.readEmploye();
+        response.forEach((data) {
+          var model = EmployeModel();
+          model.mat = data['mat'];
+          model.nompre = data['nompre'];
+          employeList.add(model);
+        });
+      } else if (connection == ConnectivityResult.mobile ||
+          connection == ConnectivityResult.wifi) {
+        await ApiServicesCall().getEmploye({"act": "", "lang": ""}).then(
+            (response) async {
+          response.forEach((data) async {
+            //print('get employe : ${data} ');
+            var model = EmployeModel();
+            model.mat = data['mat'];
+            model.nompre = data['nompre'];
+            employeList.add(model);
+          });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error Employe", err.toString(), Colors.red);
+        });
+      }
+
       employeFilter = employeList.where((u) {
         var name = u.mat.toString().toLowerCase();
         var description = u.nompre!.toLowerCase();

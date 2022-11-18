@@ -68,6 +68,42 @@ class IncidentEnvironnementService {
     }
   }
 
+  Future<dynamic> uploadImageIncEnv(Map data) async {
+    try {
+      debugPrint('data : ${json.encode(data)}');
+      var response = await http
+          .post(Uri.parse('${AppConstants.UPLOAD_URL}/uploadPhotoIncEnv'),
+              //Uri.parse('https://10.0.2.2:7019/api/Upload/uploadPhotoIncEnv'),
+              body: json.encode(data),
+              headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error(exception.toString());
+    }
+  }
+
+  Future<List<dynamic>> getImageIncEnv(idFiche) async {
+    try {
+      debugPrint('${AppConstants.UPLOAD_URL}/getImageIncEnv?idFiche=$idFiche');
+      var response = await http.get(
+          Uri.parse(
+              '${AppConstants.UPLOAD_URL}/getImageIncEnv?idFiche=$idFiche'),
+          headers: {'Content-Type': 'application/json'});
+      debugPrint('response image inc env : $response');
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error(exception.toString());
+    }
+  }
+
   //champ obligatoire
   Future<dynamic> getChampObligatoireIncidentEnv() async {
     try {

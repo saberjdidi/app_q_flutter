@@ -1,4 +1,3 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,20 +6,14 @@ import 'package:qualipro_flutter/Models/champ_obligatoire_action_model.dart';
 import 'package:qualipro_flutter/Models/gravite_model.dart';
 import 'package:qualipro_flutter/Models/priorite_model.dart';
 import 'package:qualipro_flutter/Models/action/sous_action_model.dart';
-import 'package:qualipro_flutter/Views/action/action_page.dart';
-
-import '../../Models/Domaine_affectation_model.dart';
 import '../../Models/employe_model.dart';
 import '../../Models/processus_employe_model.dart';
-import '../../Models/processus_model.dart';
-import '../../Route/app_route.dart';
 import '../../Services/action/action_service.dart';
 import '../../Services/action/local_action_service.dart';
 import '../../Services/api_services_call.dart';
 import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
-import '../../Views/action/sous_action/sous_action_page.dart';
 import '../sync_data_controller.dart';
 
 class SousActionController extends GetxController {
@@ -33,8 +26,11 @@ class SousActionController extends GetxController {
 
   //add sous action
   final addItemFormKey = GlobalKey<FormState>();
-  late TextEditingController delaiRealisationController, delaiSuiviController, designationController, risqueController,
-     coutPrevController;
+  late TextEditingController delaiRealisationController,
+      delaiSuiviController,
+      designationController,
+      risqueController,
+      coutPrevController;
   DateTime datePickerReal = DateTime.now();
   DateTime datePickerSuivi = DateTime.now();
   final declencheur = SharedPreference.getNomPrenom();
@@ -60,12 +56,14 @@ class SousActionController extends GetxController {
   EmployeModel? respRealModel = null;
 
   //Champ obligatoire
-  getChampObligatoire() async{
-    List<ChampObligatoireActionModel> champObligatoireList = await List<ChampObligatoireActionModel>.empty(growable: true);
+  getChampObligatoire() async {
+    List<ChampObligatoireActionModel> champObligatoireList =
+        await List<ChampObligatoireActionModel>.empty(growable: true);
     var response = await localActionService.readChampObligatoireAction();
-    response.forEach((data){
+    response.forEach((data) {
       var model = ChampObligatoireActionModel();
-      model.commentaire_Realisation_Action = data['commentaire_Realisation_Action'];
+      model.commentaire_Realisation_Action =
+          data['commentaire_Realisation_Action'];
       model.rapport_Suivi_Action = data['rapport_Suivi_Action'];
       model.delai_Suivi_Action = data['delai_Suivi_Action'];
       model.priorite = data['priorite'];
@@ -79,34 +77,35 @@ class SousActionController extends GetxController {
     });
   }
 
-
-  bool _dataValidation(){
-    if(designationController.text.trim()==''){
-      Message.taskErrorOrWarning("Designation", "designation is required");
+  bool _dataValidation() {
+    if (designationController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'designation'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(delai_suivi_obligatoire == 1 && delaiRealisationController.text.trim()==''){
-      Message.taskErrorOrWarning("Date", "Delai realisation is required");
+    } else if (delai_suivi_obligatoire == 1 &&
+        delaiRealisationController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'delai_real'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(delaiSuiviController.text.trim()==''){
-      Message.taskErrorOrWarning("Type Action", "Delai suivi is required");
+    } else if (delaiSuiviController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'delai_suivi'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(priorite_obligatoire == 1 && prioriteModel == null){
-      Message.taskErrorOrWarning("Priorite", "Priorite is required");
+    } else if (priorite_obligatoire == 1 && prioriteModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'priority'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(gravite_obligatoire == 1 && graviteModel == null){
-      Message.taskErrorOrWarning("Gravite", "gravite is required");
+    } else if (gravite_obligatoire == 1 && graviteModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'gravity'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(respRealModel == null){
-      Message.taskErrorOrWarning("Responsable Realisation", "Responsable Realisation is required");
+    } else if (respRealModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'resp_real'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(resSuiviModel == null){
-      Message.taskErrorOrWarning("Responsable Suivi", "Responsable Suivi is required");
+    } else if (resSuiviModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'resp_suivi'.tr} ${'is_required'.tr}");
       return false;
     }
     return true;
@@ -123,8 +122,10 @@ class SousActionController extends GetxController {
     coutPrevController = TextEditingController();
     delaiRealisationController = TextEditingController();
     delaiSuiviController = TextEditingController();
-    delaiRealisationController.text = DateFormat('dd/MM/yyyy').format(datePickerReal);
-    delaiSuiviController.text = DateFormat('dd/MM/yyyy').format(datePickerSuivi);
+    delaiRealisationController.text =
+        DateFormat('dd/MM/yyyy').format(datePickerReal);
+    delaiSuiviController.text =
+        DateFormat('dd/MM/yyyy').format(datePickerSuivi);
 
     checkConnectivity();
   }
@@ -134,15 +135,15 @@ class SousActionController extends GetxController {
     var countSousActionLocal = LocalActionService().getCountSousActionOffline();
     print('count Table SousAction : ${countSousActionLocal}');
     if (connection == ConnectivityResult.none) {
-     // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-     /* if(countSousActionLocal > 0){
+      /* if(countSousActionLocal > 0){
         ShowSnackBar.snackBar("Synchronization", " data synchronized", Colors.cyan.shade400);
         await syncSousActionToWebService();
       } */
-     // await syncSousActionToWebService();
+      // await syncSousActionToWebService();
     }
   }
 
@@ -152,10 +153,11 @@ class SousActionController extends GetxController {
         initialDate: datePickerReal,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //lastDate: DateTime.now()
-    ))!;
-    if(datePickerReal != null){
-      delaiRealisationController.text = DateFormat('dd/MM/yyyy').format(datePickerReal);
+        //lastDate: DateTime.now()
+        ))!;
+    if (datePickerReal != null) {
+      delaiRealisationController.text =
+          DateFormat('dd/MM/yyyy').format(datePickerReal);
       //delaiRealisationController.text = DateFormat.yMMMMd().format(datePickerReal);
     }
   }
@@ -166,11 +168,12 @@ class SousActionController extends GetxController {
         initialDate: datePickerSuivi,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //firstDate: datePickerReal,
-      //lastDate: DateTime.now()
-    ))!;
-    if(datePickerSuivi != null){
-      delaiSuiviController.text = DateFormat('dd/MM/yyyy').format(datePickerSuivi);
+        //firstDate: datePickerReal,
+        //lastDate: DateTime.now()
+        ))!;
+    if (datePickerSuivi != null) {
+      delaiSuiviController.text =
+          DateFormat('dd/MM/yyyy').format(datePickerSuivi);
     }
   }
 
@@ -181,114 +184,110 @@ class SousActionController extends GetxController {
       id_action = Get.arguments['id_action'];
       print('id action $id_action');
       //rest api
-      await Future.delayed(Duration(seconds: 1),
-              () async {
-                var connection = await Connectivity().checkConnectivity();
-                if (connection == ConnectivityResult.none) {
-                  //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      await Future.delayed(Duration(seconds: 1), () async {
+        var connection = await Connectivity().checkConnectivity();
+        if (connection == ConnectivityResult.none) {
+          //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                  var response = await localActionService.readSousActionByNumAction(id_action);
-                  //print('response sous action local  : $response');
-                  response.forEach((data) {
-                    var model = SousActionModel();
-                    model.nSousAct = data['nSousAct'];
-                    model.nAct = data['nAct'];
-                    model.cloture = data['cloture'];
-                    model.sousAct = data['sousAct'];
-                    model.delaiReal = data['delaiReal'];
-                    model.delaiSuivi = data['delaiSuivi'];
-                    model.dateReal = data['dateReal'];
-                    model.dateSuivi = data['dateSuivi'];
-                    model.coutPrev = data['coutPrev'];
-                    model.pourcentReal = data['pourcentReal'];
-                    model.depense = data['depense'];
-                    model.pourcentSuivie = data['pourcentSuivie'];
-                    model.rapportEff = data['rapportEff'];
-                    model.commentaire = data['commentaire'];
-                    model.respRealNom = data['respRealNompre'];
-                    model.respSuivieNom = data['respSuiviNompre'];
-                    model.respReal = data['respRealMat'];
-                    model.respSuivi = data['respSuiviMat'];
-                    model.priorite = data['priorite'];
-                    model.gravite = data['gravite'];
-                    model.processus = data['processus'];
-                    model.risques = data['risques'];
-                    model.online = data['online'];
+          var response =
+              await localActionService.readSousActionByNumAction(id_action);
+          //print('response sous action local  : $response');
+          response.forEach((data) {
+            var model = SousActionModel();
+            model.nSousAct = data['nSousAct'];
+            model.nAct = data['nAct'];
+            model.cloture = data['cloture'];
+            model.sousAct = data['sousAct'];
+            model.delaiReal = data['delaiReal'];
+            model.delaiSuivi = data['delaiSuivi'];
+            model.dateReal = data['dateReal'];
+            model.dateSuivi = data['dateSuivi'];
+            model.coutPrev = data['coutPrev'];
+            model.pourcentReal = data['pourcentReal'];
+            model.depense = data['depense'];
+            model.pourcentSuivie = data['pourcentSuivie'];
+            model.rapportEff = data['rapportEff'];
+            model.commentaire = data['commentaire'];
+            model.respRealNom = data['respRealNompre'];
+            model.respSuivieNom = data['respSuiviNompre'];
+            model.respReal = data['respRealMat'];
+            model.respSuivi = data['respSuiviMat'];
+            model.priorite = data['priorite'];
+            model.gravite = data['gravite'];
+            model.processus = data['processus'];
+            model.risques = data['risques'];
+            model.online = data['online'];
 
-                    listSousAction.add(model);
-                    listSousAction.forEach((element) {
-                      print('sous act ${element.sousAct}, online: ${element.online}');
-                    });
-                  });
-                }
-                else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-                  //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+            listSousAction.add(model);
+            listSousAction.forEach((element) {
+              print('sous act ${element.sousAct}, online: ${element.online}');
+            });
+          });
+        } else if (connection == ConnectivityResult.wifi ||
+            connection == ConnectivityResult.mobile) {
+          //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                  await ActionService().getSousAction(id_action).then((resp) async {
-                    //isDataProcessing(false);
-                    resp.forEach((data) async {
-                      print('get sous actions : ${data} ');
-                      var model = SousActionModel();
-                      model.nSousAct = data['nSousAct'];
-                      model.nAct = data['nAct'];
-                      model.cloture = data['cloture'];
-                      model.sousAct = data['sousAct'];
-                      model.delaiReal = data['delaiReal'];
-                      model.delaiSuivi = data['delaiSuivi'];
-                      model.dateReal = data['dateReal'];
-                      model.dateSuivi = data['dateSuivi'];
-                      model.coutPrev = data['coutPrev'];
-                      model.pourcentReal = data['pourcentReal'];
-                      model.depense = data['depense'];
-                      model.pourcentSuivie = data['pourcentSuivie'];
-                      model.rapportEff = data['rapportEff'];
-                      model.commentaire = data['commentaire'];
-                      model.respRealNom = data['respRealNom'];
-                      model.respSuivieNom = data['respSuivieNom'];
-                      model.respReal = data['respReal'];
-                      model.respSuivi = data['respSuivi'];
-                      model.priorite = data['priorite'];
-                      model.gravite = data['gravite'];
-                      model.processus = data['processus'];
-                      model.risques = data['risques'];
-                      model.online = 1;
+          await ActionService().getSousAction(id_action).then((resp) async {
+            //isDataProcessing(false);
+            resp.forEach((data) async {
+              print('get sous actions : ${data} ');
+              var model = SousActionModel();
+              model.nSousAct = data['nSousAct'];
+              model.nAct = data['nAct'];
+              model.cloture = data['cloture'];
+              model.sousAct = data['sousAct'];
+              model.delaiReal = data['delaiReal'];
+              model.delaiSuivi = data['delaiSuivi'];
+              model.dateReal = data['dateReal'];
+              model.dateSuivi = data['dateSuivi'];
+              model.coutPrev = data['coutPrev'];
+              model.pourcentReal = data['pourcentReal'];
+              model.depense = data['depense'];
+              model.pourcentSuivie = data['pourcentSuivie'];
+              model.rapportEff = data['rapportEff'];
+              model.commentaire = data['commentaire'];
+              model.respRealNom = data['respRealNom'];
+              model.respSuivieNom = data['respSuivieNom'];
+              model.respReal = data['respReal'];
+              model.respSuivi = data['respSuivi'];
+              model.priorite = data['priorite'];
+              model.gravite = data['gravite'];
+              model.processus = data['processus'];
+              model.risques = data['risques'];
+              model.online = 1;
 
-                      listSousAction.add(model);
-                      listSousAction.forEach((element) {
-                        print('element act ${element.sousAct}, online: ${element.online}');
-                      });
-                      //delete db local
-                      ///await localActionService.deleteAllSousAction();
-                      //save data in local db
-                      ///await localActionService.saveSousAction(model);
-                      //print('Inserting sous action : ${model.sousAct} ');
-
-                    });
-                    print('get data');
-                  }
-                      , onError: (err) {
-                        isDataProcessing(false);
-                        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-                      });
-              }
-          }
-      );
-
+              listSousAction.add(model);
+              listSousAction.forEach((element) {
+                print(
+                    'element act ${element.sousAct}, online: ${element.online}');
+              });
+              //delete db local
+              ///await localActionService.deleteAllSousAction();
+              //save data in local db
+              ///await localActionService.saveSousAction(model);
+              //print('Inserting sous action : ${model.sousAct} ');
+            });
+            print('get data');
+          }, onError: (err) {
+            isDataProcessing(false);
+            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          });
+        }
+      });
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('exception : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing(false);
     }
   }
 
   Future saveBtn() async {
-    if(_dataValidation() && addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && addItemFormKey.currentState!.validate()) {
       try {
         isDataProcessing.value = true;
-        if(datePickerSuivi.isBefore(datePickerReal)){
+        if (datePickerSuivi.isBefore(datePickerReal)) {
           isDataProcessing.value = false;
           Get.defaultDialog(
               title: "Exception",
@@ -296,7 +295,7 @@ class SousActionController extends GetxController {
               titleStyle: TextStyle(color: Colors.white),
               middleTextStyle: TextStyle(color: Colors.white),
               textConfirm: "Confirm",
-              onConfirm: (){
+              onConfirm: () {
                 Get.back();
               },
               textCancel: "Cancel",
@@ -305,25 +304,26 @@ class SousActionController extends GetxController {
               buttonColor: Colors.red,
               barrierDismissible: false,
               radius: 20,
-              content: Text('Le delai de suivi doit être supérieur au délai de réalisation',
-                style: TextStyle(color: Colors.white),)
-          );
+              content: Text(
+                'Le delai de suivi doit être supérieur au délai de réalisation',
+                style: TextStyle(color: Colors.white),
+              ));
           return;
         }
-        if(coutPrevController.text.trim() == ''){
+        if (coutPrevController.text.trim() == '') {
           cout_prev = 0;
-        }
-        else {
+        } else {
           cout_prev = int.parse(coutPrevController.text.toString());
         }
 
         var connection = await Connectivity().checkConnectivity();
-        if(connection == ConnectivityResult.none) {
-          int max_num_sous_action = await localActionService.getMaxNumSousAction(id_action);
+        if (connection == ConnectivityResult.none) {
+          int max_num_sous_action =
+              await localActionService.getMaxNumSousAction(id_action);
           print('max num sous action: $max_num_sous_action');
           //save data in local db
           var model = SousActionModel();
-          model.nSousAct = max_num_sous_action+1;//data['nSousAct'];
+          model.nSousAct = max_num_sous_action + 1; //data['nSousAct'];
           model.nAct = id_action;
           model.cloture = 0;
           model.sousAct = designationController.text.trim();
@@ -349,24 +349,25 @@ class SousActionController extends GetxController {
           model.risques = risqueController.text.trim();
           model.online = 0;
 
-        await localActionService.saveSousAction(model);
-        print('Inserting sous action offline  : num sousAct: ${model.nSousAct}, numAct: ${model.nAct}, sousAct: ${model.sousAct}, '
-            'cout prev: ${model.coutPrev}, respreal: ${model.respRealNom}, respsuivi ${model.respSuivieNom}, '
-            'respreasmat: ${model.respReal}, ressuivimat:  ${model.respSuivi}, priorite: ${model.priorite}, code priorite: ${model.codePriorite}, gravite: ${model.gravite}, '
-            'delai real: ${model.delaiReal}, delai suivi: ${model.delaiSuivi}, online: ${model.online} ');
+          await localActionService.saveSousAction(model);
+          print(
+              'Inserting sous action offline  : num sousAct: ${model.nSousAct}, numAct: ${model.nAct}, sousAct: ${model.sousAct}, '
+              'cout prev: ${model.coutPrev}, respreal: ${model.respRealNom}, respsuivi ${model.respSuivieNom}, '
+              'respreasmat: ${model.respReal}, ressuivimat:  ${model.respSuivi}, priorite: ${model.priorite}, code priorite: ${model.codePriorite}, gravite: ${model.gravite}, '
+              'delai real: ${model.delaiReal}, delai suivi: ${model.delaiSuivi}, online: ${model.online} ');
 
-        Get.back();
+          Get.back();
           listSousAction.clear();
           refreshList();
-          Get.snackbar("Mode Offline", "Sous Action Successfully", colorText: Colors.blue,
-              snackPosition: SnackPosition.TOP);
-        /*  Get.toNamed(AppRoute.sous_action, arguments: {
+          Get.snackbar("Mode Offline", "Sous Action Successfully",
+              colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+          /*  Get.toNamed(AppRoute.sous_action, arguments: {
             "id_action" : id_action
           }); */
 
           clearData();
-        }
-        else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        } else if (connection == ConnectivityResult.wifi ||
+            connection == ConnectivityResult.mobile) {
           await ActionService().saveSousAction({
             "nact": id_action,
             "sousact": designationController.text.trim(),
@@ -391,13 +392,14 @@ class SousActionController extends GetxController {
             Get.back();
             listSousAction.clear();
             refreshList();
-            ShowSnackBar.snackBar("Add Sous Action", "Sous Action Added", Colors.green);
+            ShowSnackBar.snackBar(
+                "Add Sous Action", "Sous Action Added", Colors.green);
 
-         /* Get.toNamed(AppRoute.sous_action, arguments: {
+            /* Get.toNamed(AppRoute.sous_action, arguments: {
             "id_action" : id_action
           }); */
 
-          //Get.offAll(ActionPage());
+            //Get.offAll(ActionPage());
             clearData();
           }, onError: (err) {
             isDataProcessing(false);
@@ -405,8 +407,7 @@ class SousActionController extends GetxController {
             ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
           });
         }
-      }
-      catch (ex){
+      } catch (ex) {
         Get.defaultDialog(
             title: "Exception",
             backgroundColor: Colors.lightBlue,
@@ -419,12 +420,13 @@ class SousActionController extends GetxController {
             buttonColor: Colors.red,
             barrierDismissible: false,
             radius: 20,
-            content: Text('${ex.toString()}', style: TextStyle(color: Colors.black),)
-        );
+            content: Text(
+              '${ex.toString()}',
+              style: TextStyle(color: Colors.black),
+            ));
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
-      }
-      finally{
+      } finally {
         isDataProcessing.value = false;
         //Get.back();
       }
@@ -434,8 +436,10 @@ class SousActionController extends GetxController {
   clearData() {
     //onInit();
     designationController.clear();
-    delaiRealisationController.text = DateFormat('dd/MM/yyyy').format(datePickerReal);
-    delaiSuiviController.text = DateFormat('dd/MM/yyyy').format(datePickerSuivi);
+    delaiRealisationController.text =
+        DateFormat('dd/MM/yyyy').format(datePickerReal);
+    delaiSuiviController.text =
+        DateFormat('dd/MM/yyyy').format(datePickerSuivi);
     risqueController.clear();
     coutPrevController.clear();
     prioriteModel = null;
@@ -460,12 +464,11 @@ class SousActionController extends GetxController {
     try {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         await SyncDataController().syncSousActionToSQLServer();
 
         //save data to db local
@@ -503,22 +506,22 @@ class SousActionController extends GetxController {
             await localActionService.deleteAllSousAction();
             //save data
             await localActionService.saveSousAction(model);
-            print('Inserting data in table SousAction : NAct: ${model.nAct}, NSousAct ${model.nSousAct}, SousAct: ${model.sousAct}, online:${model.online} ');
+            print(
+                'Inserting data in table SousAction : NAct: ${model.nAct}, NSousAct ${model.nSousAct}, SousAct: ${model.sousAct}, online:${model.online} ');
           });
 
           listSousAction.clear();
           getSousActions();
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error processus emp", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar(
+              "Error processus emp", err.toString(), Colors.red);
+        });
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }
@@ -528,8 +531,7 @@ class SousActionController extends GetxController {
   Widget customDropDownPriorite(BuildContext context, PrioriteModel? item) {
     if (prioriteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -538,6 +540,7 @@ class SousActionController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderPriorite(
       BuildContext context, prioriteModel, bool isSelected) {
     return Container(
@@ -545,10 +548,10 @@ class SousActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(prioriteModel?.priorite ?? ''),
@@ -556,12 +559,12 @@ class SousActionController extends GetxController {
       ),
     );
   }
+
   //gravite action
   Widget customDropDownGravite(BuildContext context, GraviteModel? item) {
     if (graviteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -570,6 +573,7 @@ class SousActionController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderGravite(
       BuildContext context, graviteModel, bool isSelected) {
     return Container(
@@ -577,10 +581,10 @@ class SousActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(graviteModel?.gravite ?? ''),
@@ -588,20 +592,25 @@ class SousActionController extends GetxController {
       ),
     );
   }
+
   //processus
-  Widget customDropDownProcessus(BuildContext context, ProcessusEmployeModel? item) {
+  Widget customDropDownProcessus(
+      BuildContext context, ProcessusEmployeModel? item) {
     if (processusModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${processusModel?.processus}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${processusModel?.processus}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderProcessus(
       BuildContext context, processusModel, bool isSelected) {
     return Container(
@@ -609,10 +618,10 @@ class SousActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
@@ -620,34 +629,36 @@ class SousActionController extends GetxController {
       ),
     );
   }
+
   //employe
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
-
     if (respRealModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${respRealModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${respRealModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customDropDownRespSuivi(BuildContext context, EmployeModel? item) {
     if (resSuiviModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${resSuiviModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${resSuiviModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, respRealModel, bool isSelected) {
     return Container(
@@ -655,10 +666,10 @@ class SousActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(respRealModel?.nompre ?? ''),

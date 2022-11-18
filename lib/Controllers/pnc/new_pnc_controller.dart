@@ -1,23 +1,25 @@
+import 'dart:math';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Models/client_model.dart';
 import 'package:qualipro_flutter/Models/fournisseur_model.dart';
 import 'package:qualipro_flutter/Models/pnc/atelier_pnc_model.dart';
-import 'package:qualipro_flutter/Models/pnc/isps_pnc_model.dart';
 import 'package:qualipro_flutter/Models/pnc/source_pnc_model.dart';
 import 'package:qualipro_flutter/Models/pnc/type_pnc_model.dart';
 import 'package:qualipro_flutter/Models/product_model.dart';
 import 'package:qualipro_flutter/Services/action/local_action_service.dart';
 import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
-
 import '../../Models/Domaine_affectation_model.dart';
 import '../../Models/activity_model.dart';
 import '../../Models/champ_cache_model.dart';
 import '../../Models/direction_model.dart';
 import '../../Models/employe_model.dart';
+import '../../Models/image_model.dart';
+import '../../Models/incident_environnement/upload_image_model.dart';
 import '../../Models/pnc/champ_obligatoire_pnc_model.dart';
 import '../../Models/pnc/gravite_pnc_model.dart';
 import '../../Models/pnc/pnc_model.dart';
@@ -32,12 +34,9 @@ import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
 import '../../Views/pnc/add_products_pnc/products_pnc_page.dart';
-import '../../Views/pnc/pnc_navigation_bar_page.dart';
-import '../../Views/pnc/products/new_product.dart';
 import 'pnc_controller.dart';
 
 class NewPNCController extends GetxController {
-
   var isDataProcessing = false.obs;
   var isVisibleNewPNC = true.obs;
   LocalPNCService localPNCService = LocalPNCService();
@@ -45,10 +44,18 @@ class NewPNCController extends GetxController {
   final matricule = SharedPreference.getMatricule();
 
   final addItemFormKey = GlobalKey<FormState>();
-  late TextEditingController dateDetectionController, dateLivraisonController, dateSaisieController,
-      designationController, actionPriseController, numInterneController, numeroOfController,
-      numeroLotController, uniteController, quantityDetectController, quantityProductController,
-       pourcentageController;
+  late TextEditingController dateDetectionController,
+      dateLivraisonController,
+      dateSaisieController,
+      designationController,
+      actionPriseController,
+      numInterneController,
+      numeroOfController,
+      numeroLotController,
+      uniteController,
+      quantityDetectController,
+      quantityProductController,
+      pourcentageController;
   DateTime datePickerDetection = DateTime.now();
   DateTime datePickerLivraison = DateTime.now();
   DateTime datePickerSaisie = DateTime.now();
@@ -125,19 +132,29 @@ class NewPNCController extends GetxController {
   ClientModel? clientModel = null;
   String? selectedCodeClient = "";
 
-  onChangePNCDetected(var detectedBy){
+  //upload images
+  final ImagePicker imagePicker = ImagePicker();
+  var imageFileList = List<XFile>.empty(growable: true).obs;
+  var base64List = List<ImageModel>.empty(growable: true).obs;
+  //random data
+  var _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  Random _rnd = Random();
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+
+  onChangePNCDetected(var detectedBy) {
     pncDetected.value = detectedBy;
     print('detected by : ${pncDetected.value}');
     print('code client : ${selectedCodeClient}');
-    if(pncDetected.value == 1){
+    if (pncDetected.value == 1) {
       isVisibleCLient.value = true;
-    }
-    else {
+    } else {
       isVisibleCLient.value = false;
       clientModel = null;
       selectedCodeClient = "";
     }
   }
+
   //checkbox product
   var checkProductBloque = false.obs;
   var productBloque = 0.obs;
@@ -146,12 +163,12 @@ class NewPNCController extends GetxController {
 
   //domaine affectation
   getDomaineAffectation() async {
-    List<DomaineAffectationModel> domaineList = await List<
-        DomaineAffectationModel>.empty(growable: true);
+    List<DomaineAffectationModel> domaineList =
+        await List<DomaineAffectationModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      var response = await localActionService.readDomaineAffectationByModule(
-          "PNC", "PNC");
+      var response =
+          await localActionService.readDomaineAffectationByModule("PNC", "PNC");
       response.forEach((data) {
         var model = DomaineAffectationModel();
         model.id = data['id'];
@@ -182,18 +199,18 @@ class NewPNCController extends GetxController {
         site_visible.value = model.vSite!;
         processus_visible.value = model.vProcessus!;
         activity_visible.value = model.vDomaine!;
-        direction_visible.value  = model.vDirection!;
-        service_visible.value  = model.vService!;
+        direction_visible.value = model.vDirection!;
+        service_visible.value = model.vService!;
 
         site_obligatoire.value = model.oSite!;
-        processus_obligatoire.value  = model.oProcessus!;
-        activity_obligatoire.value  = model.oDomaine!;
-        direction_obligatoire.value  = model.oDirection!;
-        service_obligatoire.value  = model.oService!;
-        print('fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+        processus_obligatoire.value = model.oProcessus!;
+        activity_obligatoire.value = model.oDomaine!;
+        direction_obligatoire.value = model.oDirection!;
+        service_obligatoire.value = model.oService!;
+        print(
+            'fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
       });
-    }
-    else if (connection == ConnectivityResult.wifi ||
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
       await ApiServicesCall().getDomaineAffectation().then((resp) async {
         resp.forEach((data) async {
@@ -226,22 +243,21 @@ class NewPNCController extends GetxController {
             site_visible.value = model.vSite!;
             processus_visible.value = model.vProcessus!;
             activity_visible.value = model.vDomaine!;
-            direction_visible.value  = model.vDirection!;
-            service_visible.value  = model.vService!;
+            direction_visible.value = model.vDirection!;
+            service_visible.value = model.vService!;
 
             site_obligatoire.value = model.oSite!;
-            processus_obligatoire.value  = model.oProcessus!;
-            activity_obligatoire.value  = model.oDomaine!;
-            direction_obligatoire.value  = model.oDirection!;
-            service_obligatoire.value  = model.oService!;
-            print('fiche: ${model
-                .fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+            processus_obligatoire.value = model.oProcessus!;
+            activity_obligatoire.value = model.oDomaine!;
+            direction_obligatoire.value = model.oDirection!;
+            service_obligatoire.value = model.oService!;
+            print(
+                'fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
           }
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     }
   }
 
@@ -268,8 +284,8 @@ class NewPNCController extends GetxController {
   bool isVisibileUnite = true;
   getChampCache() async {
     try {
-      List<ChampCacheModel> listChampCache = await List<ChampCacheModel>.empty(
-          growable: true);
+      List<ChampCacheModel> listChampCache =
+          await List<ChampCacheModel>.empty(growable: true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         var response = await localActionService.readChampCacheByModule(
@@ -282,56 +298,54 @@ class NewPNCController extends GetxController {
           model.listOrder = data['listOrder'];
           model.nomParam = data['nomParam'];
           model.visible = data['visible'];
-          print('module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+          print(
+              'module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
           listChampCache.add(model);
 
           if (model.nomParam == "ISPS" && model.module == "P.N.C.") {
             isps_visible = model.visible;
             //isps_visible = 0;
-          }
-          else if (model.nomParam == "Type N.C." && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Type N.C." &&
+              model.module == "P.N.C.") {
             type_nc_visible = model.visible;
             //type_nc_visible = 0;
-          }
-          else if (model.nomParam == "Produit bloqué" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Produit bloqué" &&
+              model.module == "P.N.C.") {
             product_bloque_visible = model.visible;
             //product_bloque_visible = 0;
-          }
-          else if (model.nomParam == "Produit isolé" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Produit isolé" &&
+              model.module == "P.N.C.") {
             product_isole_visible = model.visible;
             //product_isole_visible = 0;
-          }
-          else if (model.nomParam == "N° interne" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "N° interne" &&
+              model.module == "P.N.C.") {
             num_interne_visible = model.visible;
             //num_interne_visible = 0;
-          }
-          else if (model.nomParam == "Détectée par" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Détectée par" &&
+              model.module == "P.N.C.") {
             detected_by_visible = model.visible;
             //detected_by_visible = 0;
-          }
-          else if (model.nomParam == "A l'origine de la N.C." && model.module == "P.N.C.") {
+          } else if (model.nomParam == "A l'origine de la N.C." &&
+              model.module == "P.N.C.") {
             origine_nc_visible = model.visible;
             //origine_nc_visible = 0;
-          }
-          else if (model.nomParam == "Atelier" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Atelier" && model.module == "P.N.C.") {
             atelier_visible = model.visible;
             //atelier_visible = 0;
-          }
-          else if (model.nomParam == "Fournisseur" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Fournisseur" &&
+              model.module == "P.N.C.") {
             fournisseur_visible = model.visible;
             //fournisseur_visible = 0;
-          }
-          else if (model.nomParam == "Unité" && model.module == "P.N.C.") {
+          } else if (model.nomParam == "Unité" && model.module == "P.N.C.") {
             unite_visible = model.visible;
             //unite_visible = 0;
           }
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-        await ApiServicesCall().getChampCache({
-          "module": "P.N.C.",
-          "fiche": ""
-        }).then((resp) async {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        await ApiServicesCall()
+            .getChampCache({"module": "P.N.C.", "fiche": ""}).then(
+                (resp) async {
           resp.forEach((data) async {
             //print('get champ obligatoire : ${data} ');
             var model = ChampCacheModel();
@@ -341,62 +355,61 @@ class NewPNCController extends GetxController {
             model.listOrder = data['list_order'];
             model.nomParam = data['nom_param'];
             model.visible = data['visible'];
-            print('module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+            print(
+                'module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
             listChampCache.add(model);
 
             if (model.nomParam == "ISPS" && model.module == "P.N.C.") {
               isps_visible = model.visible;
               //isps_visible = 0;
-            }
-            else if (model.nomParam == "Type N.C." && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Type N.C." &&
+                model.module == "P.N.C.") {
               type_nc_visible = model.visible;
               //type_nc_visible = 0;
-            }
-            else if (model.nomParam == "Produit bloqué" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Produit bloqué" &&
+                model.module == "P.N.C.") {
               product_bloque_visible = model.visible;
               //product_bloque_visible = 0;
-            }
-            else if (model.nomParam == "Produit isolé" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Produit isolé" &&
+                model.module == "P.N.C.") {
               product_isole_visible = model.visible;
               //product_isole_visible = 0;
-            }
-            else if (model.nomParam == "N° interne" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "N° interne" &&
+                model.module == "P.N.C.") {
               num_interne_visible = model.visible;
               //num_interne_visible = 0;
-            }
-            else if (model.nomParam == "Détectée par" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Détectée par" &&
+                model.module == "P.N.C.") {
               detected_by_visible = model.visible;
               //detected_by_visible = 0;
-            }
-            else if (model.nomParam == "A l'origine de la N.C." && model.module == "P.N.C.") {
+            } else if (model.nomParam == "A l'origine de la N.C." &&
+                model.module == "P.N.C.") {
               origine_nc_visible = model.visible;
               //origine_nc_visible = 0;
-            }
-            else if (model.nomParam == "Atelier" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Atelier" &&
+                model.module == "P.N.C.") {
               atelier_visible = model.visible;
               //atelier_visible = 0;
-            }
-            else if (model.nomParam == "Fournisseur" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Fournisseur" &&
+                model.module == "P.N.C.") {
               fournisseur_visible = model.visible;
               //fournisseur_visible = 0;
-            }
-            else if (model.nomParam == "Unité" && model.module == "P.N.C.") {
+            } else if (model.nomParam == "Unité" && model.module == "P.N.C.") {
               unite_visible = model.visible;
               //unite_visible = 0;
             }
           });
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-    }
-    catch (exception) {
+    } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
     }
   }
+
   //champ obligatoire
   int? num_interne_obligatoire = 1;
   int? date_liv_obligatoire = 1;
@@ -411,8 +424,8 @@ class NewPNCController extends GetxController {
   int? atelier_obligatoire = 1;
   int? origine_nc_obligatoire = 1;
   getChampObligatoire() async {
-    List<ChampObligatoirePNCModel> champObligatoireList = await List<
-        ChampObligatoirePNCModel>.empty(growable: true);
+    List<ChampObligatoirePNCModel> champObligatoireList =
+        await List<ChampObligatoirePNCModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
       var response = await localPNCService.readChampObligatoirePNC();
@@ -460,10 +473,9 @@ class NewPNCController extends GetxController {
         atelier_obligatoire = model.atelier;
         origine_nc_obligatoire = model.origine;
 
-        print('champ obligatoire PNC : ${data}');
+        debugPrint('champ obligatoire PNC : ${data}');
       });
-    }
-    else if (connection == ConnectivityResult.wifi ||
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
       await ApiServicesCall().getChampObligatoirePNC().then((data) async {
         var model = ChampObligatoirePNCModel();
@@ -508,116 +520,123 @@ class NewPNCController extends GetxController {
         source_obligatoire = model.source;
         atelier_obligatoire = model.atelier;
         origine_nc_obligatoire = model.origine;
-        print('champ obligatoire PNC : ${data}');
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+        debugPrint('champ obligatoire PNC : ${data}');
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     }
   }
 
   bool _dataValidation() {
     if (designationController.text.trim() == '') {
-      Message.taskErrorOrWarning("Designation", "designation is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "designation ${'is_required'.tr}");
       return false;
-    }
-    else if (dateDetectionController.text.trim() == '') {
-      Message.taskErrorOrWarning("Date", "Date is required");
+    } else if (dateDetectionController.text.trim() == '') {
+      Message.taskErrorOrWarning('warning'.tr, "Date ${'is_required'.tr}");
       return false;
-    }
-    else if (date_liv_obligatoire == 1 && dateLivraisonController.text.trim() == '') {
-      Message.taskErrorOrWarning("Date", "Date livraison is required");
+    } else if (date_liv_obligatoire == 1 &&
+        dateLivraisonController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Date ${'delivery'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (typePNCModel == null) {
-      Message.taskErrorOrWarning("Type NC", "Type is required");
+    } else if (typePNCModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Type ${'is_required'.tr}");
       return false;
-    }
-    else if (graviteModel == null && gravite_obligatoire == 1) {
-      Message.taskErrorOrWarning("Gravite", "Gravite is required");
+    } else if (graviteModel == null && gravite_obligatoire == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'gravity'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (sourcePNCModel == null && source_obligatoire == 1) {
-      Message.taskErrorOrWarning("Source", "Source is required");
+    } else if (sourcePNCModel == null && source_obligatoire == 1) {
+      Message.taskErrorOrWarning('warning'.tr, "Source ${'is_required'.tr}");
       return false;
-    }
-    else if (atelierPNCModel == null && atelier_obligatoire == 1) {
-      Message.taskErrorOrWarning("Atelier", "Atelier is required");
+    } else if (atelierPNCModel == null && atelier_obligatoire == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'atelier'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (productModel == null && selectedCodeProduct == "" && selectedProduct=="") {
-      Message.taskErrorOrWarning("Product", "Product is required");
+    } else if (productModel == null &&
+        selectedCodeProduct == "" &&
+        selectedProduct == "") {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'product'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(fournisseur_obligatoire == 1 && fournisseurModel == null){
-      Message.taskErrorOrWarning("Fournisseur", "Fournisseur is required");
+    } else if (fournisseur_obligatoire == 1 && fournisseurModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'fournisseur'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (site_visible.value == 1 && site_obligatoire.value == 1 && siteModel == null) {
-      Message.taskErrorOrWarning("Site", "Site is required");
+    } else if (site_visible.value == 1 &&
+        site_obligatoire.value == 1 &&
+        siteModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Site ${'is_required'.tr}");
       return false;
-    }
-    else if (processus_visible.value == 1 && processus_obligatoire.value == 1 && processusModel == null) {
-      Message.taskErrorOrWarning("Processus", "Processus is required");
+    } else if (processus_visible.value == 1 &&
+        processus_obligatoire.value == 1 &&
+        processusModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Processus ${'is_required'.tr}");
       return false;
-    }
-    else if (direction_visible.value == 1 && direction_obligatoire.value == 1 &&
+    } else if (direction_visible.value == 1 &&
+        direction_obligatoire.value == 1 &&
         directionModel == null) {
-      Message.taskErrorOrWarning("Direction", "Direction is required");
+      Message.taskErrorOrWarning('warning'.tr, "Direction ${'is_required'.tr}");
       return false;
-    }
-    else if (service_visible.value == 1 && service_obligatoire.value == 1 &&
+    } else if (service_visible.value == 1 &&
+        service_obligatoire.value == 1 &&
         serviceModel == null) {
-      Message.taskErrorOrWarning("Service", "Service is required");
+      Message.taskErrorOrWarning('warning'.tr, "Service ${'is_required'.tr}");
       return false;
-    }
-    else if (activity_visible.value == 1 && activity_obligatoire.value == 1 &&
+    } else if (activity_visible.value == 1 &&
+        activity_obligatoire.value == 1 &&
         activityModel == null) {
-      Message.taskErrorOrWarning("Activity", "Activity is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'activity'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(origine_nc_obligatoire == 1 && employeModel == null){
-      Message.taskErrorOrWarning("Origine N.C", "Origine N.C is required");
+    } else if (origine_nc_obligatoire == 1 && employeModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'origine_pnc'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(num_interne_obligatoire == 1 && numInterneController.text.trim() == ''){
-      Message.taskErrorOrWarning("Ref interne", "Reference interne is required");
+    } else if (num_interne_obligatoire == 1 &&
+        numInterneController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'ref_interne'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(num_of_obligatoire == 1 && numeroOfController.text.trim() == ''){
-      Message.taskErrorOrWarning("Numero Of", "Numero Of is required");
+    } else if (num_of_obligatoire == 1 &&
+        numeroOfController.text.trim() == '') {
+      Message.taskErrorOrWarning('warning'.tr, "Numero Of ${'is_required'.tr}");
       return false;
-    }
-    else if(num_lot_obligatoire == 1 && numeroLotController.text.trim() == ''){
-      Message.taskErrorOrWarning("Numero Lot", "Numero Lot is required");
+    } else if (num_lot_obligatoire == 1 &&
+        numeroLotController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Numero Lot ${'is_required'.tr}");
       return false;
-    }
-    else if(unite_obligatoire == 1 && uniteController.text.trim() == ''){
-      Message.taskErrorOrWarning("unite", "unite is required");
+    } else if (unite_obligatoire == 1 && uniteController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'unite'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(qte_detect_obligatoire == 1 && quantityDetectController.text.trim() == ''){
-      Message.taskErrorOrWarning("Quantity detect", "Quantity detect is required");
+    } else if (qte_detect_obligatoire == 1 &&
+        quantityDetectController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'quantity'.tr} ${'detect'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(qte_produit_obligatoire == 1 && quantityProductController.text.trim() == ''){
-      Message.taskErrorOrWarning("Quantity product", "Quantity product is required");
+    } else if (qte_produit_obligatoire == 1 &&
+        quantityProductController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'quantity'.tr} ${'product'.tr} ${'is_required'.tr}");
       return false;
     }
 
-
-    if(quantityDetectController.text.trim() == ''){
+    if (quantityDetectController.text.trim() == '') {
       quantity_detect = 0;
     } else {
       quantity_detect = int.parse(quantityDetectController.text.toString());
     }
-    if(quantityProductController.text.trim() == ''){
+    if (quantityProductController.text.trim() == '') {
       quantity_product = 0;
     } else {
       quantity_product = int.parse(quantityProductController.text.toString());
     }
-    if(quantity_detect > quantity_product ){
-      Message.taskErrorOrWarning("Quantity invalid", "Quantity product must be greater or equal quantity detected ");
+    if (quantity_detect > quantity_product) {
+      Message.taskErrorOrWarning('warning'.tr,
+          'quantity_product_greater_or_equal_quantity_detected'.tr);
       return false;
     }
 
@@ -640,9 +659,12 @@ class NewPNCController extends GetxController {
     numeroLotController = TextEditingController();
     uniteController = TextEditingController();
     pourcentageController = TextEditingController();
-    dateDetectionController.text = DateFormat('yyyy-MM-dd').format(datePickerDetection);
-    dateLivraisonController.text = DateFormat('yyyy-MM-dd').format(datePickerLivraison);
-    dateSaisieController.text = DateFormat('yyyy-MM-dd').format(datePickerSaisie);
+    dateDetectionController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerDetection);
+    dateLivraisonController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerLivraison);
+    dateSaisieController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerSaisie);
     //quantityDetectController.text = '0';
     //quantityProductController.text = '0';
 
@@ -658,43 +680,48 @@ class NewPNCController extends GetxController {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        isVisiblePercentagePNC.value = false;
-        pourcentageController.text = '0';
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        int? oneProduct = SharedPreference.getIsOneProduct();
+        if (oneProduct == 1) {
+          isVisiblePercentagePNC.value = false;
+          pourcentageController.text = '0';
+        } else {
+          isVisiblePercentagePNC.value = true;
+        }
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
         PNCService().parametrageProduct().then((params) async {
           final paramProduct = params['seulProduit'];
-          if(paramProduct == 1){
+          if (paramProduct == 1) {
             isVisiblePercentagePNC.value = false;
             pourcentageController.text = '0';
-          }
-          else {
+          } else {
             isVisiblePercentagePNC.value = true;
           }
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
+
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue,
-          snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-    }
-    else if (connection == ConnectivityResult.wifi ||
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 900));
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue,
-          snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 900));
     }
   }
 
@@ -704,35 +731,37 @@ class NewPNCController extends GetxController {
         initialDate: datePickerDetection,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //lastDate: DateTime.now()
-    ))!;
+        //lastDate: DateTime.now()
+        ))!;
     if (datePickerDetection != null) {
       dateDetectionController.text =
           DateFormat('yyyy-MM-dd').format(datePickerDetection);
       //dateDetectionController.text = DateFormat.yMMMMd().format(datePickerDetection);
     }
   }
+
   selectedDateLivraison(BuildContext context) async {
     datePickerLivraison = (await showDatePicker(
         context: context,
         initialDate: datePickerLivraison,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //lastDate: DateTime.now()
-    ))!;
+        //lastDate: DateTime.now()
+        ))!;
     if (datePickerLivraison != null) {
-      dateLivraisonController.text = DateFormat('yyyy-MM-dd').format(datePickerLivraison);
+      dateLivraisonController.text =
+          DateFormat('yyyy-MM-dd').format(datePickerLivraison);
     }
   }
 
   Future saveBtn() async {
-    if(_dataValidation() && addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && addItemFormKey.currentState!.validate()) {
       try {
         var connection = await Connectivity().checkConnectivity();
         if (connection == ConnectivityResult.none) {
           int max_num_pnc = await localPNCService.getMaxNumPNC();
           var model = PNCModel();
-          model.nnc = max_num_pnc+1;
+          model.nnc = max_num_pnc + 1;
           model.nc = designationController.text.trim();
           model.codePdt = selectedCodeProduct;
           model.codeTypeNC = selectedCodeType;
@@ -772,12 +801,13 @@ class NewPNCController extends GetxController {
           model.rapportT = "";
           //save data sync
           await localPNCService.savePNCSync(model);
+
           //save product
           int max_product_id = await LocalPNCService().getMaxNumProductPNC();
           var modelProduct = ProductPNCModel();
           modelProduct.online = 3;
-          modelProduct.nnc = max_num_pnc+1;
-          modelProduct.idNCProduct = max_product_id+1;
+          modelProduct.nnc = max_num_pnc + 1;
+          modelProduct.idNCProduct = max_product_id + 1;
           modelProduct.codeProduit = selectedCodeProduct;
           modelProduct.produit = selectedProduct;
           modelProduct.numOf = numeroOfController.text;
@@ -786,14 +816,41 @@ class NewPNCController extends GetxController {
           modelProduct.qprod = quantity_product;
           modelProduct.typeProduit = '';
           modelProduct.unite = uniteController.text.toString();
-          await LocalPNCService().saveProductPNC(modelProduct);
+          await localPNCService.saveProductPNC(modelProduct);
+
+          //save type product
+          int max_id_type_product_nc =
+              await localPNCService.getMaxIdTypeProductPNC();
+          var modelTypeProduct = TypePNCModel();
+          modelTypeProduct.online = 2;
+          modelTypeProduct.nnc = max_num_pnc + 1;
+          modelTypeProduct.idProduct = max_product_id + 1;
+          modelTypeProduct.idTabNcProductType = max_id_type_product_nc + 1;
+          modelTypeProduct.codeTypeNC = selectedCodeType;
+          modelTypeProduct.typeNC = selectedTypeNc;
+          modelTypeProduct.color = 'FFFFFF';
+          modelTypeProduct.pourcentage = int.parse(pourcentageController.text);
+          await localPNCService.saveTypeProductPNC(modelTypeProduct);
+
+          //upload images offline
+          base64List.forEach((element) async {
+            print('base64 image: ${element.fileName} - ${element.image}');
+            var modelImage = UploadImageModel();
+            modelImage.idFiche = max_num_pnc + 1;
+            modelImage.image = element.image.toString();
+            modelImage.fileName = element.fileName.toString();
+
+            await localPNCService.uploadImagePNC(modelImage);
+          });
+
           Get.back();
           Get.find<PNCController>().listPNC.clear();
           Get.find<PNCController>().getPNC();
-          ShowSnackBar.snackBar("Mode Offline", "PNC Added Successfully", Colors.green);
+          ShowSnackBar.snackBar(
+              "Mode Offline", "PNC Added Successfully", Colors.green);
           //Get.offAllNamed(AppRoute.pnc);
-        }
-        else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        } else if (connection == ConnectivityResult.wifi ||
+            connection == ConnectivityResult.mobile) {
           await PNCService().savePNC({
             "codePdt": selectedCodeProduct,
             "codeTypeNC": selectedCodeType,
@@ -833,7 +890,8 @@ class NewPNCController extends GetxController {
             "qtConforme": 0,
             "qtNonConforme": 0,
             "prix": 0,
-            "dateLiv": '${dateLivraisonController.text}T09:44:35.943Z', //dateLivraisonController.text,
+            "dateLiv":
+                '${dateLivraisonController.text}T09:44:35.943Z', //dateLivraisonController.text,
             "atelier": selectedCodeAtelier,
             "qteprod": quantity_product,
             "ninterne": numInterneController.text,
@@ -849,122 +907,83 @@ class NewPNCController extends GetxController {
             "isps": isps,
             "id_fournisseur": selectedCodeFournisseur,
             "pourcentage": int.parse(pourcentageController.text)
-          }
-
-            /* {
-            "codePdt": selectedCodeProduct,
-            "codeTypeNC": selectedCodeType,
-            "dateDetect": dateDetectionController.text,
-            "nc": designationController.text.trim(),
-            "recep": detectedEmployeMatricule,
-            "qteDetect": quantity_detect,
-            "unite": uniteController.text,
-            "valRej": 0,
-            "traitement": "",
-            "ctr": 0,
-            "ctt": 0,
-            "traitee": 0,
-            "respTrait": "",
-            "numOf": numeroOfController.text,
-            "delaiTrait": dateSaisieController.text,
-            "qteRej": 0,
-            "matOrigine": origineNCMatricule,
-            "ngravite": selectedCodeGravite,
-            "repSuivi": "",
-            "cloturee": 0,
-            "dateT": dateSaisieController.text,
-            "codeSite": selectedCodeSite,
-            "codeSourceNC": selectedCodeSource,
-            "codeTypeT": 0,
-            "nLot": numeroLotController.text,
-            "rapportT": "",
-            "nAct": 0,
-            "dateClot": dateSaisieController.text,
-            "rapportClot": "",
-            "bloque": productBloque.value,
-            "isole": productIsole.value,
-            "numCession": "",
-            "numEnvoi": "",
-            "dateSaisie": dateSaisieController.text,
-            "matEnreg": matricule.toString(),
-            "qtConforme": 0,
-            "qtNonConforme": 0,
-            "prix": 0,
-            "dateLiv": '${dateLivraisonController.text}T09:44:35.943Z', //dateLivraisonController.text,
-            "atelier": selectedCodeAtelier,
-            "qteprod": quantity_product,
-            "ninterne": numInterneController.text,
-            "det_type": 0,
-            "avec_retour": 0,
-            "processus": selectedCodeProcessus,
-            "domaine": selectedCodeActivity,
-            "direction": selectedCodeDirection,
-            "service": selectedCodeService,
-            "id_client": selectedCodeClient,
-            "actionIm": actionPriseController.text,
-            "causeNC": "default",
-            "isps": isps,
-            "id_fournisseur": selectedCodeFournisseur
-          } */
-          ).then((resp) {
+          }).then((resp) {
             final nnc = resp['nnc'];
             print('nnc : ${nnc}');
 
             //parametrage product
-             PNCService().parametrageProduct().then((params) async {
-               final paramProduct = params['seulProduit'];
-               print('parametre Product : ${paramProduct}');
-               if(paramProduct == 1){
-                 Get.back();
-                 Get.find<PNCController>().listPNC.clear();
-                 Get.find<PNCController>().getPNC();
-                 //Get.offAllNamed(AppRoute.pnc);
-                 ShowSnackBar.snackBar("Successfully", "PNC Added ", Colors.green);
-               }
-               else {
-                 ShowSnackBar.snackBar("Successfully", "PNC Added ", Colors.green);
-                 Get.defaultDialog(
-                     title: 'Add Products',
-                     backgroundColor: Colors.white,
-                     titleStyle: TextStyle(color: Colors.black),
-                     middleTextStyle: TextStyle(color: Colors.white),
-                     textConfirm: "Yes",
-                     textCancel: "No",
-                     onConfirm: (){
-                       //Get.find<PNCController>().listPNC.clear();
-                       //Get.find<PNCController>().getPNC();
-                       //Get.to(ProductsPNCPage(nnc: nnc));
-                       Get.offAll(ProductsPNCPage(nnc: nnc));
-                     },
-                     onCancel: (){
-                       //Get.offAllNamed(AppRoute.pnc);
-                       Get.find<PNCController>().listPNC.clear();
-                       Get.find<PNCController>().getPNC();
-                       Get.offAllNamed(AppRoute.pnc);
-                       //clearData();
-                     },
-                     confirmTextColor: Colors.white,
-                     buttonColor: Colors.blue,
-                     barrierDismissible: false,
-                     radius: 20,
-                     content: Text('Do you want to add products', style: TextStyle(
-                         color: Colors.black, fontSize: 16, fontFamily:'Brand-Bold'
-                     ),)
-                 );
-               }
-            }
-                , onError: (err) {
-                  ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-                });
+            PNCService().parametrageProduct().then((params) async {
+              final paramProduct = params['seulProduit'];
+              print('parametre Product : ${paramProduct}');
+              if (paramProduct == 1) {
+                Get.back();
+                Get.find<PNCController>().listPNC.clear();
+                Get.find<PNCController>().getPNC();
+                //Get.offAllNamed(AppRoute.pnc);
+                ShowSnackBar.snackBar(
+                    "Successfully", "PNC Added ", Colors.green);
+              } else {
+                ShowSnackBar.snackBar(
+                    "Successfully", "PNC Added ", Colors.green);
+                Get.defaultDialog(
+                    title: 'Add Products',
+                    backgroundColor: Colors.white,
+                    titleStyle: TextStyle(color: Colors.black),
+                    middleTextStyle: TextStyle(color: Colors.white),
+                    textConfirm: "Yes",
+                    textCancel: "No",
+                    onConfirm: () {
+                      //Get.find<PNCController>().listPNC.clear();
+                      //Get.find<PNCController>().getPNC();
+                      //Get.to(ProductsPNCPage(nnc: nnc));
+                      Get.offAll(ProductsPNCPage(nnc: nnc));
+                    },
+                    onCancel: () {
+                      //Get.offAllNamed(AppRoute.pnc);
+                      Get.find<PNCController>().listPNC.clear();
+                      Get.find<PNCController>().getPNC();
+                      Get.offAllNamed(AppRoute.pnc);
+                      //clearData();
+                    },
+                    confirmTextColor: Colors.white,
+                    buttonColor: Colors.blue,
+                    barrierDismissible: false,
+                    radius: 20,
+                    content: Text(
+                      'Do you want to add products',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontFamily: 'Brand-Bold'),
+                    ));
+              }
+            }, onError: (err) {
+              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+            });
 
+            //upload images
+            base64List.forEach((element) async {
+              print('base64 image: ${element.fileName} - ${element.image}');
+              await PNCService().uploadImagePNC({
+                "image": element.image.toString(),
+                "idFiche": nnc,
+                "fileName": element.fileName.toString()
+              }).then((resp) async {
+                //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);
+                //Get.to(ActionRealisationPage());
+              }, onError: (err) {
+                isDataProcessing(false);
+                //ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);
+                print('Error upload images : ${err.toString()}');
+              });
+            });
           }, onError: (err) {
             isDataProcessing(false);
             print('Error : ${err.toString()}');
             ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
           });
-      }
-      }
-      catch (ex){
+        }
+      } catch (ex) {
         Get.defaultDialog(
             title: "Exception",
             backgroundColor: Colors.lightBlue,
@@ -977,10 +996,12 @@ class NewPNCController extends GetxController {
             buttonColor: Colors.red,
             barrierDismissible: false,
             radius: 50,
-            content: Text('${ex.toString()}', style: TextStyle(color: Colors.black),)
-        );
+            content: Text(
+              '${ex.toString()}',
+              style: TextStyle(color: Colors.black),
+            ));
         //ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
-        if(kDebugMode) {
+        if (kDebugMode) {
           print("throwing new error " + ex.toString());
         }
         throw Exception("Error " + ex.toString());
@@ -994,9 +1015,12 @@ class NewPNCController extends GetxController {
     actionPriseController.clear();
     detectedEmployeModel = null;
     detectedEmployeMatricule = "";
-    dateDetectionController.text = DateFormat('yyyy-MM-dd').format(datePickerDetection);
-    dateLivraisonController.text = DateFormat('yyyy-MM-dd').format(datePickerLivraison);
-    dateSaisieController.text = DateFormat('yyyy-MM-dd').format(datePickerSaisie);
+    dateDetectionController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerDetection);
+    dateLivraisonController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerLivraison);
+    dateSaisieController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerSaisie);
     typePNCModel = null;
     selectedCodeType = 0;
     graviteModel = null;
@@ -1040,8 +1064,7 @@ class NewPNCController extends GetxController {
   Widget customDropDownType(BuildContext context, TypePNCModel? item) {
     if (typePNCModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1050,6 +1073,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderType(
       BuildContext context, typePNCModel, bool isSelected) {
     return Container(
@@ -1057,10 +1081,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(typePNCModel?.typeNC ?? ''),
@@ -1068,12 +1092,12 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //gravite pnc
   Widget customDropDownGravite(BuildContext context, GravitePNCModel? item) {
     if (graviteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1082,6 +1106,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderGravite(
       BuildContext context, graviteModel, bool isSelected) {
     return Container(
@@ -1089,10 +1114,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(graviteModel?.gravite ?? ''),
@@ -1100,12 +1125,12 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //source pnc
   Widget customDropDownSource(BuildContext context, SourcePNCModel? item) {
     if (sourcePNCModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1114,6 +1139,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderSource(
       BuildContext context, sourcePNCModel, bool isSelected) {
     return Container(
@@ -1121,10 +1147,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(sourcePNCModel?.sourceNC ?? ''),
@@ -1132,12 +1158,12 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //atelier pnc
   Widget customDropDownAtelier(BuildContext context, AtelierPNCModel? item) {
     if (atelierPNCModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1146,6 +1172,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderAtelier(
       BuildContext context, atelierPNCModel, bool isSelected) {
     return Container(
@@ -1153,10 +1180,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(atelierPNCModel?.atelier ?? ''),
@@ -1164,12 +1191,12 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //product
   Widget customDropDownProduct(BuildContext context, ProductModel? item) {
     if (productModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1179,6 +1206,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderProduct(
       BuildContext context, productModel, bool isSelected) {
     return Container(
@@ -1186,10 +1214,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(productModel?.produit ?? ''),
@@ -1197,12 +1225,13 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //fournisseur
-  Widget customDropDownFournisseur(BuildContext context, FournisseurModel? item) {
+  Widget customDropDownFournisseur(
+      BuildContext context, FournisseurModel? item) {
     if (fournisseurModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1211,6 +1240,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderFournisseur(
       BuildContext context, fournisseurModel, bool isSelected) {
     return Container(
@@ -1218,10 +1248,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(fournisseurModel?.raisonSociale ?? ''),
@@ -1229,12 +1259,12 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //client
   Widget customDropDownClient(BuildContext context, ClientModel? item) {
     if (clientModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1244,6 +1274,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderClient(
       BuildContext context, clientModel, bool isSelected) {
     return Container(
@@ -1251,10 +1282,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(clientModel?.nomClient ?? ''),
@@ -1262,21 +1293,22 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //employe
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
-
     if (employeModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${employeModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${employeModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, employeModel, bool isSelected) {
     return Container(
@@ -1284,10 +1316,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(employeModel?.nompre ?? ''),
@@ -1295,21 +1327,23 @@ class NewPNCController extends GetxController {
       ),
     );
   }
-  //detected by
-  Widget customDropDownDetectedEmploye(BuildContext context, EmployeModel? item) {
 
+  //detected by
+  Widget customDropDownDetectedEmploye(
+      BuildContext context, EmployeModel? item) {
     if (detectedEmployeModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${detectedEmployeModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${detectedEmployeModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDetectedEmploye(
       BuildContext context, detectedEmployeModel, bool isSelected) {
     return Container(
@@ -1317,10 +1351,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(detectedEmployeModel?.nompre ?? ''),
@@ -1328,20 +1362,24 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //site
   Widget customDropDownSite(BuildContext context, SiteModel? item) {
     if (siteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${siteModel?.site}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${siteModel?.site}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderSite(
       BuildContext context, siteModel, bool isSelected) {
     return Container(
@@ -1349,10 +1387,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(siteModel?.site ?? ''),
@@ -1360,20 +1398,24 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //processus
   Widget customDropDownProcessus(BuildContext context, ProcessusModel? item) {
     if (processusModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${processusModel?.processus}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${processusModel?.processus}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderProcessus(
       BuildContext context, processusModel, bool isSelected) {
     return Container(
@@ -1381,10 +1423,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
@@ -1392,12 +1434,12 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //Activity
   Widget customDropDownActivity(BuildContext context, ActivityModel? item) {
     if (activityModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1406,6 +1448,7 @@ class NewPNCController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderActivity(
       BuildContext context, activityModel, bool isSelected) {
     return Container(
@@ -1413,10 +1456,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(activityModel?.domaine ?? ''),
@@ -1424,20 +1467,24 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //direction
   Widget customDropDownDirection(BuildContext context, DirectionModel? item) {
     if (directionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${directionModel?.direction}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${directionModel?.direction}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDirection(
       BuildContext context, directionModel, bool isSelected) {
     return Container(
@@ -1445,10 +1492,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(directionModel?.direction ?? ''),
@@ -1456,20 +1503,24 @@ class NewPNCController extends GetxController {
       ),
     );
   }
+
   //service
   Widget customDropDownService(BuildContext context, ServiceModel? item) {
     if (serviceModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${serviceModel?.service}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${serviceModel?.service}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderService(
       BuildContext context, serviceModel, bool isSelected) {
     return Container(
@@ -1477,10 +1528,10 @@ class NewPNCController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(serviceModel?.service ?? ''),

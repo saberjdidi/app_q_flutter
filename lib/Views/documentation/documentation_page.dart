@@ -23,7 +23,7 @@ class DocumentationPage extends GetView<DocumentationController> {
     const Color lightPrimary = Colors.white;
     const Color darkPrimary = Colors.white;
     return Scaffold(
-       drawer: NavigationDrawerWidget(),
+      drawer: NavigationDrawerWidget(),
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -53,29 +53,58 @@ class DocumentationPage extends GetView<DocumentationController> {
                 primary: false,
                 itemCount: controller.listDocument.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final status = controller.listDocument[index].fichierLien.toString();
-                  Image document_image = Image.asset("assets/images/logo.png", width: 60.0, height: 60.0,);
+                  final status =
+                      controller.listDocument[index].fichierLien.toString();
+                  Image document_image = Image.asset(
+                    "assets/images/logo.png",
+                    width: 60.0,
+                    height: 60.0,
+                  );
 
-                  if(status.contains(".png") || status.contains(".PNG")){
-                    document_image = Image.asset("assets/images/icon_png.png",width: 60.0, height: 60.0,);
-                  }
-                  else if(status.contains(".docx") || status.contains(".DOCX")){
-                    document_image = Image.asset("assets/images/word.png",width: 60.0, height: 60.0,);
-                  }
-                  else if(status.contains(".txt")){
-                    document_image = Image.asset("assets/images/word.png",width: 60.0, height: 60.0,);
-                  }
-                  else if(status.contains(".xls") || status.contains(".xlsx")){
-                    document_image = Image.asset("assets/images/excel.png",width: 60.0, height: 60.0,);
-                  }
-                  else if(status.contains(".ppt")){
-                    document_image = Image.asset("assets/images/ppt.png",width: 60.0, height: 60.0,);
-                  }
-                  else if(status.contains(".pdf")){
-                    document_image = Image.asset("assets/images/pdficon.png",width: 60.0, height: 60.0,);
-                  }
-                  else {
-                    document_image = Image.asset("assets/images/logo.png", width: 60.0, height: 60.0,);
+                  if (status.contains(".png") || status.contains(".PNG")) {
+                    document_image = Image.asset(
+                      "assets/images/icon_png.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
+                  } else if (status.contains(".docx") ||
+                      status.contains(".DOCX")) {
+                    document_image = Image.asset(
+                      "assets/images/word.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
+                  } else if (status.contains(".txt")) {
+                    document_image = Image.asset(
+                      "assets/images/word.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
+                  } else if (status.contains(".xls") ||
+                      status.contains(".xlsx")) {
+                    document_image = Image.asset(
+                      "assets/images/excel.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
+                  } else if (status.contains(".ppt")) {
+                    document_image = Image.asset(
+                      "assets/images/ppt.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
+                  } else if (status.contains(".pdf")) {
+                    document_image = Image.asset(
+                      "assets/images/pdficon.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
+                  } else {
+                    document_image = Image.asset(
+                      "assets/images/logo.png",
+                      width: 60.0,
+                      height: 60.0,
+                    );
                   }
 
                   return Accordion(
@@ -84,7 +113,8 @@ class DocumentationPage extends GetView<DocumentationController> {
                     maxOpenSections: 1,
                     headerBackgroundColorOpened: Colors.black54,
                     openAndCloseAnimation: true,
-                    headerPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 2),
+                    headerPadding:
+                        const EdgeInsets.symmetric(vertical: 1, horizontal: 2),
                     sectionOpeningHapticFeedback: SectionHapticFeedback.heavy,
                     sectionClosingHapticFeedback: SectionHapticFeedback.light,
                     paddingListBottom: 1.0,
@@ -95,21 +125,27 @@ class DocumentationPage extends GetView<DocumentationController> {
                         leftIcon: document_image,
                         rightIcon: Padding(
                           padding: const EdgeInsets.only(right: 2.0),
-                          child: Icon(Icons.remove_red_eye, color: Colors.blue, size: 20.0,),
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.blue,
+                            size: 20.0,
+                          ),
                         ),
                         headerBackgroundColor: Color(0xFFedf0f8),
                         headerBackgroundColorOpened: Color(0xFFDBF1CC),
                         header: ListTile(
-                          title:  Row(
+                          title: Row(
                             children: [
                               Expanded(
                                 flex: 2,
-                                child: Text("${controller.listDocument[index].cdi}",
+                                child: Text(
+                                    "${controller.listDocument[index].cdi}",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontFamily: "Brand-Regular",
                                         fontSize: 15.0,
-                                        color: Colors.blue)),),
+                                        color: Colors.blue)),
+                              ),
                             ],
                           ),
                           subtitle: Column(
@@ -119,8 +155,13 @@ class DocumentationPage extends GetView<DocumentationController> {
                                 children: [
                                   Expanded(
                                     flex: 2,
-                                    child: Text("${controller.listDocument[index].dateCreat}", style:
-                                    TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontFamily: "Brand-Bold"),),
+                                    child: Text(
+                                      "${controller.listDocument[index].dateCreat}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54,
+                                          fontFamily: "Brand-Bold"),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -160,11 +201,11 @@ class DocumentationPage extends GetView<DocumentationController> {
                                       fontFamily: "Brand-Bold"),
                                 ),
                               ),
-
                             ],
                           ),
                         ),
-                        content: DetailsDocumentation(model: controller.listDocument[index]),
+                        content: DetailsDocumentation(
+                            model: controller.listDocument[index]),
                         contentHorizontalPadding: 2,
                         contentBorderWidth: 1,
                         // onOpenSection: () => print('onOpenSection ...'),
@@ -193,7 +234,7 @@ class DocumentationPage extends GetView<DocumentationController> {
         backgroundColor: Colors.blue,
         spaceBetweenChildren: 15.0,
         children: [
-         /* SpeedDialChild(
+          /* SpeedDialChild(
               child: Icon(Icons.add, color: Colors.blue, size: 32),
               label: '${'new'.tr} Document',
               labelBackgroundColor: Colors.white,
@@ -209,85 +250,97 @@ class DocumentationPage extends GetView<DocumentationController> {
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
               label: '${'search'.tr} Document',
-              onTap: (){
+              onTap: () {
                 /* showSearch(
                     context: context,
                     delegate: SearchDocumentationDelegate(controller.listDocument),
                   ); */
 
                 //type
-                controller.searchType = '';
-                controller.searchTypeOffline = '';
+                //controller.searchType.value = '';
+                //controller.searchTypeOffline.value = '';
                 Future<List<TypeDocumentModel>> getTypes(filter) async {
                   try {
-                    List<TypeDocumentModel> _typesList = await List<TypeDocumentModel>.empty(growable: true);
-                    List<TypeDocumentModel> _typesFilter = await List<TypeDocumentModel>.empty(growable: true);
+                    List<TypeDocumentModel> _typesList =
+                        await List<TypeDocumentModel>.empty(growable: true);
+                    List<TypeDocumentModel> _typesFilter =
+                        await List<TypeDocumentModel>.empty(growable: true);
                     var connection = await Connectivity().checkConnectivity();
-                    if(connection == ConnectivityResult.none) {
+                    if (connection == ConnectivityResult.none) {
                       //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                      var response = await controller.localDocumentationService.readTypeDocument();
-                      response.forEach((data){
+                      var response = await controller.localDocumentationService
+                          .readTypeDocument();
+                      response.forEach((data) {
                         var model = TypeDocumentModel();
                         model.codeType = data['codeType'];
                         model.type = data['type'];
                         _typesList.add(model);
                       });
-                    }
-                    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+                    } else if (connection == ConnectivityResult.wifi ||
+                        connection == ConnectivityResult.mobile) {
                       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                      await DocumentationService().getTypeDocument().then((resp) async {
+                      await DocumentationService().getTypeDocument().then(
+                          (resp) async {
                         resp.forEach((data) async {
                           var model = TypeDocumentModel();
                           model.codeType = data['codeTypeDI'];
                           model.type = data['type'];
                           _typesList.add(model);
                         });
-                      }
-                          , onError: (err) {
-                            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-                          });
+                      }, onError: (err) {
+                        ShowSnackBar.snackBar(
+                            "Error", err.toString(), Colors.red);
+                      });
                     }
                     _typesFilter = _typesList.where((u) {
                       var query = u.type!.toLowerCase();
                       return query.contains(filter);
                     }).toList();
                     return _typesFilter;
-
                   } catch (exception) {
-                    ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+                    ShowSnackBar.snackBar(
+                        "Exception", exception.toString(), Colors.red);
                     return Future.error('service : ${exception.toString()}');
                   }
                 }
 
-                Widget customDropDownType(BuildContext context, TypeDocumentModel? item) {
+                Widget customDropDownType(
+                    BuildContext context, TypeDocumentModel? item) {
                   if (item == null) {
                     return Container();
-                  }
-                  else{
+                  } else {
                     return Container(
                       child: ListTile(
                         contentPadding: EdgeInsets.all(0),
-                        title: Text('${item.type}', style: TextStyle(color: Colors.black),),
+                        title: Text(
+                          '${item.type}',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     );
                   }
                 }
-                Widget customPopupItemBuilderType(
-                    BuildContext context, TypeDocumentModel? item, bool isSelected) {
+
+                Widget customPopupItemBuilderType(BuildContext context,
+                    TypeDocumentModel? item, bool isSelected) {
                   return Container(
                     margin: EdgeInsets.symmetric(horizontal: 8),
                     decoration: !isSelected
                         ? null
                         : BoxDecoration(
-                      border: Border.all(color: Theme.of(context).primaryColor),
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.white,
-                    ),
+                            border: Border.all(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white,
+                          ),
                     child: ListTile(
                       selected: isSelected,
-                      title: Text(item!.type ?? '', style: TextStyle(color: Colors.black),),
+                      title: Text(
+                        item!.type ?? '',
+                        style: TextStyle(color: Colors.black),
+                      ),
                       //subtitle: Text(item?.TypeAct ?? ''),
                     ),
                   );
@@ -299,17 +352,23 @@ class DocumentationPage extends GetView<DocumentationController> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       scrollable: true,
-                      title: const Center(
-                        child: Text('Search Documentation', style: TextStyle(
-                          fontWeight: FontWeight.w500, fontFamily: "Brand-Bold",
-                          color: Color(0xFF0769D2), fontSize: 20.0
-                        ),),
+                      title: Center(
+                        child: Text(
+                          '${'search'.tr} Documentation',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Brand-Bold",
+                              color: Color(0xFF0769D2),
+                              fontSize: 20.0),
+                        ),
                       ),
                       titlePadding: EdgeInsets.only(top: 2.0),
                       content: SingleChildScrollView(
                         child: ListBody(
                           children: <Widget>[
-                            SizedBox(height: 10.0,),
+                            SizedBox(
+                              height: 10.0,
+                            ),
                             TextFormField(
                               controller: controller.searchCode,
                               keyboardType: TextInputType.text,
@@ -325,37 +384,43 @@ class DocumentationPage extends GetView<DocumentationController> {
                                   fontSize: 10.0,
                                 ),
                                 border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(30))
-                                ),
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30))),
                                 prefixIcon: Icon(Icons.search),
                               ),
                               style: TextStyle(fontSize: 14.0),
                             ),
-                            SizedBox(height: 10.0,),
+                            SizedBox(
+                              height: 10.0,
+                            ),
                             TextFormField(
                               controller: controller.searchLibelle,
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                  labelText: 'Libelle',
-                                  hintText: 'libelle',
-                                  labelStyle: TextStyle(
-                                    fontSize: 14.0,
-                                  ),
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 10.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                      borderRadius: BorderRadius.all(Radius.circular(30))
-                                  ),
+                                labelText: 'Libelle',
+                                hintText: 'libelle',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30))),
                                 prefixIcon: Icon(Icons.search),
                               ),
                               style: TextStyle(fontSize: 14.0),
                             ),
-                            SizedBox(height: 10.0,),
+                            SizedBox(
+                              height: 10.0,
+                            ),
                             DropdownSearch<TypeDocumentModel>(
                               showSelectedItems: true,
                               showClearButton: true,
@@ -364,21 +429,26 @@ class DocumentationPage extends GetView<DocumentationController> {
                               compareFn: (i, s) => i?.isEqual(s) ?? false,
                               dropdownSearchDecoration: InputDecoration(
                                 labelText: "Type",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                                contentPadding:
+                                    EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(30))
-                                ),
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30))),
                               ),
                               onFind: (String? filter) => getTypes(filter),
                               onChanged: (data) {
-                                controller.searchType = data?.codeType.toString();
-                                controller.searchTypeOffline = data?.type.toString();
-                                if(controller.typeDocumentModel == null){
-                                  controller.searchType = '';
+                                controller.searchType.value =
+                                    data!.codeType.toString();
+                                controller.searchTypeOffline =
+                                    data.type.toString();
+                                if (data == null) {
+                                  controller.searchType.value = '';
                                   controller.searchTypeOffline = '';
                                 }
-                                print('code type document: ${controller.searchType} type : ${controller.searchTypeOffline}');
+                                debugPrint(
+                                    'code type document: ${controller.searchType} type : ${controller.searchTypeOffline}');
                               },
                               dropdownBuilder: customDropDownType,
                               popupItemBuilder: customPopupItemBuilderType,
@@ -390,15 +460,18 @@ class DocumentationPage extends GetView<DocumentationController> {
                       actionsPadding: EdgeInsets.all(1.0),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: Text('cancel'.tr),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
                         ),
                         ElevatedButton(
                           onPressed: () async {
-                            Get.find<DocumentationController>().listDocument.clear();
-                            Get.find<DocumentationController>().searchDocument();
+                            Get.find<DocumentationController>()
+                                .listDocument
+                                .clear();
+                            Get.find<DocumentationController>()
+                                .searchDocument();
                             Get.back();
                           },
                           style: ButtonStyle(
@@ -413,7 +486,8 @@ class DocumentationPage extends GetView<DocumentationController> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child: Text('Search',
+                            child: Text(
+                              'search'.tr,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -427,20 +501,17 @@ class DocumentationPage extends GetView<DocumentationController> {
                     );
                   },
                 );
-              }
-          ),
-        SpeedDialChild(
-        labelBackgroundColor: Colors.white,
-        backgroundColor: Colors.white,
-          child: Icon(Icons.sync, color: Colors.blue, size: 32),
-          label: 'Synchronisation',
-          onTap: (){
-          controller.syncDocumentationToWebService();
-          }
-          )
+              }),
+          SpeedDialChild(
+              labelBackgroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              child: Icon(Icons.sync, color: Colors.blue, size: 32),
+              label: 'Synchronisation',
+              onTap: () {
+                controller.syncDocumentationToWebService();
+              })
         ],
       ),
     );
   }
-
 }

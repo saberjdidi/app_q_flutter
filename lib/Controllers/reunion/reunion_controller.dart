@@ -6,6 +6,7 @@ import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
 
 import '../../Models/pnc/pnc_model.dart';
 import '../../Models/reunion/reunion_model.dart';
+import '../../Models/reunion/type_reunion_model.dart';
 import '../../Services/pnc/pnc_service.dart';
 import '../../Services/reunion/local_reunion_service.dart';
 import '../../Services/reunion/reunion_service.dart';
@@ -20,6 +21,11 @@ class ReunionController extends GetxController {
   var isDataProcessing = false.obs;
   LocalReunionService localReunionService = LocalReunionService();
   final matricule = SharedPreference.getMatricule();
+  //search
+  TextEditingController searchNumero = TextEditingController();
+  TextEditingController searchDesignation = TextEditingController();
+  //TextEditingController searchType = TextEditingController();
+  String? searchCodeType = "";
 
   @override
   void onInit() {
@@ -27,6 +33,8 @@ class ReunionController extends GetxController {
     super.onInit();
     getReunion();
     //checkConnectivity();
+    searchNumero.text = '';
+    searchDesignation.text = '';
   }
 
   Future<void> checkConnectivity() async {
@@ -62,9 +70,6 @@ class ReunionController extends GetxController {
           model.site = data['site'];
           model.ordreJour = data['ordreJour'];
           listReunion.add(model);
-          listReunion.forEach((element) {
-            print('element reunion ${element.typeReunion}');
-          });
         });
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
@@ -88,9 +93,6 @@ class ReunionController extends GetxController {
             //model.reunionPlus0 = data['reunion_plus0'];
             //model.reunionPlus1 = data['reunion_plus1'];
             listReunion.add(model);
-            listReunion.forEach((element) {
-              print('element reunion ${element.typeReunion}');
-            });
           });
         }, onError: (err) {
           isDataProcessing.value = false;
@@ -101,6 +103,64 @@ class ReunionController extends GetxController {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
+    } finally {
+      isDataProcessing.value = false;
+    }
+  }
+
+  searchReunion() async {
+    try {
+      var connection = await Connectivity().checkConnectivity();
+      if (connection == ConnectivityResult.none) {
+        var response = await localReunionService.searchReunion(
+            searchNumero.text, searchCodeType, searchDesignation.text);
+        response.forEach((data) {
+          var model = ReunionModel();
+          model.online = data['online'];
+          model.nReunion = data['nReunion'];
+          model.typeReunion = data['typeReunion'];
+          model.codeTypeReunion = data['codeTypeReunion'];
+          model.datePrev = data['datePrev'];
+          model.dateReal = data['dateReal'];
+          model.etat = data['etat'];
+          model.lieu = data['lieu'];
+          model.site = data['site'];
+          model.ordreJour = data['ordreJour'];
+          listReunion.add(model);
+        });
+        searchNumero.text = '';
+        searchDesignation.text = '';
+      } else if (connection == ConnectivityResult.mobile ||
+          connection == ConnectivityResult.wifi) {
+        await ReunionService()
+            .searchReunion(matricule, searchNumero.text, searchCodeType,
+                searchDesignation.text)
+            .then((response) {
+          response.forEach((data) async {
+            var model = ReunionModel();
+            model.nReunion = data['nReunion'];
+            model.typeReunion = data['typeReunion'];
+            model.codeTypeReunion = data['codeTypeReunion'];
+            model.datePrev = data['datePrev'];
+            model.etat = data['etat'];
+            model.lieu = data['lieu'];
+            model.site = data['site'];
+            model.ordreJour = data['ordreJour'];
+            model.online = 1;
+            listReunion.add(model);
+            searchNumero.text = '';
+            searchDesignation.text = '';
+          });
+        }, onError: (error) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
+          debugPrint('Error : ${error.toString()}');
+        });
+      }
+    } catch (exception) {
+      isDataProcessing.value = false;
+      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      debugPrint('Exception : ${exception.toString()}');
     } finally {
       isDataProcessing.value = false;
     }

@@ -68,6 +68,41 @@ class IncidentSecuriteService {
     }
   }
 
+  Future<dynamic> uploadImageIncSec(Map data) async {
+    try {
+      debugPrint('data : ${json.encode(data)}');
+      var response = await http.post(
+          Uri.parse('${AppConstants.UPLOAD_URL}/uploadPhotoIncSec'),
+          body: json.encode(data),
+          headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error(exception.toString());
+    }
+  }
+
+  Future<List<dynamic>> getImageIncSec(idFiche) async {
+    try {
+      debugPrint('${AppConstants.UPLOAD_URL}/getImageIncSec?idFiche=$idFiche');
+      var response = await http.get(
+          Uri.parse(
+              '${AppConstants.UPLOAD_URL}/getImageIncSec?idFiche=$idFiche'),
+          headers: {'Content-Type': 'application/json'});
+      debugPrint('response image inc sec : $response');
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error(exception.toString());
+    }
+  }
+
   //champ obligatoire
   Future<dynamic> getChampObligatoireIncidentSecurite() async {
     try {

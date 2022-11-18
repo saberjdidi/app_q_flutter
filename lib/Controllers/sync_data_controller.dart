@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Models/action/action_model.dart';
 import 'package:qualipro_flutter/Models/audit/audit_model.dart';
+import 'package:qualipro_flutter/Models/incident_environnement/upload_image_model.dart';
 import 'package:qualipro_flutter/Models/incident_securite/cause_typique_model.dart';
 import 'package:qualipro_flutter/Models/incident_securite/site_lesion_model.dart';
 import 'package:qualipro_flutter/Models/reunion/action_reunion.dart';
@@ -12,6 +13,7 @@ import '../Models/action/action_sync.dart';
 import '../Models/action/sous_action_model.dart';
 import '../Models/audit/auditeur_model.dart';
 import '../Models/audit/constat_audit_model.dart';
+import '../Models/audit/critere_checklist_audit_model.dart';
 import '../Models/incident_environnement/action_inc_env.dart';
 import '../Models/incident_environnement/incident_env_model.dart';
 import '../Models/incident_environnement/type_cause_incident_model.dart';
@@ -21,6 +23,7 @@ import '../Models/incident_securite/incident_securite_model.dart';
 import '../Models/pnc/pnc_model.dart';
 import '../Models/pnc/product_pnc_model.dart';
 import '../Models/pnc/type_cause_pnc_model.dart';
+import '../Models/pnc/type_pnc_model.dart';
 import '../Models/reunion/participant_reunion_model.dart';
 import '../Models/reunion/reunion_model.dart';
 import '../Models/type_cause_model.dart';
@@ -477,11 +480,26 @@ class SyncDataController extends GetxController {
           "isps": listPNCSync[i].isps,
           "id_fournisseur": listPNCSync[i].codeFournisseur,
           "pourcentage": listPNCSync[i].pourcentage
-        }).then((resp) async {
+        }).then((response) async {
           //await localPNCService.deletePNCOffline();
-          //ShowSnackBar.snackBar("${listPNCSync[i].nc} added", "Synchronization successfully", Colors.green);
-          //listPNC.clear();
-          //getPNC();
+          List<UploadImageModel> listImages =
+              await localPNCService.readImagesPNC();
+          for (var j = 0; j < listImages.length; j++) {
+            debugPrint(
+                'image pnc sync : ${listImages[j].idFiche} - ${listImages[j].fileName.toString()} - ${listImages[j].image.toString()}');
+            await PNCService().uploadImagePNC({
+              "image": listImages[j].image.toString(),
+              "idFiche": listImages[j].idFiche,
+              "fileName": listImages[j].fileName.toString()
+            }).then((resp) async {
+              await localPNCService.deleteTableImagePNC();
+              //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);
+              //Get.to(ActionRealisationPage());
+            }, onError: (err) {
+              isDataProcessing(false);
+              // ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);
+            });
+          }
         }, onError: (err) {
           isDataProcessing(false);
           ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
@@ -549,6 +567,34 @@ class SyncDataController extends GetxController {
       isDataProcessing(false);
       ShowSnackBar.snackBar(
           "Error Sync Participant reunion", error.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> syncTypeProductPNCToSQLServer() async {
+    try {
+      isDataProcessing(true);
+      List<TypePNCModel> listTypeProductPNCSync =
+          await localPNCService.readTypeProductNNCByOnline();
+      for (var i = 0; i < listTypeProductPNCSync.length; i++) {
+        debugPrint(
+            'type product pnc sync : ${listTypeProductPNCSync[i].nnc} - ${listTypeProductPNCSync[i].idProduct} - ${listTypeProductPNCSync[i].typeNC}');
+        await PNCService().addTypeProductNC({
+          "nnc": listTypeProductPNCSync[i].nnc,
+          "id_produit": listTypeProductPNCSync[i].idProduct,
+          "type": listTypeProductPNCSync[i].codeTypeNC,
+          "pourcentage": listTypeProductPNCSync[i].pourcentage,
+        }).then((resp) async {}, onError: (err) {
+          if (kDebugMode) print('error type product : ${err.toString()}');
+          ShowSnackBar.snackBar(
+              "Error type product pnc sync : ", err.toString(), Colors.red);
+        });
+      }
+    } catch (error) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception Sync type product pnc", error.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -689,6 +735,89 @@ class SyncDataController extends GetxController {
     }
   }
 
+  Future<void> syncAuditeurExterneToSQLServer() async {
+    try {
+      isDataProcessing(true);
+      List<AuditeurModel> listAuditeurExterneSync =
+          await localAuditService.readAuditeurExterneRattacherByOnline();
+      for (var i = 0; i < listAuditeurExterneSync.length; i++) {
+        debugPrint(
+            'auditeur externe sync : ${listAuditeurExterneSync[i].refAudit} - ${listAuditeurExterneSync[i].code} - ${listAuditeurExterneSync[i].nompre}');
+        await AuditService().saveAuditeurExterne({
+          "codeAuditeur": listAuditeurExterneSync[i].code,
+          "refAudit": listAuditeurExterneSync[i].refAudit,
+          "affectation": listAuditeurExterneSync[i].affectation
+        }).then((value) {
+          //print('auditeur interne  : ${data['refAudit']} - ${data['mat']}');
+        }, onError: (error) {
+          ShowSnackBar.snackBar(
+              "Error auditeur externe sync", error.toString(), Colors.red);
+        });
+      }
+    } catch (error) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Error auditeur externe Sync", error.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> syncEmployeHabiliteAuditToSQLServer() async {
+    try {
+      isDataProcessing(true);
+      List<AuditeurModel> listEmployeSync =
+          await localAuditService.readEmployeHabiliteAuditByOnline();
+      for (var i = 0; i < listEmployeSync.length; i++) {
+        debugPrint(
+            'auditeur employe habilite sync : ${listEmployeSync[i].refAudit} - ${listEmployeSync[i].mat} - ${listEmployeSync[i].nompre}');
+        await AuditService().addEmployeHabiliteAudit({
+          "mat": listEmployeSync[i].mat,
+          "refAudit": listEmployeSync[i].refAudit
+        }).then((value) {
+          //print('auditeur interne  : ${data['refAudit']} - ${data['mat']}');
+        }, onError: (error) {
+          ShowSnackBar.snackBar(
+              "Error employe habilite sync", error.toString(), Colors.red);
+        });
+      }
+    } catch (error) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Error employe habilite Sync", error.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> syncCritereCheckListAudit() async {
+    try {
+      isDataProcessing(true);
+      List<CritereChecklistAuditModel> listCritereCheckList =
+          await localAuditService.readCritereCheckListAuditByOnline();
+      for (var i = 0; i < listCritereCheckList.length; i++) {
+        debugPrint(
+            'critere checklist sync : ${listCritereCheckList[i].refAudit}-${listCritereCheckList[i].idChamp}-${listCritereCheckList[i].commentaire}');
+        await AuditService().evaluerCritereOfCheckList({
+          "refAudit": listCritereCheckList[i].refAudit,
+          "idChamp": listCritereCheckList[i].idChamp,
+          "idCritere": listCritereCheckList[i].idCrit,
+          "evaluation": listCritereCheckList[i].evaluation,
+          "commentaire": listCritereCheckList[i].commentaire
+        }).then((response) {}, onError: (error) {
+          ShowSnackBar.snackBar(
+              'Error Critere CheckList Audit', error.toString(), Colors.red);
+        });
+      }
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar('Exception Critere CheckList Audit',
+          exception.toString(), Colors.redAccent);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
   //sync incident environnement
   Future<void> syncIncidentEnvironnementToSQLServer() async {
     try {
@@ -749,6 +878,26 @@ class SyncDataController extends GetxController {
           "causes": listIncidentEnvSync[i].listTypeCause
         }).then((resp) async {
           //ShowSnackBar.snackBar("${data['incident']} added", "Synchronization successfully", Colors.green);
+          List<UploadImageModel> listImages =
+              await localIncidentEnvironnementService
+                  .readImagesIncidentEnvironnement();
+          for (var j = 0; j < listImages.length; j++) {
+            debugPrint(
+                'image inc env sync : ${listImages[j].idFiche} - ${listImages[j].fileName.toString()} - ${listImages[j].image.toString()}');
+            await IncidentEnvironnementService().uploadImageIncEnv({
+              "image": listImages[j].image.toString(),
+              "idFiche": listImages[j].idFiche,
+              "fileName": listImages[j].fileName.toString()
+            }).then((resp) async {
+              await localIncidentEnvironnementService
+                  .deleteTableImageIncidentEnvironnement();
+              //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);
+              //Get.to(ActionRealisationPage());
+            }, onError: (err) {
+              isDataProcessing(false);
+              // ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);
+            });
+          }
         }, onError: (err) {
           isDataProcessing(false);
           ShowSnackBar.snackBar(
@@ -887,9 +1036,27 @@ class SyncDataController extends GetxController {
           "typesConsequences": listIncidentSecSync[i].listTypeConsequence,
           "causesTypiques": listIncidentSecSync[i].listCauseTypique,
           "sitesLesions": listIncidentSecSync[i].listSiteLesion
-        }).then((resp) async {
+        }).then((response) async {
           //await localSecuriteEnvironnementService.deleteIncidentEnvironnementOffline();
-          //ShowSnackBar.snackBar("${data['designation']} added", "Synchronization successfully", Colors.green);
+          List<UploadImageModel> listImages =
+              await localIncidentSecuriteService.readImagesIncidentSecurite();
+          for (var j = 0; j < listImages.length; j++) {
+            debugPrint(
+                'image inc sec sync : ${listImages[j].idFiche} - ${listImages[j].fileName.toString()} - ${listImages[j].image.toString()}');
+            await IncidentSecuriteService().uploadImageIncSec({
+              "image": listImages[j].image.toString(),
+              "idFiche": listImages[j].idFiche,
+              "fileName": listImages[j].fileName.toString()
+            }).then((resp) async {
+              await localIncidentSecuriteService
+                  .deleteTableImageIncidentSecurite();
+              //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);
+              //Get.to(ActionRealisationPage());
+            }, onError: (err) {
+              isDataProcessing(false);
+              // ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);
+            });
+          }
         }, onError: (err) {
           isDataProcessing(false);
           ShowSnackBar.snackBar(
@@ -1092,13 +1259,27 @@ class SyncDataController extends GetxController {
           "equipes": listEquipeVisiteSecSync //listEquipeToSync
         }).then((resp) async {
           //await localSecuriteEnvironnementService.deleteIncidentEnvironnementOffline();
-          //ShowSnackBar.snackBar("data added", "Synchronization successfully", Colors.green);
-          //listVisiteSecurite.clear();
-          //getData();
         }, onError: (err) {
           isDataProcessing(false);
           ShowSnackBar.snackBar(
               "Error Visite Securite sync", err.toString(), Colors.red);
+        });
+      }
+      //upload images
+      List<UploadImageModel> listImages =
+          await localVisiteSecuriteService.readImagesVisiteSecurite();
+      for (var i = 0; i < listImages.length; i++) {
+        debugPrint(
+            'image visite sec sync : ${listImages[i].idFiche} - ${listImages[i].fileName.toString()} - ${listImages[i].image.toString()}');
+        await VisiteSecuriteService().uploadImageVisiteSec({
+          "image": listImages[i].image.toString(),
+          "idFiche": listImages[i].idFiche,
+          "fileName": listImages[i].fileName.toString()
+        }).then((resp) async {
+          await localIncidentSecuriteService.deleteTableImageIncidentSecurite();
+        }, onError: (err) {
+          isDataProcessing(false);
+          // ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);
         });
       }
     } catch (error) {

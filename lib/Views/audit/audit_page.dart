@@ -23,12 +23,15 @@ import 'constat/constat_audit_page.dart';
 import 'new_audit_page.dart';
 
 class AuditPage extends GetView<AuditController> {
-
   final _contentStyleHeader = const TextStyle(
-      color: Color(0xff060f7d), fontSize: 15, fontWeight: FontWeight.w700,
+      color: Color(0xff060f7d),
+      fontSize: 15,
+      fontWeight: FontWeight.w700,
       fontFamily: "Brand-Bold");
   final _contentStyle = const TextStyle(
-      color: Color(0xff0c2d5e), fontSize: 14, fontWeight: FontWeight.normal,
+      color: Color(0xff0c2d5e),
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
       fontFamily: "Brand-Regular");
 
   @override
@@ -37,7 +40,7 @@ class AuditPage extends GetView<AuditController> {
     const Color lightPrimary = Colors.white;
     const Color darkPrimary = Colors.white;
     return Scaffold(
-       drawer: NavigationDrawerWidget(),
+      drawer: NavigationDrawerWidget(),
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -53,11 +56,10 @@ class AuditPage extends GetView<AuditController> {
         if (controller.isDataProcessing.value == true) {
           return ListView.builder(
               itemCount: 10,
-              itemBuilder: (BuildContext context, int index){
+              itemBuilder: (BuildContext context, int index) {
                 return BuildShimmer();
-              }
-          );
-         /* return Center(
+              });
+          /* return Center(
             child: LoadingView(),
           ); */
         } else {
@@ -92,7 +94,8 @@ class AuditPage extends GetView<AuditController> {
                         children: [
                           SlidableAction(
                             onPressed: (context) {
-                              Get.to(ConstatAuditPage(model: controller.listAudit[index]));
+                              Get.to(ConstatAuditPage(
+                                  model: controller.listAudit[index]));
                             },
                             backgroundColor: Color(0xFF21B7CA),
                             foregroundColor: Colors.white,
@@ -107,7 +110,7 @@ class AuditPage extends GetView<AuditController> {
                         children: [
                           SlidableAction(
                             onPressed: (context) async {
-                               /* try {
+                              /* try {
                                   var connection = await Connectivity().checkConnectivity();
                                   if (connection == ConnectivityResult.none) {
                                     Get.defaultDialog(
@@ -159,212 +162,409 @@ class AuditPage extends GetView<AuditController> {
                                   isScrollControlled: true,
                                   shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(30)
-                                      )
-                                  ),
-                                  builder: (context) => DraggableScrollableSheet(
-                                    expand: false,
-                                    initialChildSize: 0.8,
-                                    maxChildSize: 0.9,
-                                    minChildSize: 0.6,
-                                    builder: (context, scrollController) => SingleChildScrollView(
-                                      child: ListBody(
-                                        children: <Widget>[
-                                          SizedBox(height: 5.0,),
-                                          Center(
-                                            child: Text('Ref Audit N°${controller.listAudit[index].refAudit}', style: TextStyle(
-                                                fontWeight: FontWeight.w500, fontFamily: "Brand-Bold",
-                                                color: Color(0xFF0769D2), fontSize: 30.0
-                                            ),),
-                                          ),
-                                          SizedBox(height: 15.0,),
-                                          Column(
-                                            children: [
-
-                                              ConstrainedBox(
-                                                constraints: BoxConstraints.tightFor(width: MediaQuery.of(context).size.width / 1.1, height: 50),
-                                                child: ElevatedButton.icon(
-                                                  style: ButtonStyle(
-                                                    shape: MaterialStateProperty.all(
-                                                      RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(30),
-                                                      ),
-                                                    ),
-                                                    backgroundColor:
-                                                    MaterialStateProperty.all(CustomColors.googleBackground),
-                                                    padding: MaterialStateProperty.all(EdgeInsets.all(14)),
-                                                  ),
-                                                  icon: Icon(Icons.list),
-                                                  label: Text(
-                                                    'Auditeur Interne',
-                                                    style: TextStyle(fontSize: 16, color: Colors.white),
-                                                  ),
-                                                  onPressed: () {
-                                                    Get.to(AuditeurInternePage(numFiche: controller.listAudit[index].refAudit));
-                                                  },
+                                          top: Radius.circular(30))),
+                                  builder: (context) =>
+                                      DraggableScrollableSheet(
+                                        expand: false,
+                                        initialChildSize: 0.8,
+                                        maxChildSize: 0.9,
+                                        minChildSize: 0.6,
+                                        builder: (context, scrollController) =>
+                                            SingleChildScrollView(
+                                          child: ListBody(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  'Ref Audit N°${controller.listAudit[index].refAudit}',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontFamily: "Brand-Bold",
+                                                      color: Color(0xFF0769D2),
+                                                      fontSize: 30.0),
                                                 ),
                                               ),
-                                              SizedBox(height: 10,),
-                                              ConstrainedBox(
-                                                constraints: BoxConstraints.tightFor(width: MediaQuery.of(context).size.width / 1.1, height: 50),
-                                                child: ElevatedButton.icon(
-                                                  style: ButtonStyle(
-                                                    shape: MaterialStateProperty.all(
-                                                      RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(30),
-                                                      ),
-                                                    ),
-                                                    backgroundColor:
-                                                    MaterialStateProperty.all(Color(
-                                                        0xFD10B3E3)),
-                                                    padding: MaterialStateProperty.all(EdgeInsets.all(14)),
-                                                  ),
-                                                  icon: Icon(Icons.list),
-                                                  label: Text(
-                                                    'Auditeur Externe',
-                                                    style: TextStyle(fontSize: 16, color: Colors.white),
-                                                  ),
-                                                  onPressed: () {
-                                                    Get.to(AuditeurExternePage(numFiche: controller.listAudit[index].refAudit));
-                                                  },
-                                                ),
+                                              SizedBox(
+                                                height: 15.0,
                                               ),
-                                              SizedBox(height: 10,),
-                                              ConstrainedBox(
-                                                constraints: BoxConstraints.tightFor(width: MediaQuery.of(context).size.width / 1.1, height: 50),
-                                                child: ElevatedButton.icon(
-                                                  style: ButtonStyle(
-                                                    shape: MaterialStateProperty.all(
-                                                      RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(30),
-                                                      ),
-                                                    ),
-                                                    backgroundColor:
-                                                    MaterialStateProperty.all(Color(
-                                                        0xFF6C13D2)),
-                                                    padding: MaterialStateProperty.all(EdgeInsets.all(14)),
-                                                  ),
-                                                  icon: Icon(Icons.list),
-                                                  label: Text(
-                                                    'Checklist',
-                                                    style: TextStyle(fontSize: 16, color: Colors.white),
-                                                  ),
-                                                  onPressed: () {
-                                                    Get.to(CheckListPage(model: controller.listAudit[index]));
-                                                  },
-                                                ),
-                                              ),
-                                            Padding(
-                                              padding: const EdgeInsets.all(5.0),
-                                              child: Divider(height: 2.0, color: Colors.grey,),
-                                            ),
-                                              Padding(
-                                                padding: const EdgeInsets.all(5.0),
-                                                child: ListBody(
-                                                  children: <Widget>[
-                                                    Row(
-                                                      children: [
-                                                        Text('id Audit : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].idAudit}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                    Row(
-                                                      children: [
-                                                        Text('Reference Audit : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].refAudit}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                    Row(
-                                                      children: [
-                                                        Text('Description Audit : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].audit}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                    Row(
-                                                      children: [
-                                                        Text('Champ : ', style: _contentStyleHeader,),
-                                                        SizedBox(
-                                                          width: MediaQuery.of(context).size.width / 1.5,
-                                                          child: Html(
-                                                            data: controller.listAudit[index].champ, //htmlData,
-                                                            //tagsList: Html.tags..remove(Platform.isAndroid ? "-" : ""),
-                                                            style: {
-                                                              "body": Style(
-                                                                //backgroundColor: Color.fromARGB(0x50, 0xee, 0xee, 0xee),
-                                                                  fontSize: FontSize.medium,
-                                                                  fontWeight: FontWeight.normal,
-                                                                  margin: EdgeInsets.zero,
-                                                                  textTransform: TextTransform.none
-                                                              ),
-                                                            },
+                                              Column(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        BoxConstraints.tightFor(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                1.1,
+                                                            height: 50),
+                                                    child: ElevatedButton.icon(
+                                                      style: ButtonStyle(
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
                                                           ),
-                                                        )
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all(CustomColors
+                                                                    .googleBackground),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all(EdgeInsets
+                                                                    .all(14)),
+                                                      ),
+                                                      icon: Icon(Icons.list),
+                                                      label: Text(
+                                                        '${'auditeur'.tr} ${'interne'.tr}',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onPressed: () {
+                                                        Get.to(AuditeurInternePage(
+                                                            numFiche: controller
+                                                                .listAudit[
+                                                                    index]
+                                                                .refAudit));
+                                                      },
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        BoxConstraints.tightFor(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                1.1,
+                                                            height: 50),
+                                                    child: ElevatedButton.icon(
+                                                      style: ButtonStyle(
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all(Color(
+                                                                    0xFD10B3E3)),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all(EdgeInsets
+                                                                    .all(14)),
+                                                      ),
+                                                      icon: Icon(Icons.list),
+                                                      label: Text(
+                                                        '${'auditeur'.tr} ${'externe'.tr}',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onPressed: () {
+                                                        Get.to(AuditeurExternePage(
+                                                            numFiche: controller
+                                                                .listAudit[
+                                                                    index]
+                                                                .refAudit));
+                                                      },
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        BoxConstraints.tightFor(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width /
+                                                                1.1,
+                                                            height: 50),
+                                                    child: ElevatedButton.icon(
+                                                      style: ButtonStyle(
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                        ),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all(Color(
+                                                                    0xFF6C13D2)),
+                                                        padding:
+                                                            MaterialStateProperty
+                                                                .all(EdgeInsets
+                                                                    .all(14)),
+                                                      ),
+                                                      icon: Icon(Icons.list),
+                                                      label: Text(
+                                                        'Checklist',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onPressed: () {
+                                                        Get.to(CheckListPage(
+                                                            model: controller
+                                                                    .listAudit[
+                                                                index]));
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: Divider(
+                                                      height: 2.0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: ListBody(
+                                                      children: <Widget>[
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'id Audit : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                '${controller.listAudit[index].idAudit}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Ref. Audit : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                '${controller.listAudit[index].refAudit}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Description Audit : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                '${controller.listAudit[index].audit}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
+                                                        SingleChildScrollView(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                '${'champ_audit'.tr} : ',
+                                                                style:
+                                                                    _contentStyleHeader,
+                                                              ),
+                                                              SizedBox(
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width /
+                                                                    1.5,
+                                                                child: Html(
+                                                                  data: controller
+                                                                      .listAudit[
+                                                                          index]
+                                                                      .champ, //htmlData,
+                                                                  //tagsList: Html.tags..remove(Platform.isAndroid ? "-" : ""),
+                                                                  style: {
+                                                                    "body": Style(
+                                                                        //backgroundColor: Color.fromARGB(0x50, 0xee, 0xee, 0xee),
+                                                                        fontSize: FontSize.medium,
+                                                                        fontWeight: FontWeight.normal,
+                                                                        margin: EdgeInsets.zero,
+                                                                        textTransform: TextTransform.none),
+                                                                  },
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        //SizedBox(height: 5.0,),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              '${'date_debut_prevue'.tr} : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                controller
+                                                                            .listAudit[
+                                                                                index]
+                                                                            .dateDebPrev ==
+                                                                        null
+                                                                    ? ''
+                                                                    : controller.langue ==
+                                                                            'fr'
+                                                                        ? '${DateFormat('dd/MM/yyyy').format(DateTime.parse(controller.listAudit[index].dateDebPrev.toString()))}'
+                                                                        : '${DateFormat('MM/dd/yyyy').format(DateTime.parse(controller.listAudit[index].dateDebPrev.toString()))}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              '${'date_fin_prevue'.tr} : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                controller
+                                                                            .listAudit[
+                                                                                index]
+                                                                            .dateFinPrev ==
+                                                                        null
+                                                                    ? ''
+                                                                    : controller.langue ==
+                                                                            'fr'
+                                                                        ? '${DateFormat('dd/MM/yyyy').format(DateTime.parse(controller.listAudit[index].dateFinPrev.toString()))}'
+                                                                        : '${DateFormat('MM/dd/yyyy').format(DateTime.parse(controller.listAudit[index].dateFinPrev.toString()))}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Site : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                '${controller.listAudit[index].site}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Type audit : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                '${controller.listAudit[index].typeA}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Objective : ',
+                                                              style:
+                                                                  _contentStyleHeader,
+                                                            ),
+                                                            Text(
+                                                                '${controller.listAudit[index].objectif}',
+                                                                style:
+                                                                    _contentStyle),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
+                                                        (controller
+                                                                        .listAudit[
+                                                                            index]
+                                                                        .rapportClot ==
+                                                                    null ||
+                                                                controller
+                                                                        .listAudit[
+                                                                            index]
+                                                                        .rapportClot ==
+                                                                    '')
+                                                            ? Text('')
+                                                            : Row(
+                                                                children: [
+                                                                  Text(
+                                                                    '${'rapport'.tr} ${'cloture'.tr} : ',
+                                                                    style:
+                                                                        _contentStyleHeader,
+                                                                  ),
+                                                                  Text(
+                                                                      '${controller.listAudit[index].rapportClot}',
+                                                                      style:
+                                                                          _contentStyle),
+                                                                ],
+                                                              ),
+                                                        SizedBox(
+                                                          height: 5.0,
+                                                        ),
                                                       ],
                                                     ),
-                                                    //SizedBox(height: 5.0,),
-                                                    Row(
-                                                      children: [
-                                                        Text('Date debut prevue : ', style: _contentStyleHeader,),
-                                                        Text(
-                                                            controller.listAudit[index].dateDebPrev == null
-                                                            ? ''
-                                                            : '${DateFormat('dd/MM/yyyy').format(DateTime.parse(controller.listAudit[index].dateDebPrev.toString()))}',
-                                                            style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text('Date fin prevue : ', style: _contentStyleHeader,),
-                                                        Text(
-                                                            controller.listAudit[index].dateFinPrev == null
-                                                                ? ''
-                                                                : '${DateFormat('dd/MM/yyyy').format(DateTime.parse(controller.listAudit[index].dateFinPrev.toString()))}',
-                                                            style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                     Row(
-                                                      children: [
-                                                        Text('Site : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].site}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                    Row(
-                                                      children: [
-                                                        Text('Type audit : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].typeA}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                    Row(
-                                                      children: [
-                                                        Text('Objectif : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].objectif}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                    (controller.listAudit[index].rapportClot == null || controller.listAudit[index].rapportClot == '')
-                                                    ? Text('')
-                                                    : Row(
-                                                      children: [
-                                                        Text('Rapport Cloture : ', style: _contentStyleHeader,),
-                                                        Text('${controller.listAudit[index].rapportClot}', style: _contentStyle),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 5.0,),
-                                                  ],
-                                                ),
-                                              )
+                                                  )
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                              );
+                                        ),
+                                      ));
                             },
                             backgroundColor: Color(0xFF21B7CA),
                             foregroundColor: Colors.white,
@@ -401,51 +601,57 @@ class AuditPage extends GetView<AuditController> {
               label: '${'new'.tr} Audit',
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
-              onTap: (){
-                Get.to(()=>NewAuditPage(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
-              }
-          ),
+              onTap: () {
+                Get.to(() => NewAuditPage(),
+                    transition: Transition.zoom,
+                    duration: Duration(milliseconds: 500));
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
               label: '${'search'.tr} Audit',
-              onTap: (){
+              onTap: () {
                 //etat
                 Future<List<ISPSPNCModel>> getEtat(filter) async {
                   try {
                     List<ISPSPNCModel> ispsList = [
-                      ISPSPNCModel(value: "1", name: "non encore realisé"),
-                      ISPSPNCModel(value: "2", name: "REALISE"),
-                      ISPSPNCModel(value: "3", name: "REPORTE"),
-                      ISPSPNCModel(value: "4", name: "ANNULE"),
-                      ISPSPNCModel(value: "5", name: "EN COURS DE VALIDATION"),
-                      ISPSPNCModel(value: "6", name: "EN COURS D'ELABORATION"),
+                      ISPSPNCModel(value: "1", name: 'non_encore_realise'.tr),
+                      ISPSPNCModel(value: "2", name: 'realise'.tr),
+                      ISPSPNCModel(value: "3", name: 'reporte'.tr),
+                      ISPSPNCModel(value: "4", name: 'annule'.tr),
+                      ISPSPNCModel(
+                          value: "5", name: 'en_cours_de_validation'.tr),
+                      ISPSPNCModel(value: "6", name: 'en_cours_elaboration'.tr),
                     ];
 
                     return ispsList;
                   } catch (exception) {
-                    ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+                    ShowSnackBar.snackBar(
+                        "Exception", exception.toString(), Colors.red);
                     return Future.error('service : ${exception.toString()}');
                   }
                 }
+
                 //ISPS
-                Widget _customDropDownEtat(BuildContext context, ISPSPNCModel? item) {
+                Widget _customDropDownEtat(
+                    BuildContext context, ISPSPNCModel? item) {
                   if (item == null) {
                     return Container();
                   }
                   return Container(
                     child: (item.name == null)
                         ? ListTile(
-                      contentPadding: EdgeInsets.all(0),
-                      title: Text("No item selected"),
-                    )
+                            contentPadding: EdgeInsets.all(0),
+                            title: Text(""),
+                          )
                         : ListTile(
-                      contentPadding: EdgeInsets.all(0),
-                      title: Text('${item.name}'),
-                    ),
+                            contentPadding: EdgeInsets.all(0),
+                            title: Text('${item.name}'),
+                          ),
                   );
                 }
+
                 Widget _customPopupItemBuilderEtat(
                     BuildContext context, ISPSPNCModel? item, bool isSelected) {
                   return Container(
@@ -453,10 +659,11 @@ class AuditPage extends GetView<AuditController> {
                     decoration: !isSelected
                         ? null
                         : BoxDecoration(
-                      border: Border.all(color: Theme.of(context).primaryColor),
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.white,
-                    ),
+                            border: Border.all(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white,
+                          ),
                     child: ListTile(
                       selected: isSelected,
                       title: Text(item?.name ?? ''),
@@ -464,6 +671,7 @@ class AuditPage extends GetView<AuditController> {
                     ),
                   );
                 }
+
                 //dialog
                 showDialog<void>(
                   context: context,
@@ -471,11 +679,15 @@ class AuditPage extends GetView<AuditController> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       scrollable: true,
-                      title: const Center(
-                        child: Text('Search Audit', style: TextStyle(
-                            fontWeight: FontWeight.w500, fontFamily: "Signatra",
-                            color: Color(0xFF0769D2), fontSize: 30.0
-                        ),),
+                      title: Center(
+                        child: Text(
+                          '${'search'.tr} Audit',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Signatra",
+                              color: Color(0xFF0769D2),
+                              fontSize: 30.0),
+                        ),
                       ),
                       titlePadding: EdgeInsets.only(top: 2.0),
                       content: SingleChildScrollView(
@@ -486,13 +698,13 @@ class AuditPage extends GetView<AuditController> {
                               child: new ListTile(
                                 leading: new Icon(Icons.search),
                                 title: new TextField(
-                                    controller: controller.searchNumero,
-                                    keyboardType: TextInputType.number,
-                                    textInputAction: TextInputAction.done,
-                                    decoration: new InputDecoration(
-                                        hintText: 'Ref Audit',
-                                        border: InputBorder.none),
-                                    ),
+                                  controller: controller.searchNumero,
+                                  keyboardType: TextInputType.number,
+                                  textInputAction: TextInputAction.done,
+                                  decoration: new InputDecoration(
+                                      hintText: 'Ref Audit',
+                                      border: InputBorder.none),
+                                ),
                                 trailing: new IconButton(
                                   icon: Icon(Icons.cancel),
                                   onPressed: () {
@@ -501,7 +713,9 @@ class AuditPage extends GetView<AuditController> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 5.0,),
+                            SizedBox(
+                              height: 5.0,
+                            ),
                             Card(
                               color: Color(0xffa5e1f5),
                               child: new ListTile(
@@ -522,7 +736,9 @@ class AuditPage extends GetView<AuditController> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 5.0,),
+                            SizedBox(
+                              height: 5.0,
+                            ),
                             Card(
                               color: Color(0xffa5e1f5),
                               child: DropdownSearch<ISPSPNCModel>(
@@ -533,17 +749,19 @@ class AuditPage extends GetView<AuditController> {
                                 mode: Mode.DIALOG,
                                 compareFn: (i, s) => i?.isEqual(s) ?? false,
                                 dropdownSearchDecoration: InputDecoration(
-                                  labelText: "Etat",
-                                  contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                                  labelText: 'etat'.tr,
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(12, 12, 0, 0),
                                   border: OutlineInputBorder(),
                                 ),
                                 onFind: (String? filter) => getEtat(filter),
                                 onChanged: (data) {
                                   controller.search_etat = data?.value;
-                                  if(data == null){
+                                  if (data == null) {
                                     controller.search_etat = "0";
                                   }
-                                  print('etat value :${controller.search_etat}');
+                                  print(
+                                      'etat value :${controller.search_etat}');
                                 },
                                 dropdownBuilder: _customDropDownEtat,
                                 popupItemBuilder: _customPopupItemBuilderEtat,
@@ -556,7 +774,7 @@ class AuditPage extends GetView<AuditController> {
                       actionsPadding: EdgeInsets.all(1.0),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: Text('cancel'.tr),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -579,7 +797,8 @@ class AuditPage extends GetView<AuditController> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child: Text('Search',
+                            child: Text(
+                              'search'.tr,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -593,21 +812,17 @@ class AuditPage extends GetView<AuditController> {
                     );
                   },
                 );
-
-              }
-          ),
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.sync, color: Colors.blue, size: 32),
               label: 'Synchronisation',
-              onTap: (){
+              onTap: () {
                 controller.syncAuditToWebService();
-              }
-          )
+              })
         ],
       ),
     );
   }
-
 }

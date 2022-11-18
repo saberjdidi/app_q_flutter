@@ -30,7 +30,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                   ? StepState.complete
                   : StepState.indexed,
               isActive: controller.currentStep.value >= 0,
-              title: Text('Enregistrement'),
+              title: Text('enregistrement'.tr),
               content: Column(
                 children: <Widget>[
                   SizedBox(
@@ -45,7 +45,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                         isFilteredOnline: true,
                         compareFn: (i, s) => i?.isEqual(s) ?? false,
                         dropdownSearchDecoration: InputDecoration(
-                          labelText: "Type Reunion *",
+                          labelText: "Type ${'reunion'.tr} *",
                           contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                           border: OutlineInputBorder(),
                         ),
@@ -56,13 +56,13 @@ class NewReunionPage extends GetView<NewReunionController> {
                           if (controller.typeReunionModel == null) {
                             controller.selectedCodeType = 0;
                           }
-                          print(
+                          debugPrint(
                               'typeReunion: ${controller.typeReunionModel?.typeReunion}, code: ${controller.selectedCodeType}');
                         },
                         dropdownBuilder: controller.customDropDownType,
                         popupItemBuilder: controller.customPopupItemBuilderType,
                         validator: (u) =>
-                            u == null ? "type is required " : null,
+                            u == null ? "type ${'is_required'.tr} " : null,
                       )),
                   SizedBox(
                     height: 10.0,
@@ -75,8 +75,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                                         value: value!
                                     ), */
                     decoration: InputDecoration(
-                      labelText: 'Ordre du jour',
-                      hintText: 'Ordre du jour',
+                      labelText: 'order_jour'.tr,
+                      hintText: 'order_jour'.tr,
                       labelStyle: TextStyle(
                         fontSize: 14.0,
                       ),
@@ -101,8 +101,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: 'Lieu',
-                      hintText: 'lieu',
+                      labelText: 'lieu'.tr,
+                      hintText: 'lieu'.tr,
                       labelStyle: TextStyle(
                         fontSize: 14.0,
                       ),
@@ -137,7 +137,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           controller.selectedDatePrevue(context);
                         },
                         decoration: InputDecoration(
-                            labelText: 'Date Prévue *',
+                            labelText: '${'date_prevue'.tr} *',
                             hintText: 'date',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
@@ -179,7 +179,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           controller.selectedTimeDebut(context);
                         },
                         decoration: InputDecoration(
-                            labelText: 'Heure Debut Reunion',
+                            labelText: 'heur_debut_reunion'.tr,
                             hintText: 'time',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
@@ -221,7 +221,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           controller.selectedTimeFin(context);
                         },
                         decoration: InputDecoration(
-                            labelText: 'Heure Fin Reunion',
+                            labelText: 'heur_fin_reunion'.tr,
                             hintText: 'time',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
@@ -254,7 +254,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: 'Durée Reunion',
+                      labelText: 'duree_reunion'.tr,
                       hintText: 'durée',
                       labelStyle: TextStyle(
                         fontSize: 14.0,
@@ -297,7 +297,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           if (controller.siteModel == null) {
                             controller.selectedCodeSite = 0;
                           }
-                          print(
+                          debugPrint(
                               'site: ${controller.siteModel?.site}, code: ${controller.selectedCodeSite}');
                         },
                         dropdownBuilder: controller.customDropDownSite,
@@ -305,7 +305,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                         validator: (u) =>
                             (controller.site_obligatoire.value == 1 &&
                                     controller.siteModel == null)
-                                ? "site is required "
+                                ? "site ${'is_required'.tr}"
                                 : null,
                       )),
                   SizedBox(
@@ -338,7 +338,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           if (controller.processusModel == null) {
                             controller.selectedCodeProcessus = 0;
                           }
-                          print(
+                          debugPrint(
                               'processus: ${controller.processusModel?.processus}, code: ${controller.selectedCodeProcessus}');
                         },
                         dropdownBuilder: controller.customDropDownProcessus,
@@ -347,7 +347,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                         validator: (u) =>
                             (controller.processus_obligatoire.value == 1 &&
                                     controller.processusModel == null)
-                                ? "processus is required "
+                                ? "processus ${'is_required'.tr}"
                                 : null,
                       )),
                   SizedBox(
@@ -380,7 +380,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                             if (controller.directionModel == null) {
                               controller.selectedCodeDirection = 0;
                             }
-                            print(
+                            debugPrint(
                                 'direction: ${controller.directionModel?.direction}, code: ${controller.selectedCodeDirection}');
                           },
                           dropdownBuilder: controller.customDropDownDirection,
@@ -389,7 +389,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           validator: (u) =>
                               (controller.direction_obligatoire.value == 1 &&
                                       controller.directionModel == null)
-                                  ? "direction is required "
+                                  ? "direction ${'is_required'.tr}"
                                   : null,
                           onBeforeChange: (a, b) {
                             if (b == null) {
@@ -449,7 +449,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                             if (controller.serviceModel == null) {
                               controller.selectedCodeService = 0;
                             }
-                            print(
+                            debugPrint(
                                 'service: ${controller.serviceModel?.service}, code: ${controller.selectedCodeService}');
                           },
                           dropdownBuilder: controller.customDropDownService,
@@ -457,7 +457,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                               controller.customPopupItemBuilderService,
                           validator: (u) => (controller.serviceModel == null &&
                                   controller.service_obligatoire.value == 1)
-                              ? "service is required "
+                              ? "service ${'is_required'.tr} "
                               : null,
                           //u == null ? "service is required " : null,
                           onBeforeChange: (a, b) {
@@ -519,7 +519,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                             if (controller.activityModel == null) {
                               controller.selectedCodeActivity = 0;
                             }
-                            print(
+                            debugPrint(
                                 'activity:${controller.activityModel?.domaine}, code:${controller.selectedCodeActivity}');
                           },
                           dropdownBuilder: controller.customDropDownActivity,
@@ -528,7 +528,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                           validator: (u) =>
                               (controller.activity_obligatoire.value == 1 &&
                                       controller.activityModel == null)
-                                  ? "activity is required "
+                                  ? "${'activity'.tr} ${'is_required'.tr} "
                                   : null,
                           onBeforeChange: (a, b) {
                             if (b == null) {
@@ -600,7 +600,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                   ? StepState.complete
                   : StepState.indexed,
               isActive: controller.currentStep.value >= 1,
-              title: Text('Réalisation'),
+              title: Text('realisation'.tr),
               content: Column(
                 children: <Widget>[
                   SizedBox(
@@ -619,8 +619,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                             activeColor: Colors.blue,
                             fillColor: MaterialStateProperty.all(Colors.blue),
                           ),
-                          const Text(
-                            "Non encore réalisée",
+                          Text(
+                            'non_encore_realise'.tr,
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -639,8 +639,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                             activeColor: Colors.blue,
                             fillColor: MaterialStateProperty.all(Colors.blue),
                           ),
-                          const Text(
-                            "Réalisée",
+                          Text(
+                            'realise'.tr,
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -659,8 +659,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                             activeColor: Colors.blue,
                             fillColor: MaterialStateProperty.all(Colors.blue),
                           ),
-                          const Text(
-                            "Reportée",
+                          Text(
+                            'reporte'.tr,
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -679,8 +679,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                             activeColor: Colors.blue,
                             fillColor: MaterialStateProperty.all(Colors.blue),
                           ),
-                          const Text(
-                            "Annulée",
+                          Text(
+                            'annule'.tr,
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
@@ -695,37 +695,43 @@ class NewReunionPage extends GetView<NewReunionController> {
                   ),
                   Visibility(
                     visible: true,
-                    child: TextFormField(
-                      controller: controller.dateRealisationController,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) =>
-                          Validator.validateField(value: value!),
-                      onChanged: (value) {
+                    child: InkWell(
+                      onTap: () {
                         controller.selectedDateRealisation(context);
                       },
-                      decoration: InputDecoration(
-                          labelText: 'Date Realisation *',
-                          hintText: 'date',
-                          labelStyle: TextStyle(
-                            fontSize: 14.0,
-                          ),
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 10.0,
-                          ),
-                          suffixIcon: InkWell(
-                            onTap: () {
-                              controller.selectedDateRealisation(context);
-                            },
-                            child: Icon(Icons.calendar_today),
-                          ),
-                          border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.lightBlue, width: 1),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)))),
-                      style: TextStyle(fontSize: 14.0),
+                      child: TextFormField(
+                        enabled: false,
+                        controller: controller.dateRealisationController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        validator: (value) =>
+                            Validator.validateField(value: value!),
+                        onChanged: (value) {
+                          controller.selectedDateRealisation(context);
+                        },
+                        decoration: InputDecoration(
+                            labelText: 'Date ${'realisation'.tr} *',
+                            hintText: 'date',
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                controller.selectedDateRealisation(context);
+                              },
+                              child: Icon(Icons.calendar_today),
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)))),
+                        style: TextStyle(fontSize: 14.0),
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -736,8 +742,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: 'Durée Réalisée',
-                      hintText: 'durée',
+                      labelText: 'duree_realisation'.tr,
+                      hintText: 'time',
                       labelStyle: TextStyle(
                         fontSize: 14.0,
                       ),
@@ -760,8 +766,8 @@ class NewReunionPage extends GetView<NewReunionController> {
                     keyboardType: TextInputType.multiline,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: 'Commentaire',
-                      hintText: 'commentaire',
+                      labelText: 'comment'.tr,
+                      hintText: 'comment'.tr,
                       labelStyle: TextStyle(
                         fontSize: 14.0,
                       ),
@@ -782,7 +788,7 @@ class NewReunionPage extends GetView<NewReunionController> {
               )),
           Step(
               isActive: controller.currentStep.value >= 2,
-              title: Text('Complete'),
+              title: Text('complet'.tr),
               content: Container())
         ];
 
@@ -800,7 +806,7 @@ class NewReunionPage extends GetView<NewReunionController> {
           ),
         ),
         title: Center(
-          child: Text("Ajouter Reunion"),
+          child: Text("${'new'.tr} ${'reunion'.tr}"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -824,7 +830,7 @@ class NewReunionPage extends GetView<NewReunionController> {
                       final isLastStep =
                           controller.currentStep.value == getSteps().length - 1;
                       if (isLastStep) {
-                        print('complete');
+                        debugPrint('complete');
                       } else {
                         controller.currentStep.value += 1;
                       }
@@ -840,51 +846,61 @@ class NewReunionPage extends GetView<NewReunionController> {
                           controller.currentStep.value == getSteps().length - 1;
                       return Container(
                         margin: EdgeInsets.only(top: 20),
-                        child: Row(
-                          children: [
-                            if (controller.currentStep.value != 0)
-                              ElevatedButton(
-                                  onPressed: details.onStepCancel,
-                                  child: Text('PREVIOUS')),
-                            const SizedBox(
-                              width: 12,
-                            ),
-                            isLastStep
-                                ? ConstrainedBox(
-                                    constraints: BoxConstraints.tightFor(
-                                        width: 130, height: 50),
-                                    child: ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                        shape: MaterialStateProperty.all(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              if (controller.currentStep.value != 0)
+                                SizedBox(
+                                  width: Get.width * 0.3,
+                                  child: ElevatedButton(
+                                      onPressed: details.onStepCancel,
+                                      child: Text(
+                                        'previous'.tr,
+                                        style: TextStyle(fontSize: 13),
+                                      )),
+                                ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              isLastStep
+                                  ? ConstrainedBox(
+                                      constraints: BoxConstraints.tightFor(
+                                          width: Get.width * 0.4, height: 47),
+                                      child: ElevatedButton.icon(
+                                        style: ButtonStyle(
+                                          shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
                                           ),
+                                          padding: MaterialStateProperty.all(
+                                              EdgeInsets.all(14)),
                                         ),
-                                        padding: MaterialStateProperty.all(
-                                            EdgeInsets.all(14)),
+                                        icon: controller.isDataProcessing.value
+                                            ? CircularProgressIndicator()
+                                            : Icon(Icons.save),
+                                        label: Text(
+                                          controller.isDataProcessing.value
+                                              ? 'processing'.tr
+                                              : 'save'.tr,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                        ),
+                                        onPressed: () {
+                                          controller.isDataProcessing.value
+                                              ? null
+                                              : controller.saveBtn();
+                                        },
                                       ),
-                                      icon: controller.isDataProcessing.value
-                                          ? CircularProgressIndicator()
-                                          : Icon(Icons.save),
-                                      label: Text(
-                                        controller.isDataProcessing.value
-                                            ? 'Processing'
-                                            : 'Save',
-                                        style: TextStyle(
-                                            fontSize: 16, color: Colors.white),
-                                      ),
-                                      onPressed: () {
-                                        controller.isDataProcessing.value
-                                            ? null
-                                            : controller.saveBtn();
-                                      },
-                                    ),
-                                  )
-                                : ElevatedButton(
-                                    onPressed: details.onStepContinue,
-                                    child: Text('NEXT')),
-                          ],
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: details.onStepContinue,
+                                      child: Text('next'.tr)),
+                            ],
+                          ),
                         ),
                       );
                     },

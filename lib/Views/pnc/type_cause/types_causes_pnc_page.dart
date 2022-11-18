@@ -4,39 +4,29 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Models/employe_model.dart';
-import 'package:qualipro_flutter/Models/product_model.dart';
 import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
 import 'package:qualipro_flutter/Services/pnc/pnc_service.dart';
-import 'package:readmore/readmore.dart';
-import '../../../Controllers/pnc/pnc_controller.dart';
 import '../../../Models/pnc/type_cause_pnc_model.dart';
-import '../../../Models/type_cause_model.dart';
-import '../../../Route/app_route.dart';
-import '../../../Services/action/action_service.dart';
 import '../../../Services/action/local_action_service.dart';
-import '../../../Services/api_services_call.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
-import 'new_type_cause_pnc.dart';
 
 class TypesCausesPNCPage extends StatefulWidget {
   final nnc;
 
- const TypesCausesPNCPage({Key? key, required this.nnc}) : super(key: key);
+  const TypesCausesPNCPage({Key? key, required this.nnc}) : super(key: key);
 
   @override
   State<TypesCausesPNCPage> createState() => _TypesCausesPNCPageState();
 }
 
 class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
-
   LocalActionService localService = LocalActionService();
   //ActionService actionService = ActionService();
   final matricule = SharedPreference.getMatricule();
-  List<TypeCausePNCModel> listTypesCauses = List<TypeCausePNCModel>.empty(growable: true);
+  List<TypeCausePNCModel> listTypesCauses =
+      List<TypeCausePNCModel>.empty(growable: true);
   bool isVisibleDeleteButton = true;
 
   @override
@@ -44,12 +34,13 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
     super.initState();
     getTypeCauses();
   }
+
   void getTypeCauses() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         var response = await LocalPNCService().readTypeCauseByNNC(widget.nnc);
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = TypeCausePNCModel();
             model.idTypeCause = data['idTypeCause'];
@@ -59,8 +50,8 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
             isVisibleDeleteButton = false;
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //rest api
         await PNCService().getTypesCausesOfPNC(widget.nnc).then((resp) async {
           //isDataProcessing(false);
@@ -74,16 +65,13 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
               isVisibleDeleteButton = true;
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -98,87 +86,93 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.back();
-             // Get.find<PNCController>().listPNC.clear();
-             // Get.find<PNCController>().getPNC();
+              // Get.find<PNCController>().listPNC.clear();
+              // Get.find<PNCController>().getPNC();
               //Get.offAllNamed(AppRoute.pnc);
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
-            'Types Causes of P.N.C N°${widget.nnc}',
-            style: TextStyle(color: Colors.black, fontSize: 18),
+            'Types Causes ${'of'.tr} P.N.C N°${widget.nnc}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listTypesCauses.isNotEmpty ?
-            Container(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  final num_nc = widget.nnc;
-                  return
-                    Card(
-                      color: Color(0xFFE9EAEE),
-                      child: ListTile(
-                        title: Text(
-                          ' PNC N°${num_nc}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: RichText(
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              children: [
-                                /* WidgetSpan(
+            child: listTypesCauses.isNotEmpty
+                ? Container(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        final num_nc = widget.nnc;
+                        return Card(
+                          color: Color(0xFFE9EAEE),
+                          child: ListTile(
+                            title: Text(
+                              ' PNC N°${num_nc}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: RichText(
+                                text: TextSpan(
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  children: [
+                                    /* WidgetSpan(
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                                           child: Icon(Icons.amp_stories),
                                         ),
                                       ), */
-                                TextSpan(text: '${listTypesCauses[index].typecause}'),
+                                    TextSpan(
+                                        text:
+                                            '${listTypesCauses[index].typecause}'),
 
-                                //TextSpan(text: '${action.declencheur}'),
-                              ],
-
+                                    //TextSpan(text: '${action.declencheur}'),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            trailing: Visibility(
+                              visible: isVisibleDeleteButton,
+                              child: InkWell(
+                                  onTap: () {
+                                    deleteTypeCausePNC(context,
+                                        listTypesCauses[index].idTypeCause);
+                                  },
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  )),
                             ),
                           ),
-                        ),
-                        trailing: Visibility(
-                          visible: isVisibleDeleteButton,
-                          child: InkWell(
-                              onTap: (){
-                                deleteTypeCausePNC(context, listTypesCauses[index].idTypeCause);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red,)
-                          ),
-                        ),
-                      ),
-                    );
-                },
-                itemCount: listTypesCauses.length,
-                //itemCount: actionsList.length + 1,
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                        );
+                      },
+                      itemCount: listTypesCauses.length,
+                      //itemCount: actionsList.length + 1,
+                    ),
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-             //Get.to(NewTypeCausePNC(nnc: widget.nnc));
+          onPressed: () {
+            //Get.to(NewTypeCausePNC(nnc: widget.nnc));
             final _addItemFormKey = GlobalKey<FormState>();
             int? selectedTypeCode = 0;
             String? typeCause = "";
@@ -187,52 +181,56 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
             //types cause
             Future<List<TypeCausePNCModel>> getTypesCause(filter) async {
               try {
-                List<TypeCausePNCModel> typeCauseList = await List<TypeCausePNCModel>.empty(growable: true);
-                List<TypeCausePNCModel> typeCauseFilter = await <TypeCausePNCModel>[];
+                List<TypeCausePNCModel> typeCauseList =
+                    await List<TypeCausePNCModel>.empty(growable: true);
+                List<TypeCausePNCModel> typeCauseFilter =
+                    await <TypeCausePNCModel>[];
                 var connection = await Connectivity().checkConnectivity();
-                if(connection == ConnectivityResult.none) {
+                if (connection == ConnectivityResult.none) {
                   //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-                  var response = await LocalPNCService().readTypeCausePNCARattacher(widget.nnc);
-                  response.forEach((data){
+                  var response = await LocalPNCService()
+                      .readTypeCausePNCARattacher(widget.nnc);
+                  response.forEach((data) {
                     var model = TypeCausePNCModel();
                     model.codetypecause = data['codetypecause'];
                     model.typecause = data['typecause'];
                     typeCauseList.add(model);
                   });
-                }
-                else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+                } else if (connection == ConnectivityResult.wifi ||
+                    connection == ConnectivityResult.mobile) {
                   //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                  await PNCService().getTypesCausesToAdded(widget.nnc).then((resp) async {
+                  await PNCService().getTypesCausesToAdded(widget.nnc).then(
+                      (resp) async {
                     resp.forEach((data) async {
                       var model = TypeCausePNCModel();
                       model.codetypecause = data['codeTypeCause'];
                       model.typecause = data['typeCause'];
                       typeCauseList.add(model);
                     });
-                  }
-                      , onError: (err) {
-                        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-                      });
+                  }, onError: (err) {
+                    ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+                  });
                 }
 
                 typeCauseFilter = typeCauseList.where((u) {
                   var name = u.codetypecause.toString().toLowerCase();
                   var description = u.typecause!.toLowerCase();
-                  return name.contains(filter) ||
-                      description.contains(filter);
+                  return name.contains(filter) || description.contains(filter);
                 }).toList();
                 return typeCauseFilter;
               } catch (exception) {
-                ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+                ShowSnackBar.snackBar(
+                    "Exception", exception.toString(), Colors.red);
                 return Future.error('service : ${exception.toString()}');
               }
             }
-            Widget _customDropDownTypeCause(BuildContext context, TypeCausePNCModel? item) {
+
+            Widget _customDropDownTypeCause(
+                BuildContext context, TypeCausePNCModel? item) {
               if (item == null) {
                 return Container();
-              }
-              else{
+              } else {
                 return Container(
                   child: ListTile(
                     contentPadding: EdgeInsets.all(0),
@@ -242,6 +240,7 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
                 );
               }
             }
+
             Widget _customPopupItemBuilderTypeCause(
                 BuildContext context, TypeCausePNCModel item, bool isSelected) {
               return Container(
@@ -249,10 +248,11 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
                 decoration: !isSelected
                     ? null
                     : BoxDecoration(
-                  border: Border.all(color: Theme.of(context).primaryColor),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.white,
-                ),
+                        border:
+                            Border.all(color: Theme.of(context).primaryColor),
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.white,
+                      ),
                 child: ListTile(
                   selected: isSelected,
                   title: Text(item.typecause ?? ''),
@@ -265,182 +265,260 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
                 context: context,
                 isScrollControlled: true,
                 shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(30)
-                    )
-                ),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(30))),
                 builder: (context) => DraggableScrollableSheet(
                     expand: false,
                     initialChildSize: 0.7,
                     maxChildSize: 0.7,
                     minChildSize: 0.4,
-                    builder: (context, scrollController) => SingleChildScrollView(
-                      child: ListBody(
-                        children: [
-                          SizedBox(height: 5.0,),
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 10, right: 10),
-                              child: Center(
-                                child: Text('New Type Cause of P.N.C N°${widget.nnc}', style: TextStyle(
-                                    fontWeight: FontWeight.w500, fontFamily: "Brand-Bold",
-                                    color: Color(0xFF0769D2), fontSize: 17.0
-                                ),),
+                    builder: (context, scrollController) =>
+                        SingleChildScrollView(
+                          child: ListBody(
+                            children: [
+                              SizedBox(
+                                height: 5.0,
                               ),
-                            ),
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
+                                  child: Center(
+                                    child: Text(
+                                      '${'new'.tr} Type Cause ${'of'.tr} P.N.C N°${widget.nnc}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: "Brand-Bold",
+                                          color: Color(0xFF0769D2),
+                                          fontSize: 17.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Form(
+                                key: _addItemFormKey,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10, bottom: 5.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 15.0,
+                                      ),
+                                      Visibility(
+                                          visible: true,
+                                          child:
+                                              DropdownSearch<TypeCausePNCModel>(
+                                            showSelectedItems: true,
+                                            showClearButton: true,
+                                            showSearchBox: true,
+                                            isFilteredOnline: true,
+                                            compareFn: (i, s) =>
+                                                i?.isEqual(s) ?? false,
+                                            dropdownSearchDecoration:
+                                                InputDecoration(
+                                              labelText: "Type Cause *",
+                                              contentPadding:
+                                                  EdgeInsets.fromLTRB(
+                                                      12, 12, 0, 0),
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onFind: (String? filter) =>
+                                                getTypesCause(filter),
+                                            onChanged: (data) {
+                                              typeCauseModel = data;
+                                              selectedTypeCode =
+                                                  data?.codetypecause;
+                                              typeCause = data?.typecause;
+                                              debugPrint(
+                                                  'type cause: ${typeCause}, code: ${selectedTypeCode}');
+                                            },
+                                            dropdownBuilder:
+                                                _customDropDownTypeCause,
+                                            popupItemBuilder:
+                                                _customPopupItemBuilderTypeCause,
+                                            validator: (u) => u == null
+                                                ? "Type cause ${'is_required'.tr} "
+                                                : null,
+                                          )),
+                                      SizedBox(
+                                        height: 20.0,
+                                      ),
+                                      ConstrainedBox(
+                                        constraints: BoxConstraints.tightFor(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                1.1,
+                                            height: 50),
+                                        child: ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    CustomColors
+                                                        .googleBackground),
+                                            padding: MaterialStateProperty.all(
+                                                EdgeInsets.all(14)),
+                                          ),
+                                          icon: Icon(Icons.save),
+                                          label: Text(
+                                            'save'.tr,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white),
+                                          ),
+                                          onPressed: () async {
+                                            if (_addItemFormKey.currentState!
+                                                .validate()) {
+                                              try {
+                                                var connection =
+                                                    await Connectivity()
+                                                        .checkConnectivity();
+                                                if (connection ==
+                                                    ConnectivityResult.none) {
+                                                  int max_type_cause =
+                                                      await LocalPNCService()
+                                                          .getMaxNumTypeCausePNC();
+                                                  var model =
+                                                      TypeCausePNCModel();
+                                                  model.online = 0;
+                                                  model.nnc = widget.nnc;
+                                                  model.idTypeCause =
+                                                      max_type_cause + 1;
+                                                  model.codetypecause =
+                                                      selectedTypeCode;
+                                                  model.typecause = typeCause;
+                                                  await LocalPNCService()
+                                                      .saveTypeCausePNC(model);
+                                                  Get.back();
+                                                  setState(() {
+                                                    listTypesCauses.clear();
+                                                    getTypeCauses();
+                                                  });
+                                                  ShowSnackBar.snackBar(
+                                                      "Successfully",
+                                                      "Type Cause added",
+                                                      Colors.green);
+                                                } else if (connection ==
+                                                        ConnectivityResult
+                                                            .mobile ||
+                                                    connection ==
+                                                        ConnectivityResult
+                                                            .wifi) {
+                                                  await PNCService()
+                                                      .addTypeCauseByNNC({
+                                                    "nnc": widget.nnc,
+                                                    "codetypecause":
+                                                        selectedTypeCode
+                                                  }).then((resp) async {
+                                                    Get.back();
+                                                    ShowSnackBar.snackBar(
+                                                        "Successfully",
+                                                        "Type Cause added",
+                                                        Colors.green);
+                                                    setState(() {
+                                                      listTypesCauses.clear();
+                                                      getTypeCauses();
+                                                    });
+                                                  }, onError: (err) {
+                                                    if (kDebugMode)
+                                                      print(
+                                                          'error : ${err.toString()}');
+                                                    ShowSnackBar.snackBar(
+                                                        "Error",
+                                                        err.toString(),
+                                                        Colors.red);
+                                                  });
+                                                }
+                                              } catch (ex) {
+                                                print("Exception" +
+                                                    ex.toString());
+                                                ShowSnackBar.snackBar(
+                                                    "Exception",
+                                                    ex.toString(),
+                                                    Colors.red);
+                                                throw Exception("Exception : " +
+                                                    ex.toString());
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10.0,
+                                      ),
+                                      ConstrainedBox(
+                                        constraints: BoxConstraints.tightFor(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                1.1,
+                                            height: 50),
+                                        child: ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                            shape: MaterialStateProperty.all(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    CustomColors
+                                                        .firebaseRedAccent),
+                                            padding: MaterialStateProperty.all(
+                                                EdgeInsets.all(14)),
+                                          ),
+                                          icon: Icon(Icons.cancel),
+                                          label: Text(
+                                            'cancel'.tr,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white),
+                                          ),
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
-                          Form(
-                            key: _addItemFormKey,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5.0),
-                              child: Column(
-                                children: <Widget>[
-                                  SizedBox(height: 15.0,),
-                                  Visibility(
-                                      visible: true,
-                                      child: DropdownSearch<TypeCausePNCModel>(
-                                        showSelectedItems: true,
-                                        showClearButton: true,
-                                        showSearchBox: true,
-                                        isFilteredOnline: true,
-                                        compareFn: (i, s) => i?.isEqual(s) ?? false,
-                                        dropdownSearchDecoration: InputDecoration(
-                                          labelText: "Type Cause *",
-                                          contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        onFind: (String? filter) => getTypesCause(filter),
-                                        onChanged: (data) {
-                                          typeCauseModel = data;
-                                          selectedTypeCode = data?.codetypecause;
-                                          typeCause = data?.typecause;
-                                          print('type cause: ${typeCause}, code: ${selectedTypeCode}');
-                                        },
-                                        dropdownBuilder: _customDropDownTypeCause,
-                                        popupItemBuilder: _customPopupItemBuilderTypeCause,
-                                        validator: (u) =>
-                                        u == null ? "Type cause is required " : null,
-                                      )
-                                  ),
-                                  SizedBox(height: 20.0,),
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints.tightFor(width: MediaQuery.of(context).size.width / 1.1, height: 50),
-                                    child: ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                        shape: MaterialStateProperty.all(
-                                          RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(30),
-                                          ),
-                                        ),
-                                        backgroundColor:
-                                        MaterialStateProperty.all(CustomColors.googleBackground),
-                                        padding: MaterialStateProperty.all(EdgeInsets.all(14)),
-                                      ),
-                                      icon: Icon(Icons.save),
-                                      label: Text(
-                                        'Save',
-                                        style: TextStyle(fontSize: 16, color: Colors.white),
-                                      ),
-                                      onPressed: () async {
-                                        if(_addItemFormKey.currentState!.validate()){
-                                          try {
-                                            var connection = await Connectivity().checkConnectivity();
-                                            if(connection == ConnectivityResult.none){
-                                              int max_type_cause = await LocalPNCService().getMaxNumTypeCausePNC();
-                                              var model = TypeCausePNCModel();
-                                              model.online = 0;
-                                              model.nnc = widget.nnc;
-                                              model.idTypeCause = max_type_cause + 1;
-                                              model.codetypecause = selectedTypeCode;
-                                              model.typecause = typeCause;
-                                              await LocalPNCService().saveTypeCausePNC(model);
-                                              Get.back();
-                                              setState(() {
-                                                listTypesCauses.clear();
-                                                getTypeCauses();
-                                              });
-                                              ShowSnackBar.snackBar("Successfully", "Type Cause added", Colors.green);
-                                            }
-                                            else if(connection == ConnectivityResult.mobile || connection == ConnectivityResult.wifi){
-                                              await PNCService().addTypeCauseByNNC({
-                                                "nnc": widget.nnc,
-                                                "codetypecause": selectedTypeCode
-                                              }).then((resp) async {
-                                                Get.back();
-                                                ShowSnackBar.snackBar("Successfully", "Type Cause added", Colors.green);
-                                                setState(() {
-                                                  listTypesCauses.clear();
-                                                  getTypeCauses();
-                                                });
-                                              }, onError: (err) {
-                                                if(kDebugMode) print('error : ${err.toString()}');
-                                                ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-                                              });
-                                            }
-                                          }
-                                          catch (ex){
-                                            print("Exception" + ex.toString());
-                                            ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
-                                            throw Exception("Exception : " + ex.toString());
-                                          }
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(height: 10.0,),
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints.tightFor(width: MediaQuery.of(context).size.width / 1.1, height: 50),
-                                    child: ElevatedButton.icon(
-                                      style: ButtonStyle(
-                                        shape: MaterialStateProperty.all(
-                                          RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(30),
-                                          ),
-                                        ),
-                                        backgroundColor:
-                                        MaterialStateProperty.all(CustomColors.firebaseRedAccent),
-                                        padding: MaterialStateProperty.all(EdgeInsets.all(14)),
-                                      ),
-                                      icon: Icon(Icons.cancel),
-                                      label: Text(
-                                        'Cancel',
-                                        style: TextStyle(fontSize: 16, color: Colors.white),
-                                      ),
-                                      onPressed: () {
-                                        Get.back();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                )
-            );
+                        )));
           },
           child: const Icon(
             Icons.add,
             color: Colors.white,
-            size: 32,),
+            size: 32,
+          ),
           backgroundColor: Colors.blue,
         ),
       ),
     );
   }
+
 //delete type cause
-  deleteTypeCausePNC(context, position){
+  deleteTypeCausePNC(context, position) {
     AwesomeDialog(
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          'Are you sure to delete this item ${position}',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
-        title: 'Delete',
+        body: Center(
+          child: Text(
+            '${'delete_item'.tr} ${position}',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -453,10 +531,12 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
             ),
           ),
           onPressed: () async {
-
-            await PNCService().deleteTypeCausePNCByID(position).then((resp) async {
-              ShowSnackBar.snackBar("Successfully", "Type Cause Deleted", Colors.green);
-              listTypesCauses.removeWhere((element) => element.idTypeCause == position);
+            await PNCService().deleteTypeCausePNCByID(position).then(
+                (resp) async {
+              ShowSnackBar.snackBar(
+                  "Successfully", "Type Cause Deleted", Colors.green);
+              listTypesCauses
+                  .removeWhere((element) => element.idTypeCause == position);
               setState(() {});
               Navigator.of(context).pop();
             }, onError: (err) {
@@ -466,7 +546,8 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Ok',
+            child: Text(
+              'Ok',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -476,7 +557,10 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
             ),
           ),
         ),
-        closeIcon: Icon(Icons.close, color: Colors.red,),
+        closeIcon: Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
         btnCancel: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -493,7 +577,8 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Cancel',
+            child: Text(
+              'cancel'.tr,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -502,7 +587,6 @@ class _TypesCausesPNCPageState extends State<TypesCausesPNCPage> {
               ),
             ),
           ),
-        )
-    )..show();
+        )).show();
   }
 }

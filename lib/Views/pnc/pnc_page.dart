@@ -7,6 +7,7 @@ import 'package:qualipro_flutter/Views/pnc/pnc_widget.dart';
 import '../../Widgets/build_shimmer.dart';
 import '../../Widgets/refresh_widget.dart';
 import 'add_products_pnc/products_pnc_page.dart';
+import 'image_pnc.dart';
 import 'new_pnc.dart';
 import 'search_pnc.dart';
 import 'type_cause/types_causes_pnc_page.dart';
@@ -34,11 +35,10 @@ class PNCPage extends GetView<PNCController> {
         if (controller.isDataProcessing.value == true) {
           return ListView.builder(
               itemCount: 10,
-              itemBuilder: (BuildContext context, int index){
+              itemBuilder: (BuildContext context, int index) {
                 return BuildShimmer();
-              }
-          );
-         /* return Center(
+              });
+          /* return Center(
             child: LoadingView(),
           ); */
         } else {
@@ -58,33 +58,38 @@ class PNCPage extends GetView<PNCController> {
                     margin: EdgeInsets.only(left: 5, right: 5, bottom: 0.0),
                     child: Slidable(
                       key: const ValueKey(0),
-                      child: PNCWidget(pncModel: controller.listPNC[index], color: Colors.blueGrey,),
+                      child: PNCWidget(
+                        pncModel: controller.listPNC[index],
+                        color: Colors.blueGrey,
+                      ),
+                      direction: Axis.horizontal,
                       // The start action pane is the one at the left or the top side.
                       startActionPane: ActionPane(
                         // A motion is a widget used to control how the pane animates.
                         motion: const ScrollMotion(),
-
                         // All actions are defined in the children parameter.
                         children: [
                           // A SlidableAction can have an icon and/or a label.
                           SlidableAction(
                             onPressed: (context) {
-                              Get.to(TypesCausesPNCPage(nnc: controller.listPNC[index].nnc));
+                              Get.to(TypesCausesPNCPage(
+                                  nnc: controller.listPNC[index].nnc));
                             },
                             backgroundColor: Color(0xFF2639E8),
                             foregroundColor: Colors.white,
                             icon: Icons.remove_red_eye,
-                            label: 'Types Causes',
+                            label: 'Types \n Causes',
                           ),
-                         /* SlidableAction(
+                          SlidableAction(
                             onPressed: (context) {
-                              Get.to(ProductsPNCPage(nnc: controller.listPNC[index].nnc));
+                              Get.to(ImagePNC(
+                                  numFiche: controller.listPNC[index].nnc));
                             },
                             backgroundColor: Color(0xFF21B7CA),
                             foregroundColor: Colors.white,
-                            icon: Icons.list,
-                            label: 'product'.tr,
-                          ), */
+                            icon: Icons.camera,
+                            label: 'Images',
+                          ),
                         ],
                       ),
                       // The end action pane is the one at the right or the bottom side.
@@ -95,7 +100,8 @@ class PNCPage extends GetView<PNCController> {
                             // An action can be bigger than the others.
                             flex: 2,
                             onPressed: (context) {
-                              Get.to(ProductsPNCPage(nnc: controller.listPNC[index].nnc));
+                              Get.to(ProductsPNCPage(
+                                  nnc: controller.listPNC[index].nnc));
                             },
                             backgroundColor: Color(0xFF0DBD90),
                             foregroundColor: Colors.white,
@@ -141,35 +147,33 @@ class PNCPage extends GetView<PNCController> {
                 label: '${'new'.tr} PNC',
                 labelBackgroundColor: Colors.white,
                 backgroundColor: Colors.white,
-                onTap: (){
-                  Get.to(()=>NewPNCPage(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
-                }
-            ),
+                onTap: () {
+                  Get.to(() => NewPNCPage(),
+                      transition: Transition.zoom,
+                      duration: Duration(milliseconds: 500));
+                }),
             SpeedDialChild(
                 labelBackgroundColor: Colors.white,
                 backgroundColor: Colors.white,
                 child: Icon(Icons.search, color: Colors.blue, size: 32),
                 label: '${'search'.tr} PNC',
-                onTap: (){
+                onTap: () {
                   showSearch(
                     context: context,
                     delegate: SearchPNCDelegate(controller.listPNC),
                   );
-                }
-            ),
+                }),
             SpeedDialChild(
                 labelBackgroundColor: Colors.white,
                 backgroundColor: Colors.white,
                 child: Icon(Icons.sync, color: Colors.blue, size: 32),
                 label: 'Synchronisation',
-                onTap: (){
+                onTap: () {
                   controller.syncPNCToWebService();
-                }
-            )
+                })
           ],
         ),
       ),
     );
   }
-
 }

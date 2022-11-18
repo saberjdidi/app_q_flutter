@@ -12,6 +12,7 @@ import '../../Models/incident_environnement/incident_env_agenda_model.dart';
 import '../../Models/incident_environnement/source_inc_env_model.dart';
 import '../../Models/incident_environnement/type_cause_incident_model.dart';
 import '../../Models/incident_environnement/type_consequence_incident_model.dart';
+import '../../Models/incident_environnement/upload_image_model.dart';
 import '../../Models/type_cause_model.dart';
 import '../../Models/type_incident_model.dart';
 import '../../Utils/Sqflite/db_helper.dart';
@@ -71,6 +72,25 @@ class LocalIncidentEnvironnementService {
 
   getCountIncidentEnvironnement() async {
     return await dbHelper.getCountIncidentEnvironnement();
+  }
+
+  //upload image
+  /* readImagesIncidentEnvironnement() async {
+    return await dbHelper.readImagesIncidentEnvironnement();
+  } */
+  Future<List<UploadImageModel>> readImagesIncidentEnvironnement() async {
+    final response = await dbHelper.readImagesIncidentEnvironnement();
+    final List result = response;
+    return result.map(((e) => UploadImageModel.fromDBLocal(e))).toList();
+  }
+
+  uploadImageIncidentEnvironnement(UploadImageModel model) async {
+    return await dbHelper.uploadImageIncidentEnvironnement(
+        DBTable.upload_image_inc_env, model.dataMap());
+  }
+
+  deleteTableImageIncidentEnvironnement() async {
+    return await dbHelper.deleteTableImageIncidentEnvironnement();
   }
 
   //Champ obligatoire

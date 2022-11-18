@@ -1,8 +1,10 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Controllers/incident_environnement/incident_environnement_controller.dart';
 import 'package:qualipro_flutter/Controllers/reunion/reunion_controller.dart';
@@ -21,12 +23,14 @@ import '../../Models/champ_cache_model.dart';
 import '../../Models/direction_model.dart';
 import '../../Models/employe_model.dart';
 import '../../Models/gravite_model.dart';
+import '../../Models/image_model.dart';
 import '../../Models/incident_environnement/champ_obligatore_incident_env_model.dart';
 import '../../Models/incident_environnement/cout_estime_inc_env_model.dart';
 import '../../Models/incident_environnement/incident_env_model.dart';
 import '../../Models/incident_environnement/source_inc_env_model.dart';
 import '../../Models/incident_environnement/type_cause_incident_model.dart';
 import '../../Models/incident_environnement/type_consequence_incident_model.dart';
+import '../../Models/incident_environnement/upload_image_model.dart';
 import '../../Models/pnc/champ_obligatoire_pnc_model.dart';
 import '../../Models/pnc/gravite_pnc_model.dart';
 import '../../Models/pnc/pnc_model.dart';
@@ -41,21 +45,28 @@ import '../../Services/pnc/pnc_service.dart';
 import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
+import 'package:path/path.dart' as mypath;
 
 class NewIncidentEnvironnementController extends GetxController {
-
   var isDataProcessing = false.obs;
   var isVisibleNewIncident = true.obs;
   LocalActionService localActionService = LocalActionService();
   LocalReunionService localReunionService = LocalReunionService();
-  LocalIncidentEnvironnementService localIncidentEnvironnementService = LocalIncidentEnvironnementService();
+  LocalIncidentEnvironnementService localIncidentEnvironnementService =
+      LocalIncidentEnvironnementService();
   final matricule = SharedPreference.getMatricule();
 
   final addItemFormKey = GlobalKey<FormState>();
-  late TextEditingController dateIncidentController, dateEntreController,
-      designationController, numInterneController, heureIncidentController,
-      quantityRejController, descriptionIncidentController, descriptionCauseController, 
-      descriptionConsequenceController, actionImmediateController;
+  late TextEditingController dateIncidentController,
+      dateEntreController,
+      designationController,
+      numInterneController,
+      heureIncidentController,
+      quantityRejController,
+      descriptionIncidentController,
+      descriptionCauseController,
+      descriptionConsequenceController,
+      actionImmediateController;
   DateTime dateNow = DateTime.now();
   DateTime datePickerIncident = DateTime.now();
   DateTime datePickerEntre = DateTime.now();
@@ -141,15 +152,30 @@ class NewIncidentEnvironnementController extends GetxController {
 
   //radio
   var etat = 0.obs;
-  onChangeEtat(var valeur){
+  onChangeEtat(var valeur) {
     etat.value = valeur;
     print('etat : ${etat.value}');
   }
 
+  //upload images
+  final ImagePicker imagePicker = ImagePicker();
+  var imageFileList = List<XFile>.empty(growable: true).obs;
+  var base64List = List<ImageModel>.empty(growable: true).obs;
+  //var base64String = ''.obs;
+  //var filename = ''.obs;
+  //var filenameList = List<String>.empty(growable: true).obs;
+
+  //random data
+  var _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  Random _rnd = Random();
+
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+
   //domaine affectation
   getDomaineAffectation() async {
-    List<DomaineAffectationModel> domaineList = await List<
-        DomaineAffectationModel>.empty(growable: true);
+    List<DomaineAffectationModel> domaineList =
+        await List<DomaineAffectationModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
       var response = await localActionService.readDomaineAffectationByModule(
@@ -184,18 +210,18 @@ class NewIncidentEnvironnementController extends GetxController {
         site_visible.value = model.vSite!;
         processus_visible.value = model.vProcessus!;
         activity_visible.value = model.vDomaine!;
-        direction_visible.value  = model.vDirection!;
-        service_visible.value  = model.vService!;
+        direction_visible.value = model.vDirection!;
+        service_visible.value = model.vService!;
 
         site_obligatoire.value = model.oSite!;
-        processus_obligatoire.value  = model.oProcessus!;
-        activity_obligatoire.value  = model.oDomaine!;
-        direction_obligatoire.value  = model.oDirection!;
-        service_obligatoire.value  = model.oService!;
-        debugPrint('Domaine affectation : fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+        processus_obligatoire.value = model.oProcessus!;
+        activity_obligatoire.value = model.oDomaine!;
+        direction_obligatoire.value = model.oDirection!;
+        service_obligatoire.value = model.oService!;
+        debugPrint(
+            'Domaine affectation : fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
       });
-    }
-    else if (connection == ConnectivityResult.wifi ||
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
       await ApiServicesCall().getDomaineAffectation().then((resp) async {
         resp.forEach((data) async {
@@ -228,21 +254,21 @@ class NewIncidentEnvironnementController extends GetxController {
             site_visible.value = model.vSite!;
             processus_visible.value = model.vProcessus!;
             activity_visible.value = model.vDomaine!;
-            direction_visible.value  = model.vDirection!;
-            service_visible.value  = model.vService!;
+            direction_visible.value = model.vDirection!;
+            service_visible.value = model.vService!;
 
             site_obligatoire.value = model.oSite!;
-            processus_obligatoire.value  = model.oProcessus!;
-            activity_obligatoire.value  = model.oDomaine!;
-            direction_obligatoire.value  = model.oDirection!;
-            service_obligatoire.value  = model.oService!;
-            debugPrint(' domaine affectation : fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
+            processus_obligatoire.value = model.oProcessus!;
+            activity_obligatoire.value = model.oDomaine!;
+            direction_obligatoire.value = model.oDirection!;
+            service_obligatoire.value = model.oService!;
+            debugPrint(
+                ' domaine affectation : fiche: ${model.fiche}, site visible :${site_visible.value}, site obligatoire :${site_obligatoire.value}');
           }
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     }
   }
 
@@ -266,8 +292,8 @@ class NewIncidentEnvironnementController extends GetxController {
   bool isVisibileCout = true;
   getChampCache() async {
     try {
-      List<ChampCacheModel> listChampCache = await List<ChampCacheModel>.empty(
-          growable: true);
+      List<ChampCacheModel> listChampCache =
+          await List<ChampCacheModel>.empty(growable: true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         var response = await localActionService.readChampCacheByModule(
@@ -280,45 +306,55 @@ class NewIncidentEnvironnementController extends GetxController {
           model.listOrder = data['listOrder'];
           model.nomParam = data['nomParam'];
           model.visible = data['visible'];
-          print('module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+          debugPrint(
+              'module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
           listChampCache.add(model);
 
-          if (model.nomParam == "ISPS" && model.module == "Environnement" && model.fiche == "Incident") {
+          if (model.nomParam == "ISPS" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             isps_visible = model.visible;
             //isps_visible = 0;
-          }
-          else if (model.nomParam == "Type incident" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "Type incident" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             type_incident_visible = model.visible;
             //type_incident_visible = 0;
-          }
-          else if (model.nomParam == "Lieu" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "Lieu" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             lieu_visible = model.visible;
             lieu_obligatoire = model.visible;
             //product_bloque_visible = 0;
-          }
-          else if (model.nomParam == "Coût estimé" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "Coût estimé" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             cout_esteme_visible = model.visible;
             //cout_esteme_visible = 0;
-          }
-          else if (model.nomParam == "Date d'entrée" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "Date d'entrée" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             date_entre_visible = model.visible;
             //date_entre_visible = 0;
-          }
-          else if (model.nomParam == "A l'origine" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "A l'origine" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             origine_employe_visible = model.visible;
             //origine_employe_visible = 0;
-          }
-          else if (model.nomParam == "Source incident" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "Source incident" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             source_visible = model.visible;
             //source_visible = 0;
-          }
-          else if (model.nomParam == "Coût" && model.module == "Environnement" && model.fiche == "Incident") {
+          } else if (model.nomParam == "Coût" &&
+              model.module == "Environnement" &&
+              model.fiche == "Incident") {
             cout_visible = model.visible;
             //cout_visible = 0;
           }
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         await ApiServicesCall().getChampCache({
           "module": "Environnement",
           "fiche": "Incident"
@@ -332,50 +368,58 @@ class NewIncidentEnvironnementController extends GetxController {
             model.listOrder = data['list_order'];
             model.nomParam = data['nom_param'];
             model.visible = data['visible'];
-            print('module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+            debugPrint(
+                'module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
             listChampCache.add(model);
 
-            if (model.nomParam == "ISPS" && model.module == "Environnement" && model.fiche == "Incident") {
+            if (model.nomParam == "ISPS" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               isps_visible = model.visible;
               //isps_visible = 0;
-            }
-            else if (model.nomParam == "Type incident" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "Type incident" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               type_incident_visible = model.visible;
               //type_incident_visible = 0;
-            }
-            else if (model.nomParam == "Lieu" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "Lieu" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               lieu_visible = model.visible;
               lieu_obligatoire = model.visible;
-            }
-            else if (model.nomParam == "Coût estimé" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "Coût estimé" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               cout_esteme_visible = model.visible;
               //cout_esteme_visible = 0;
-            }
-            else if (model.nomParam == "Date d'entrée" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "Date d'entrée" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               date_entre_visible = model.visible;
               //date_entre_visible = 0;
-            }
-            else if (model.nomParam == "A l'origine" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "A l'origine" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               origine_employe_visible = model.visible;
               //origine_employe_visible = 0;
-            }
-            else if (model.nomParam == "Source incident" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "Source incident" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               source_visible = model.visible;
               //source_visible = 0;
-            }
-            else if (model.nomParam == "Coût" && model.module == "Environnement" && model.fiche == "Incident") {
+            } else if (model.nomParam == "Coût" &&
+                model.module == "Environnement" &&
+                model.fiche == "Incident") {
               cout_visible = model.visible;
               //cout_visible = 0;
             }
           });
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-    }
-    catch (exception) {
+    } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
     }
@@ -394,11 +438,12 @@ class NewIncidentEnvironnementController extends GetxController {
   var description_incident_obligatoire = 0.obs;
   var description_cause_obligatoire = 0.obs;
   getChampObligatoire() async {
-    List<ChampObligatoirePNCModel> champObligatoireList = await List<
-        ChampObligatoirePNCModel>.empty(growable: true);
+    List<ChampObligatoirePNCModel> champObligatoireList =
+        await List<ChampObligatoirePNCModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      var response = await localIncidentEnvironnementService.readChampObligatoireIncidentEnv();
+      var response = await localIncidentEnvironnementService
+          .readChampObligatoireIncidentEnv();
       response.forEach((data) {
         var model = ChampObligatoireIncidentEnvModel();
         model.incCat = data['incCat'];
@@ -424,12 +469,13 @@ class NewIncidentEnvironnementController extends GetxController {
         description_incident_obligatoire.value = model.descIncident!;
         description_cause_obligatoire.value = model.descCauses!;
         gravite_obligatoire.value = model.gravite!;
-        print('champ obligatoire incident : ${data}');
+        debugPrint('champ obligatoire incident : ${data}');
       });
-    }
-    else if (connection == ConnectivityResult.wifi ||
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
-      await IncidentEnvironnementService().getChampObligatoireIncidentEnv().then((data) async {
+      await IncidentEnvironnementService()
+          .getChampObligatoireIncidentEnv()
+          .then((data) async {
         var model = ChampObligatoireIncidentEnvModel();
         //model.aspectRappclot = data['aspect_rappclot'];
         model.incCat = data['inc_cat'];
@@ -461,84 +507,98 @@ class NewIncidentEnvironnementController extends GetxController {
         description_incident_obligatoire.value = model.descIncident!;
         description_cause_obligatoire.value = model.descCauses!;
         gravite_obligatoire.value = model.gravite!;
-        print('champ obligatoire incident : ${data}');
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+        debugPrint('champ obligatoire incident : ${data}');
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     }
   }
 
   bool _dataValidation() {
-
-    if (designationController.text.trim() == '' && designation_incident_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Designation incident is required");
+    if (designationController.text.trim() == '' &&
+        designation_incident_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Designation incident ${'is_required'.tr}");
       return false;
-    }
-     else if (typeIncidentModel == null && type_incident_obligatoire.value == 1) {
-    Message.taskErrorOrWarning("Warning", "Type is required");
-    return false;
-    }
-    else if (categoryModel == null && category_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Category is required");
+    } else if (typeIncidentModel == null &&
+        type_incident_obligatoire.value == 1) {
+      Message.taskErrorOrWarning('warning'.tr, "Type ${'is_required'.tr}");
       return false;
-    }
-    else if (lieuModel == null && lieu_visible == 1 && lieu_obligatoire == 1) {
-      Message.taskErrorOrWarning("Warning", "Lieu is required");
+    } else if (categoryModel == null && category_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'categorie'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (dateIncidentController.text.trim() == '' && date_incident_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Date Incident is required");
+    } else if (lieuModel == null &&
+        lieu_visible == 1 &&
+        lieu_obligatoire == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'lieu'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (graviteModel == null && gravite_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Gravite is required");
+    } else if (dateIncidentController.text.trim() == '' &&
+        date_incident_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Date Incident ${'is_required'.tr}");
       return false;
-    }
-    else if (site_visible.value == 1 && site_obligatoire.value == 1 && siteModel == null) {
-      Message.taskErrorOrWarning("Warning", "Site is required");
+    } else if (graviteModel == null && gravite_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'gravity'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if (processus_visible.value == 1 && processus_obligatoire.value == 1 && processusModel == null) {
-      Message.taskErrorOrWarning("Warning", "Processus is required");
+    } else if (site_visible.value == 1 &&
+        site_obligatoire.value == 1 &&
+        siteModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Site ${'is_required'.tr}");
       return false;
-    }
-    else if (direction_visible.value == 1 && direction_obligatoire.value == 1 &&
+    } else if (processus_visible.value == 1 &&
+        processus_obligatoire.value == 1 &&
+        processusModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Processus ${'is_required'.tr}");
+      return false;
+    } else if (direction_visible.value == 1 &&
+        direction_obligatoire.value == 1 &&
         directionModel == null) {
-      Message.taskErrorOrWarning("Warning", "Direction is required");
+      Message.taskErrorOrWarning('warning'.tr, "Direction ${'is_required'.tr}");
       return false;
-    }
-    else if (service_visible.value == 1 && service_obligatoire.value == 1 &&
+    } else if (service_visible.value == 1 &&
+        service_obligatoire.value == 1 &&
         serviceModel == null) {
-      Message.taskErrorOrWarning("Warning", "Service is required");
+      Message.taskErrorOrWarning('warning'.tr, "Service ${'is_required'.tr}");
       return false;
-    }
-    else if (activity_visible.value == 1 && activity_obligatoire.value == 1 &&
+    } else if (activity_visible.value == 1 &&
+        activity_obligatoire.value == 1 &&
         activityModel == null) {
-      Message.taskErrorOrWarning("Warning", "Activity is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'activity'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if ((typeCauseList == null || typeCauseList == [] || typeCauseList.isEmpty) && type_cause_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Type Cause is required");
+    } else if ((typeCauseList == null ||
+            typeCauseList == [] ||
+            typeCauseList.isEmpty) &&
+        type_cause_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Type Cause ${'is_required'.tr}");
       return false;
-    }
-    else if ((typeConsequenceList == null || typeConsequenceList == [] || typeConsequenceList.isEmpty) && type_consequence_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Type Consequence is required");
+    } else if ((typeConsequenceList == null ||
+            typeConsequenceList == [] ||
+            typeConsequenceList.isEmpty) &&
+        type_consequence_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Type Consequence ${'is_required'.tr}");
       return false;
-    }
-    else if (descriptionIncidentController.text.trim() == '' && description_incident_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Description incident is required");
+    } else if (descriptionIncidentController.text.trim() == '' &&
+        description_incident_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Description incident ${'is_required'.tr}");
       return false;
-    }
-    else if (descriptionCauseController.text.trim() == '' && description_cause_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Description cause is required");
+    } else if (descriptionCauseController.text.trim() == '' &&
+        description_cause_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Description cause ${'is_required'.tr}");
       return false;
-    }
-    else if (actionImmediateController.text.trim() == '' && action_immediate_obligatoire.value == 1) {
-      Message.taskErrorOrWarning("Warning", "Description cause is required");
+    } else if (actionImmediateController.text.trim() == '' &&
+        action_immediate_obligatoire.value == 1) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Description cause ${'is_required'.tr}");
       return false;
-    }
-    else if(quantityRejController.text.trim() == ''){
+    } else if (quantityRejController.text.trim() == '') {
       quantityRejController.text = '0';
     }
     return true;
@@ -546,7 +606,6 @@ class NewIncidentEnvironnementController extends GetxController {
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     designationController = TextEditingController();
     numInterneController = TextEditingController();
@@ -558,7 +617,8 @@ class NewIncidentEnvironnementController extends GetxController {
     dateEntreController = TextEditingController();
     heureIncidentController = TextEditingController();
     quantityRejController = TextEditingController();
-    dateIncidentController.text = DateFormat('yyyy-MM-dd').format(datePickerIncident);
+    dateIncidentController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerIncident);
     dateEntreController.text = DateFormat('yyyy-MM-dd').format(datePickerEntre);
     heureIncidentController.text = currentTime.toString();
 
@@ -568,17 +628,19 @@ class NewIncidentEnvironnementController extends GetxController {
     checkConnectivity();
   }
 
-
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue,
-          snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-    }
-    else if (connection == ConnectivityResult.wifi ||
+      Get.snackbar("No Connection", "Mode Offline",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 900));
+    } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue,
-          snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+      Get.snackbar("Internet Connection", "Mode Online",
+          colorText: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(milliseconds: 900));
     }
   }
 
@@ -588,49 +650,51 @@ class NewIncidentEnvironnementController extends GetxController {
         initialDate: datePickerIncident,
         firstDate: DateTime(2021),
         lastDate: DateTime(2100)
-      //lastDate: DateTime.now()
-    ))!;
+        //lastDate: DateTime.now()
+        ))!;
     if (datePickerIncident != null) {
-      dateIncidentController.text = DateFormat('yyyy-MM-dd').format(datePickerIncident);
+      dateIncidentController.text =
+          DateFormat('yyyy-MM-dd').format(datePickerIncident);
       //dateIncidentController.text = DateFormat.yMMMMd().format(datePickerIncident);
     }
   }
+
   selectedDateEntre(BuildContext context) async {
     datePickerEntre = (await showDatePicker(
         context: context,
         initialDate: datePickerEntre,
         firstDate: DateTime(2021),
-        lastDate: DateTime(2030)
-    ))!;
+        lastDate: DateTime(2030)))!;
     if (datePickerEntre != null) {
-      dateEntreController.text = DateFormat('yyyy-MM-dd').format(datePickerEntre);
+      dateEntreController.text =
+          DateFormat('yyyy-MM-dd').format(datePickerEntre);
     }
   }
+
   //final hours = timeDebut.hour.toString().padLeft(2, '0');
   selectedTimeDebut(BuildContext context) async {
-    timeDebut = (await showTimePicker(
-        context: context,
-        initialTime:timeDebut
-    ))!;
-    if(timeDebut == null) return;
+    timeDebut =
+        (await showTimePicker(context: context, initialTime: timeDebut))!;
+    if (timeDebut == null) return;
     if (timeDebut != null) {
       heureIncidentController.text = '${timeDebut.hour}:${timeDebut.minute}';
     }
   }
 
-
   Future saveBtn() async {
-    if(_dataValidation() && addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && addItemFormKey.currentState!.validate()) {
       try {
         var connection = await Connectivity().checkConnectivity();
         if (connection == ConnectivityResult.none) {
-          int max_num_incident = await localIncidentEnvironnementService.getMaxNumIncidentEnvironnement();
+          int max_num_incident = await localIncidentEnvironnementService
+              .getMaxNumIncidentEnvironnement();
           Uint8List? bytesTypeCause = Uint8List.fromList(typeCauseList);
-          Uint8List? bytesTypeConsequence = Uint8List.fromList(typeConsequenceList);
+          Uint8List? bytesTypeConsequence =
+              Uint8List.fromList(typeConsequenceList);
           var model = IncidentEnvModel();
           model.online = 0;
           model.statut = 1;
-          model.n = max_num_incident+1;
+          model.n = max_num_incident + 1;
           model.incident = designationController.text;
           model.dateDetect = dateIncidentController.text;
           model.lieu = lieuIncident.toString();
@@ -676,44 +740,64 @@ class NewIncidentEnvironnementController extends GetxController {
           model.listTypeCause = bytesTypeCause;
           model.listTypeConsequence = bytesTypeConsequence;
           //save data sync
-          await localIncidentEnvironnementService.saveIncidentEnvironnementSync(model);
+          await localIncidentEnvironnementService
+              .saveIncidentEnvironnementSync(model);
 
           //save list of type cause in db local
-          int max_id_inc_cause = await LocalIncidentEnvironnementService().getMaxNumTypeCauseIncidentEnvironnementRattacher();
+          int max_id_inc_cause = await LocalIncidentEnvironnementService()
+              .getMaxNumTypeCauseIncidentEnvironnementRattacher();
           listTypeCauseIncident.forEach((element) async {
             int? id_incident_cause = max_id_inc_cause + 1;
             var model = TypeCauseIncidentModel();
             model.online = 2;
             model.idIncidentCause = id_incident_cause;
-            model.idIncident = max_num_incident+1;
+            model.idIncident = max_num_incident + 1;
             model.idTypeCause = element.idTypeCause;
             model.typeCause = element.typeCause;
-            await LocalIncidentEnvironnementService().saveTypeCauseRattacherIncidentEnv(model);
-            debugPrint('type cause list off : ${model.idIncident} - ${model.idIncidentCause} - ${model.typeCause}');
+            await localIncidentEnvironnementService
+                .saveTypeCauseRattacherIncidentEnv(model);
+            debugPrint(
+                'type cause list off : ${model.idIncident} - ${model.idIncidentCause} - ${model.typeCause}');
           });
           //save list of type consequence in db local
-          int max_id_inc_conseq = await LocalIncidentEnvironnementService().getMaxNumTypeConsequenceIncidentEnvironnementRattacher();
+          int max_id_inc_conseq = await LocalIncidentEnvironnementService()
+              .getMaxNumTypeConsequenceIncidentEnvironnementRattacher();
           listTypeConsequenceIncident.forEach((element) async {
             int? id_incident_conseq = max_id_inc_conseq + 1;
             var model = TypeConsequenceIncidentModel();
             model.online = 2;
             model.idIncidentConseq = id_incident_conseq;
-            model.idIncident = max_num_incident+1;
+            model.idIncident = max_num_incident + 1;
             model.idConsequence = element.idConsequence;
             model.typeConsequence = element.typeConsequence;
             //save data
-            await LocalIncidentEnvironnementService().saveTypeConsequenceRattacherIncidentEnv(model);
-            debugPrint('type consequence list off : ${model.idIncident} - ${model.idIncidentConseq} - ${model.typeConsequence}');
+            await localIncidentEnvironnementService
+                .saveTypeConsequenceRattacherIncidentEnv(model);
+            debugPrint(
+                'type consequence list off : ${model.idIncident} - ${model.idIncidentConseq} - ${model.typeConsequence}');
+          });
+
+          //upload images offline
+          base64List.forEach((element) async {
+            print('base64 image: ${element.fileName} - ${element.image}');
+            var modelImage = UploadImageModel();
+            modelImage.idFiche = max_num_incident + 1;
+            modelImage.image = element.image.toString();
+            modelImage.fileName = element.fileName.toString();
+
+            await localIncidentEnvironnementService
+                .uploadImageIncidentEnvironnement(modelImage);
           });
 
           Get.back();
-          ShowSnackBar.snackBar("Mode Offline", "Incident Added Successfully", Colors.green);
+          ShowSnackBar.snackBar(
+              "Mode Offline", "Incident Added Successfully", Colors.green);
           Get.find<IncidentEnvironnementController>().listIncident.clear();
           Get.find<IncidentEnvironnementController>().getIncident();
           //Get.toNamed(AppRoute.incident_environnement);
           clearData();
-        }
-        else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+        } else if (connection == ConnectivityResult.wifi ||
+            connection == ConnectivityResult.mobile) {
           await IncidentEnvironnementService().saveIncident({
             "incident": designationController.text,
             "date_detect": dateIncidentController.text,
@@ -759,11 +843,31 @@ class NewIncidentEnvironnementController extends GetxController {
             "isps": int.parse(isps.toString()),
             "cout_estime": selectedCodeCoutEsteme,
             "date_creat": dateEntreController.text,
-            "consequences":typeConsequenceList,
-            "causes":typeCauseList
-          }).then((resp) {
+            "consequences": typeConsequenceList,
+            "causes": typeCauseList
+          }).then((response) {
+            response.forEach((data) {
+              debugPrint('response inc env : ${data['id']}');
+              base64List.forEach((element) async {
+                print('base64 image: ${element.fileName} - ${element.image}');
+                await IncidentEnvironnementService().uploadImageIncEnv({
+                  "image": element.image.toString(),
+                  "idFiche": data['id'],
+                  "fileName": element.fileName.toString()
+                }).then((resp) async {
+                  //ShowSnackBar.snackBar("Action Successfully", "images uploaded", Colors.green);
+                  //Get.to(ActionRealisationPage());
+                }, onError: (err) {
+                  isDataProcessing(false);
+                  //ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);
+                  print('Error upload images : ${err.toString()}');
+                });
+              });
+            });
+
             Get.back();
-            ShowSnackBar.snackBar("Successfully", "Incident Environnement Added ", Colors.green);
+            ShowSnackBar.snackBar(
+                "Successfully", "Incident Environnement Added ", Colors.green);
             Get.find<IncidentEnvironnementController>().listIncident.clear();
             Get.find<IncidentEnvironnementController>().getIncident();
             //Get.toNamed(AppRoute.incident_environnement);
@@ -773,9 +877,8 @@ class NewIncidentEnvironnementController extends GetxController {
             print('Error : ${err.toString()}');
             ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
           });
-      }
-      }
-      catch (ex){
+        }
+      } catch (ex) {
         Get.defaultDialog(
             title: "Exception",
             backgroundColor: Colors.lightBlue,
@@ -788,8 +891,10 @@ class NewIncidentEnvironnementController extends GetxController {
             buttonColor: Colors.red,
             barrierDismissible: false,
             radius: 50,
-            content: Text('${ex.toString()}', style: TextStyle(color: Colors.black),)
-        );
+            content: Text(
+              '${ex.toString()}',
+              style: TextStyle(color: Colors.black),
+            ));
         //ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
@@ -806,7 +911,8 @@ class NewIncidentEnvironnementController extends GetxController {
     descriptionCauseController.clear();
     descriptionConsequenceController.clear();
     actionImmediateController.clear();
-    dateIncidentController.text = DateFormat('yyyy-MM-dd').format(datePickerIncident);
+    dateIncidentController.text =
+        DateFormat('yyyy-MM-dd').format(datePickerIncident);
     dateEntreController.text = DateFormat('yyyy-MM-dd').format(datePickerEntre);
     selectedCodeTypeIncident = 0;
     typeIncidentModel = null;
@@ -857,16 +963,19 @@ class NewIncidentEnvironnementController extends GetxController {
   Widget customDropDownType(BuildContext context, TypeIncidentModel? item) {
     if (typeIncidentModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${typeIncidentModel?.typeIncident}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${typeIncidentModel?.typeIncident}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderType(
       BuildContext context, typeIncidentModel, bool isSelected) {
     return Container(
@@ -874,10 +983,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(typeIncidentModel?.typeIncident ?? ''),
@@ -885,12 +994,12 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //category
   Widget customDropDownCategory(BuildContext context, CategoryModel? item) {
     if (categoryModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -899,6 +1008,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderCategory(
       BuildContext context, categoryModel, bool isSelected) {
     return Container(
@@ -906,10 +1016,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(categoryModel?.categorie ?? ''),
@@ -917,12 +1027,12 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //lieu
   Widget customDropDownLieu(BuildContext context, LieuModel? item) {
     if (lieuModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -931,6 +1041,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderLieu(
       BuildContext context, lieuModel, bool isSelected) {
     return Container(
@@ -938,10 +1049,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(lieuModel?.lieu ?? ''),
@@ -949,12 +1060,12 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //secteur
   Widget customDropDownSecteur(BuildContext context, SecteurModel? item) {
     if (secteurModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -963,6 +1074,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderSecteur(
       BuildContext context, secteurModel, bool isSelected) {
     return Container(
@@ -970,10 +1082,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(secteurModel?.secteur ?? ''),
@@ -981,12 +1093,13 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //source
-  Widget customDropDownSource(BuildContext context, SourceIncidentEnvModel? item) {
+  Widget customDropDownSource(
+      BuildContext context, SourceIncidentEnvModel? item) {
     if (sourceModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -995,6 +1108,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderSource(
       BuildContext context, sourceModel, bool isSelected) {
     return Container(
@@ -1002,10 +1116,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(sourceModel?.source ?? ''),
@@ -1013,12 +1127,12 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //gravite
   Widget customDropDownGravite(BuildContext context, GraviteModel? item) {
     if (graviteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1027,6 +1141,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderGravite(
       BuildContext context, graviteModel, bool isSelected) {
     return Container(
@@ -1034,10 +1149,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(graviteModel?.gravite ?? ''),
@@ -1045,12 +1160,13 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //cout esteme
-  Widget customDropDownCoutEsteme(BuildContext context, CoutEstimeIncidentEnvModel? item) {
+  Widget customDropDownCoutEsteme(
+      BuildContext context, CoutEstimeIncidentEnvModel? item) {
     if (coutEstemeModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1059,6 +1175,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderCoutEsteme(
       BuildContext context, coutEstemeModel, bool isSelected) {
     return Container(
@@ -1066,10 +1183,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(coutEstemeModel?.cout ?? ''),
@@ -1077,21 +1194,22 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //employe
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
-
     if (employeModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${employeModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${employeModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, employeModel, bool isSelected) {
     return Container(
@@ -1099,10 +1217,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(employeModel?.nompre ?? ''),
@@ -1110,21 +1228,23 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
-  //detected by
-  Widget customDropDownDetectedEmploye(BuildContext context, EmployeModel? item) {
 
+  //detected by
+  Widget customDropDownDetectedEmploye(
+      BuildContext context, EmployeModel? item) {
     if (detectedEmployeModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${detectedEmployeModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${detectedEmployeModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDetectedEmploye(
       BuildContext context, detectedEmployeModel, bool isSelected) {
     return Container(
@@ -1132,10 +1252,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(detectedEmployeModel?.nompre ?? ''),
@@ -1143,20 +1263,24 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //site
   Widget customDropDownSite(BuildContext context, SiteModel? item) {
     if (siteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${siteModel?.site}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${siteModel?.site}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderSite(
       BuildContext context, siteModel, bool isSelected) {
     return Container(
@@ -1164,10 +1288,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(siteModel?.site ?? ''),
@@ -1175,20 +1299,24 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //processus
   Widget customDropDownProcessus(BuildContext context, ProcessusModel? item) {
     if (processusModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${processusModel?.processus}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${processusModel?.processus}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderProcessus(
       BuildContext context, processusModel, bool isSelected) {
     return Container(
@@ -1196,10 +1324,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
@@ -1207,12 +1335,12 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //Activity
   Widget customDropDownActivity(BuildContext context, ActivityModel? item) {
     if (activityModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -1221,6 +1349,7 @@ class NewIncidentEnvironnementController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderActivity(
       BuildContext context, activityModel, bool isSelected) {
     return Container(
@@ -1228,10 +1357,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(activityModel?.domaine ?? ''),
@@ -1239,20 +1368,24 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //direction
   Widget customDropDownDirection(BuildContext context, DirectionModel? item) {
     if (directionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${directionModel?.direction}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${directionModel?.direction}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDirection(
       BuildContext context, directionModel, bool isSelected) {
     return Container(
@@ -1260,10 +1393,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(directionModel?.direction ?? ''),
@@ -1271,20 +1404,24 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //service
   Widget customDropDownService(BuildContext context, ServiceModel? item) {
     if (serviceModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${serviceModel?.service}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${serviceModel?.service}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderService(
       BuildContext context, serviceModel, bool isSelected) {
     return Container(
@@ -1292,10 +1429,10 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(serviceModel?.service ?? ''),
@@ -1303,6 +1440,7 @@ class NewIncidentEnvironnementController extends GetxController {
       ),
     );
   }
+
   //types causes
   Widget customDropDownMultiSelectionTypeCause(
       BuildContext context, List<TypeCauseIncidentModel?> selectedItems) {
@@ -1310,7 +1448,7 @@ class NewIncidentEnvironnementController extends GetxController {
       return ListTile(
         contentPadding: EdgeInsets.all(0),
         //leading: CircleAvatar(),
-        title: Text("No item selected"),
+        title: Text(""),
       );
     }
 
@@ -1329,13 +1467,13 @@ class NewIncidentEnvironnementController extends GetxController {
                 e?.mat.toString() ?? '',
               ),*/
               title: Text(e?.typeCause ?? ''),
-
             ),
           ),
         );
       }).toList(),
     );
   }
+
   Widget customPopupItemBuilderTypeCause(
       BuildContext context, TypeCauseIncidentModel? item, bool isSelected) {
     /*if(isSelected == true){
@@ -1346,21 +1484,22 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item?.typeCause ?? ''),
         subtitle: Text(item?.idTypeCause?.toString() ?? ''),
         leading: CircleAvatar(
-          // this does not work - throws 404 error
-          // backgroundImage: NetworkImage(item.avatar ?? ''),
-        ),
+            // this does not work - throws 404 error
+            // backgroundImage: NetworkImage(item.avatar ?? ''),
+            ),
       ),
     );
   }
+
   //type consequence
   Widget customDropDownMultiSelectionTypeConsequence(
       BuildContext context, List<TypeConsequenceIncidentModel?> selectedItems) {
@@ -1368,7 +1507,7 @@ class NewIncidentEnvironnementController extends GetxController {
       return ListTile(
         contentPadding: EdgeInsets.all(0),
         //leading: CircleAvatar(),
-        title: Text("No item selected"),
+        title: Text(""),
       );
     }
 
@@ -1387,15 +1526,15 @@ class NewIncidentEnvironnementController extends GetxController {
                 e?.mat.toString() ?? '',
               ),*/
               title: Text(e?.typeConsequence ?? ''),
-
             ),
           ),
         );
       }).toList(),
     );
   }
-  Widget customPopupItemBuilderTypeConsequence(
-      BuildContext context, TypeConsequenceIncidentModel? item, bool isSelected) {
+
+  Widget customPopupItemBuilderTypeConsequence(BuildContext context,
+      TypeConsequenceIncidentModel? item, bool isSelected) {
     /*if(isSelected == true){
       print('produit ${item?.produit}');
     } */
@@ -1404,18 +1543,18 @@ class NewIncidentEnvironnementController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item?.typeConsequence ?? ''),
         subtitle: Text(item?.idConsequence?.toString() ?? ''),
         leading: CircleAvatar(
-          // this does not work - throws 404 error
-          // backgroundImage: NetworkImage(item.avatar ?? ''),
-        ),
+            // this does not work - throws 404 error
+            // backgroundImage: NetworkImage(item.avatar ?? ''),
+            ),
       ),
     );
   }

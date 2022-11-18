@@ -1,12 +1,14 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
-import 'package:qualipro_flutter/Controllers/pnc/pnc_controller.dart';
-import 'package:qualipro_flutter/Views/pnc/pnc_widget.dart';
-import '../../Controllers/action/action_controller.dart';
 import '../../Controllers/reunion/reunion_controller.dart';
+import '../../Models/reunion/type_reunion_model.dart';
+import '../../Services/reunion/reunion_service.dart';
 import '../../Utils/custom_colors.dart';
+import '../../Utils/snack_bar.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
@@ -144,9 +146,233 @@ class ReunionPage extends GetView<ReunionController> {
               child: Icon(Icons.search, color: Colors.blue, size: 32),
               label: '${'search'.tr} Reunion',
               onTap: () {
-                showSearch(
+                /* showSearch(
                   context: context,
                   delegate: SearchReunionDelegate(controller.listReunion),
+                ); */
+                controller.searchCodeType = '';
+
+                Future<List<TypeReunionModel>> getTypeReunion(filter) async {
+                  try {
+                    List<TypeReunionModel> _typeList =
+                        await List<TypeReunionModel>.empty(growable: true);
+                    List<TypeReunionModel> _typeFilter =
+                        await List<TypeReunionModel>.empty(growable: true);
+                    var connection = await Connectivity().checkConnectivity();
+                    if (connection == ConnectivityResult.none) {
+                      //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+
+                      var response = await controller.localReunionService
+                          .readTypeReunion();
+                      response.forEach((data) {
+                        var model = TypeReunionModel();
+                        model.codeTypeR = data['codeTypeR'];
+                        model.typeReunion = data['typeReunion'];
+                        _typeList.add(model);
+                      });
+                    } else if (connection == ConnectivityResult.wifi ||
+                        connection == ConnectivityResult.mobile) {
+                      //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+
+                      await ReunionService().getTypeReunion().then(
+                          (resp) async {
+                        resp.forEach((data) async {
+                          var model = TypeReunionModel();
+                          model.codeTypeR = data['codeTypeR'];
+                          model.typeReunion = data['type_Reunion'];
+                          _typeList.add(model);
+                        });
+                      }, onError: (err) {
+                        ShowSnackBar.snackBar(
+                            "Error", err.toString(), Colors.red);
+                      });
+                    }
+                    _typeFilter = _typeList.where((u) {
+                      var query = u.typeReunion!.toLowerCase();
+                      return query.contains(filter);
+                    }).toList();
+                    return _typeFilter;
+                  } catch (exception) {
+                    ShowSnackBar.snackBar(
+                        "Exception", exception.toString(), Colors.red);
+                    return Future.error('service : ${exception.toString()}');
+                  }
+                }
+
+                Widget customDropDownType(
+                    BuildContext context, TypeReunionModel? item) {
+                  if (item == null) {
+                    return Container();
+                  } else {
+                    return Container(
+                      child: ListTile(
+                        contentPadding: EdgeInsets.all(0),
+                        title: Text('${item?.typeReunion}'),
+                      ),
+                    );
+                  }
+                }
+
+                Widget customPopupItemBuilderType(BuildContext context,
+                    TypeReunionModel item, bool isSelected) {
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    decoration: !isSelected
+                        ? null
+                        : BoxDecoration(
+                            border: Border.all(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white,
+                          ),
+                    child: ListTile(
+                      selected: isSelected,
+                      title: Text(item.typeReunion ?? ''),
+                      subtitle: Text(item.codeTypeR.toString() ?? ''),
+                    ),
+                  );
+                }
+
+                showDialog<void>(
+                  context: context,
+                  barrierDismissible: false, // user must tap button!
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      scrollable: true,
+                      title: Center(
+                        child: Text(
+                          '${'search'.tr} ${'reunion'.tr}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Brand-Bold",
+                              color: Color(0xFF0769D2),
+                              fontSize: 30.0),
+                        ),
+                      ),
+                      titlePadding: EdgeInsets.only(top: 2.0),
+                      content: SingleChildScrollView(
+                        child: ListBody(
+                          children: <Widget>[
+                            Card(
+                              color: Color(0xffa5e1f5),
+                              child: new ListTile(
+                                leading: new Icon(Icons.search),
+                                title: new TextField(
+                                  controller: controller.searchNumero,
+                                  keyboardType: TextInputType.number,
+                                  textInputAction: TextInputAction.next,
+                                  decoration: new InputDecoration(
+                                      hintText: 'N° ${'reunion'.tr}',
+                                      border: InputBorder.none),
+                                ),
+                                trailing: new IconButton(
+                                  icon: Icon(Icons.cancel),
+                                  onPressed: () {
+                                    controller.searchNumero.clear();
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Card(
+                              color: Color(0xffa5e1f5),
+                              child: new ListTile(
+                                leading: new Icon(Icons.search),
+                                title: new TextField(
+                                  controller: controller.searchDesignation,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.next,
+                                  decoration: new InputDecoration(
+                                      hintText: 'order'.tr,
+                                      border: InputBorder.none),
+                                ),
+                                trailing: new IconButton(
+                                  icon: Icon(Icons.cancel),
+                                  onPressed: () {
+                                    controller.searchDesignation.clear();
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Card(
+                              color: Color(0xffa5e1f5),
+                              child: DropdownSearch<TypeReunionModel>(
+                                showSelectedItems: true,
+                                showClearButton: true,
+                                showSearchBox: true,
+                                isFilteredOnline: true,
+                                compareFn: (i, s) => i?.isEqual(s) ?? false,
+                                dropdownSearchDecoration: InputDecoration(
+                                  labelText: "Type",
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(12, 12, 0, 0),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 0),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(1))),
+                                ),
+                                onFind: (String? filter) =>
+                                    getTypeReunion(filter),
+                                onChanged: (data) {
+                                  controller.searchCodeType =
+                                      data?.codeTypeR.toString();
+                                  debugPrint(
+                                      ' type reunion: ${data?.typeReunion}, code : ${controller.searchCodeType}');
+                                },
+                                dropdownBuilder: customDropDownType,
+                                popupItemBuilder: customPopupItemBuilderType,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.only(right: 5.0, left: 5.0),
+                      actionsPadding: EdgeInsets.all(1.0),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('cancel'.tr),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            Get.find<ReunionController>().listReunion.clear();
+                            Get.find<ReunionController>().searchReunion();
+                            Get.back();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              CustomColors.googleBackground,
+                            ),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(
+                              'search'.tr,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: CustomColors.firebaseWhite,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  },
                 );
               }),
           SpeedDialChild(

@@ -210,7 +210,7 @@ class NewReunionController extends GetxController {
 
   bool _dataValidation() {
     if (typeReunionModel == null) {
-      Message.taskErrorOrWarning("Warning", "Type is required");
+      Message.taskErrorOrWarning('warning'.tr, "Type ${'is_required'.tr}");
       return false;
     }
     /*  else if (orderController.text.trim() == '') {
@@ -218,35 +218,38 @@ class NewReunionController extends GetxController {
       return false;
     } */
     else if (datePrevueController.text.trim() == '') {
-      Message.taskErrorOrWarning("Warning", "Date Prevue is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'date_prevue'.tr} ${'is_required'.tr}");
       return false;
     } else if (dateRealisationController.text.trim() == '') {
-      Message.taskErrorOrWarning("Warning", "Date Realisation is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "Date ${'realisation'.tr} ${'is_required'.tr}");
       return false;
     } else if (site_visible.value == 1 &&
         site_obligatoire.value == 1 &&
         siteModel == null) {
-      Message.taskErrorOrWarning("Warning", "Site is required");
+      Message.taskErrorOrWarning('warning'.tr, "Site ${'is_required'.tr}");
       return false;
     } else if (processus_visible.value == 1 &&
         processus_obligatoire.value == 1 &&
         processusModel == null) {
-      Message.taskErrorOrWarning("Warning", "Processus is required");
+      Message.taskErrorOrWarning('warning'.tr, "Processus ${'is_required'.tr}");
       return false;
     } else if (direction_visible.value == 1 &&
         direction_obligatoire.value == 1 &&
         directionModel == null) {
-      Message.taskErrorOrWarning("Warning", "Direction is required");
+      Message.taskErrorOrWarning('warning'.tr, "Direction ${'is_required'.tr}");
       return false;
     } else if (service_visible.value == 1 &&
         service_obligatoire.value == 1 &&
         serviceModel == null) {
-      Message.taskErrorOrWarning("Warning", "Service is required");
+      Message.taskErrorOrWarning('warning'.tr, "Service ${'is_required'.tr}");
       return false;
     } else if (activity_visible.value == 1 &&
         activity_obligatoire.value == 1 &&
         activityModel == null) {
-      Message.taskErrorOrWarning("Warning", "Activity is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'activity'.tr} ${'is_required'.tr}");
       return false;
     }
     double _doubleTimeDebut =
@@ -271,7 +274,7 @@ class NewReunionController extends GetxController {
           barrierDismissible: false,
           radius: 20,
           content: Text(
-            'Heure Début doit etre inférieur à Heure Fin',
+            'heure_debut_inferieur_heure_fin'.tr,
             style: TextStyle(color: Colors.black87),
           ));
       return false;

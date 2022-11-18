@@ -42,15 +42,49 @@ class AppRoot extends StatefulWidget {
   AppRootState createState() => AppRootState();
 }
 
-class AppRootState extends State<AppRoot> {
+class AppRootState extends State<AppRoot> with WidgetsBindingObserver {
   bool forceLogout = false;
   final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addObserver(this);
     _initializeTimer();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    /* if (state == AppLifecycleState.resumed) {
+      debugPrint('resumed');
+    } else if (state == AppLifecycleState.inactive) {
+      debugPrint('inactive');
+      //Get.offAll(LoginScreen());
+      if (forceLogout) {
+        debugPrint("ForceLogout is $forceLogout");
+        navToLoginPage(context);
+      }
+    } else if (state == AppLifecycleState.detached) {
+      debugPrint('detached');
+      if (forceLogout) {
+        debugPrint("ForceLogout is $forceLogout");
+        navToLoginPage(context);
+      }
+    } else if (state == AppLifecycleState.paused) {
+      debugPrint('paused');
+      if (forceLogout) {
+        debugPrint("ForceLogout is $forceLogout");
+        navToLoginPage(context);
+      }
+    } */
   }
 
   void _initializeTimer() {

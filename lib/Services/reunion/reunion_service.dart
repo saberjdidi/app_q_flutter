@@ -23,6 +23,24 @@ class ReunionService {
     }
   }
 
+  Future<List<dynamic>> searchReunion(mat, nReunion, type, order) async {
+    try {
+      debugPrint(
+          '${AppConstants.REUNION_URL}/getListeReunion?mat=$mat&numReunion=$nReunion&type=$type&ordreDuJour=$order');
+      var response = await http.get(
+          Uri.parse(
+              '${AppConstants.REUNION_URL}/getListeReunion?mat=$mat&numReunion=$nReunion&type=$type&ordreDuJour=$order'),
+          headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error('service : ${exception.toString()}');
+    }
+  }
+
   Future<dynamic> saveReunion(Map data) async {
     try {
       print('data : ${json.encode(data)}');

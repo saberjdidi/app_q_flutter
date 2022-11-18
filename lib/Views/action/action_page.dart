@@ -33,7 +33,7 @@ class ActionPage extends GetView<ActionController> {
       drawer: NavigationDrawerWidget(),
       appBar: AppBar(
         centerTitle: true,
-       /* leading: RaisedButton(
+        /* leading: RaisedButton(
           onPressed: (){
             //Navigator.pushNamedAndRemoveUntil(context, DashboardScreen.idScreen, (route) => false);
             Get.offAll(DashboardScreen());
@@ -81,7 +81,10 @@ class ActionPage extends GetView<ActionController> {
                       key: const ValueKey(0),
                       // The child of the Slidable is what the user sees when the
                       // component is not dragged.
-                      child: ActionWidget(actionModel: controller.listAction[index], color: Colors.blueGrey,),
+                      child: ActionWidget(
+                        actionModel: controller.listAction[index],
+                        color: Colors.blueGrey,
+                      ),
                       // The start action pane is the one at the left or the top side.
                       startActionPane: ActionPane(
                         // A motion is a widget used to control how the pane animates.
@@ -92,14 +95,15 @@ class ActionPage extends GetView<ActionController> {
                           // A SlidableAction can have an icon and/or a label.
                           SlidableAction(
                             onPressed: (context) {
-                              Get.to(TypesCausesActionPage(idAction: controller.listAction[index].nAct));
+                              Get.to(TypesCausesActionPage(
+                                  idAction: controller.listAction[index].nAct));
                             },
                             backgroundColor: Color(0xFF2639E8),
                             foregroundColor: Colors.white,
                             icon: Icons.remove_red_eye,
                             label: 'Types Causes',
                           ),
-                         /* SlidableAction(
+                          /* SlidableAction(
                             onPressed: (context) {
                               Get.to(ProductsActionPage(idAction: controller.listAction[index].nAct));
                             },
@@ -123,7 +127,7 @@ class ActionPage extends GetView<ActionController> {
                                     taskModel: controller.listAction[index],
                                   )); */
                               Get.to(SousActionPage(), arguments: {
-                                "id_action" : controller.listAction[index].nAct
+                                "id_action": controller.listAction[index].nAct
                               });
                             },
                             backgroundColor: Color(0xFF0DBD90),
@@ -168,33 +172,37 @@ class ActionPage extends GetView<ActionController> {
               label: '${'new'.tr} Action',
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
-              onTap: (){
-                Get.to(()=>NewActionPage(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
+              onTap: () {
+                Get.to(() => NewActionPage(),
+                    transition: Transition.zoom,
+                    duration: Duration(milliseconds: 500));
                 //Get.to(()=>AddAction(), transition: Transition.zoom, duration: Duration(milliseconds: 500));
-              }
-          ),
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
               label: '${'search'.tr} Action',
-              onTap: (){
+              onTap: () {
                 controller.searchType = '';
-               /* showSearch(
+                /* showSearch(
                   context: context,
                   delegate: SearchActionDelegate(controller.listAction),
                 ); */
                 //type action
                 Future<List<TypeActionModel>> getTypes(filter) async {
                   try {
-                    List<TypeActionModel> _typesList = await List<TypeActionModel>.empty(growable: true);
-                    List<TypeActionModel> _typesFilter = await List<TypeActionModel>.empty(growable: true);
+                    List<TypeActionModel> _typesList =
+                        await List<TypeActionModel>.empty(growable: true);
+                    List<TypeActionModel> _typesFilter =
+                        await List<TypeActionModel>.empty(growable: true);
                     var connection = await Connectivity().checkConnectivity();
-                    if(connection == ConnectivityResult.none) {
+                    if (connection == ConnectivityResult.none) {
                       //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                      var response = await controller.localActionService.readTypeAction();
-                      response.forEach((data){
+                      var response =
+                          await controller.localActionService.readTypeAction();
+                      response.forEach((data) {
                         var sourceModel = TypeActionModel();
                         sourceModel.codetypeAct = data['codetypeAct'];
                         sourceModel.typeAct = data['typeAct'];
@@ -202,14 +210,13 @@ class ActionPage extends GetView<ActionController> {
                         sourceModel.analyseCause = data['analyseCause'];
                         _typesList.add(sourceModel);
                       });
-                    }
-                    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+                    } else if (connection == ConnectivityResult.wifi ||
+                        connection == ConnectivityResult.mobile) {
                       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-                      await ApiServicesCall().getTypeAction({
-                        "nom": "",
-                        "lang": ""
-                      }).then((resp) async {
+                      await ApiServicesCall()
+                          .getTypeAction({"nom": "", "lang": ""}).then(
+                              (resp) async {
                         resp.forEach((data) async {
                           var model = TypeActionModel();
                           model.codetypeAct = data['codetypeAct'];
@@ -218,49 +225,58 @@ class ActionPage extends GetView<ActionController> {
                           model.analyseCause = data['analyse_cause'];
                           _typesList.add(model);
                         });
-                      }
-                          , onError: (err) {
-                            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-                          });
+                      }, onError: (err) {
+                        ShowSnackBar.snackBar(
+                            "Error", err.toString(), Colors.red);
+                      });
                     }
                     _typesFilter = _typesList.where((u) {
                       var query = u.typeAct!.toLowerCase();
                       return query.contains(filter);
                     }).toList();
                     return _typesFilter;
-
                   } catch (exception) {
-                    ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+                    ShowSnackBar.snackBar(
+                        "Exception", exception.toString(), Colors.red);
                     return Future.error('service : ${exception.toString()}');
                   }
                 }
-                Widget customDropDownType(BuildContext context, TypeActionModel? item) {
+
+                Widget customDropDownType(
+                    BuildContext context, TypeActionModel? item) {
                   if (item == null) {
                     return Container();
-                  }
-                  else{
+                  } else {
                     return Container(
                       child: ListTile(
                         contentPadding: EdgeInsets.all(0),
-                        title: Text('${item.typeAct}', style: TextStyle(color: Colors.black),),
+                        title: Text(
+                          '${item.typeAct}',
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     );
                   }
                 }
-                Widget customPopupItemBuilderType(
-                    BuildContext context, TypeActionModel? item, bool isSelected) {
+
+                Widget customPopupItemBuilderType(BuildContext context,
+                    TypeActionModel? item, bool isSelected) {
                   return Container(
                     margin: EdgeInsets.symmetric(horizontal: 8),
                     decoration: !isSelected
                         ? null
                         : BoxDecoration(
-                      border: Border.all(color: Theme.of(context).primaryColor),
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colors.white,
-                    ),
+                            border: Border.all(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white,
+                          ),
                     child: ListTile(
                       selected: isSelected,
-                      title: Text(item!.typeAct ?? '', style: TextStyle(color: Colors.black),),
+                      title: Text(
+                        item!.typeAct ?? '',
+                        style: TextStyle(color: Colors.black),
+                      ),
                       //subtitle: Text(item?.TypeAct ?? ''),
                     ),
                   );
@@ -272,97 +288,120 @@ class ActionPage extends GetView<ActionController> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       scrollable: true,
-                      title: const Center(
-                        child: Text('Search Action', style: TextStyle(
-                            fontWeight: FontWeight.w500, fontFamily: "Brand-Bold",
-                            color: Color(0xFF0769D2), fontSize: 25.0
-                        ),),
+                      title: Center(
+                        child: Text(
+                          "${'search'.tr} Action",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Brand-Bold",
+                              color: Color(0xFF0769D2),
+                              fontSize: 25.0),
+                        ),
                       ),
                       titlePadding: EdgeInsets.only(top: 2.0),
-                      content: SingleChildScrollView(
-                        child: StatefulBuilder(
-                          builder: (BuildContext context, StateSetter setState){
-                            return ListBody(
-                              children: <Widget>[
-                                TextFormField(
-                                  controller: controller.searchNumAction,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'N° Action',
-                                    hintText: 'numero',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(30))
-                                    ),
-                                    prefixIcon: Icon(Icons.search),
+                      content: SingleChildScrollView(child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return ListBody(
+                            children: <Widget>[
+                              TextFormField(
+                                controller: controller.searchNumAction,
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  labelText: 'N° Action',
+                                  hintText: 'numero',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
                                   ),
-                                  style: TextStyle(fontSize: 14.0),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30))),
+                                  prefixIcon: Icon(Icons.search),
                                 ),
-                                SizedBox(height: 10.0,),
-                                TextFormField(
-                                  controller: controller.searchAction,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Action',
-                                    hintText: 'action',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(30))
-                                    ),
-                                    prefixIcon: Icon(Icons.search),
+                                style: TextStyle(fontSize: 14.0),
+                              ),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              TextFormField(
+                                controller: controller.searchAction,
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  labelText: 'Action',
+                                  hintText: 'action',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
                                   ),
-                                  style: TextStyle(fontSize: 14.0),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30))),
+                                  prefixIcon: Icon(Icons.search),
                                 ),
-                                SizedBox(height: 10.0,),
-                                DropdownSearch<TypeActionModel>(
-                                  showSelectedItems: true,
-                                  showClearButton: controller.typeActionModel?.typeAct=="" ? false : true,
-                                  showSearchBox: true,
-                                  isFilteredOnline: true,
-                                  compareFn: (i, s) => i?.isEqual(s) ?? false,
-                                  dropdownSearchDecoration: InputDecoration(
-                                    labelText: "Type",
-                                    contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(30))
-                                    ),
-                                  ),
-                                  onFind: (String? filter) => getTypes(filter),
-                                  onChanged: (data) {
-                                    controller.searchType = data?.codetypeAct.toString();
+                                style: TextStyle(fontSize: 14.0),
+                              ),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              DropdownSearch<TypeActionModel>(
+                                showSelectedItems: true,
+                                showClearButton:
+                                    controller.typeActionModel?.typeAct == ""
+                                        ? false
+                                        : true,
+                                showSearchBox: true,
+                                isFilteredOnline: true,
+                                compareFn: (i, s) => i?.isEqual(s) ?? false,
+                                dropdownSearchDecoration: InputDecoration(
+                                  labelText: "Type",
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(12, 12, 0, 0),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30))),
+                                ),
+                                onFind: (String? filter) => getTypes(filter),
+                                onChanged: (data) {
+                                  if (controller.checkOffline.value == 1) {
+                                    controller.searchType =
+                                        data?.codetypeAct.toString();
                                     //controller.typeActionModel = data;
-                                    print('type action: ${controller.searchType}');
-                                  },
-                                  dropdownBuilder: customDropDownType,
-                                  popupItemBuilder: customPopupItemBuilderType,
-                                )
-                              ],
-                            );
-                          },
-                        )
-                      ),
+                                    debugPrint(
+                                        'type action: ${controller.searchType}');
+                                  } else {
+                                    controller.searchType =
+                                        data?.typeAct.toString();
+                                    //controller.typeActionModel = data;
+                                    debugPrint(
+                                        'type action: ${controller.searchType}');
+                                  }
+                                },
+                                dropdownBuilder: customDropDownType,
+                                popupItemBuilder: customPopupItemBuilderType,
+                              )
+                            ],
+                          );
+                        },
+                      )),
                       contentPadding: EdgeInsets.only(right: 5.0, left: 5.0),
                       actionsPadding: EdgeInsets.all(1.0),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: Text('cancel'.tr),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -385,7 +424,8 @@ class ActionPage extends GetView<ActionController> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child: Text('Search',
+                            child: Text(
+                              'search'.tr,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -399,21 +439,19 @@ class ActionPage extends GetView<ActionController> {
                     );
                   },
                 );
-              }
-          ),
+              }),
           SpeedDialChild(
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.sync, color: Colors.blue, size: 32),
-              label: controller.countActionLocal ==0 ? 'No data exist to synchronized' : 'Synchronisation',
-              onTap: (){
+              label: controller.countActionLocal == 0
+                  ? 'No data exist to synchronized'
+                  : 'Synchronisation',
+              onTap: () {
                 controller.syncActionToWebService();
-              }
-          )
+              })
         ],
       ),
     );
   }
-
-
 }

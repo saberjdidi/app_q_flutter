@@ -45,8 +45,10 @@ import '../Controllers/sync_data_controller.dart';
 import '../Models/action/action_realisation_model.dart';
 import '../Models/action/action_suite_audit.dart';
 import '../Models/action/action_suivi_model.dart';
+import '../Models/begin_licence_model.dart';
 import '../Models/incident_environnement/incident_env_agenda_model.dart';
 import '../Models/incident_securite/incident_securite_agenda_model.dart';
+import '../Models/licence_end_model.dart';
 import '../Models/pnc/pnc_a_corriger_model.dart';
 import '../Models/pnc/pnc_a_traiter_model.dart';
 import '../Models/pnc/pnc_suivre_model.dart';
@@ -56,6 +58,8 @@ import '../Services/action/action_service.dart';
 import '../Services/action/local_action_service.dart';
 import '../Services/incident_environnement/incident_environnement_service.dart';
 import '../Services/incident_securite/incident_securite_service.dart';
+import '../Services/licence_service.dart';
+import '../Services/login_service.dart';
 import '../Services/pnc/local_pnc_service.dart';
 import '../Services/reunion/reunion_service.dart';
 import '../Utils/custom_colors.dart';
@@ -64,6 +68,7 @@ import '../Utils/snack_bar.dart';
 import '../Widgets/app_bar_title.dart';
 import '../Widgets/loading_widget.dart';
 import '../Widgets/navigation_drawer_widget.dart';
+import 'licence/licence_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -169,6 +174,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+    //verify if licence end or not
+    checkLicence();
+
     expandableActionController = ExpandableController();
     expandablePNCController = ExpandableController();
     expandableReunionController = ExpandableController();
@@ -226,6 +234,49 @@ class _HomePageState extends State<HomePage> {
     expandableAuditController.dispose();
 
     super.dispose();
+  }
+
+  //check if licence end
+  BeginLicenceModel? licenceDevice;
+  LicenceEndModel? licenceEndModel;
+  var isLicenceEnd = 0.obs;
+  final deviceId = SharedPreference.getDeviceIdKey();
+
+  checkLicence() async {
+    var connection = await Connectivity().checkConnectivity();
+    if (connection == ConnectivityResult.none) {
+      licenceDevice = await LicenceService().getBeginLicence();
+      String? device_id = licenceDevice?.DeviceId;
+      licenceEndModel = await LicenceService().getIsLicenceEnd(device_id);
+      setState(() {
+        if (licenceEndModel?.retour == 0) {
+          debugPrint('licence of device : $device_id');
+        } else {
+          Get.snackbar("Licence expired", "Your licence has expired",
+              colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
+          SharedPreference.clearSharedPreference();
+          Get.off(LicencePage());
+        }
+      });
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      await LoginService().isLicenceEndService({
+        "deviceid": deviceId.toString(),
+      }).then((responseLicenceEnd) async {
+        debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+        if (responseLicenceEnd['retour'] == 0) {
+          debugPrint('licence of device : ${deviceId.toString()}');
+        } else {
+          ShowSnackBar.snackBar(SharedPreference.getDeviceNameKey().toString(),
+              'Your licence has expired', Colors.lightBlueAccent);
+          SharedPreference.clearSharedPreference();
+          Get.off(LicencePage());
+        }
+      }, onError: (errorLicenceEnd) {
+        ShowSnackBar.snackBar(
+            "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+      });
+    }
   }
 
   Future<void> checkConnectivity() async {
@@ -1723,228 +1774,256 @@ class _HomePageState extends State<HomePage> {
           colorText: Colors.blue, snackPosition: SnackPosition.TOP);
     } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Please wait to Synchronization Data",
-          colorText: Colors.blue,
-          snackPosition: SnackPosition.TOP,
-          duration: Duration(seconds: 10),
-          titleText: CircularProgressIndicator());
+      //verify licence
+      final licenceDevice = await LicenceService().getBeginLicence();
+      String? device_id = licenceDevice?.DeviceId;
+      await LoginService().isLicenceEndService({
+        "deviceid": device_id.toString(),
+      }).then((responseLicenceEnd) async {
+        debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+        if (responseLicenceEnd['retour'] == 0) {
+          Get.snackbar(
+              "Internet Connection", "Please wait to Synchronization Data",
+              colorText: Colors.blue,
+              snackPosition: SnackPosition.TOP,
+              duration: Duration(seconds: 10),
+              titleText: CircularProgressIndicator());
+          //----------------------------sync from db local to web service------------------------------
+          //sync action
+          if (SharedPreference.getIsVisibleAction() == 1) {
+            await syncDataController.syncActionToSQLServer();
+            await syncDataController.syncSousActionToSQLServer();
+            await syncDataController.syncTypeCauseActionToSQLServer();
+          }
+          //sync audit
+          if (SharedPreference.getIsVisibleAudit() == 1) {
+            await syncDataController.syncAuditToSQLServer();
+            await syncDataController.syncConstatAuditToSQLServer();
+            await syncDataController.syncAuditeurInterneToSQLServer();
+            await syncDataController.syncAuditeurExterneToSQLServer();
+            await syncDataController.syncEmployeHabiliteAuditToSQLServer();
+            await syncDataController.syncCritereCheckListAudit();
+          }
+          //sync reunion
+          if (SharedPreference.getIsVisibleReunion() == 1) {
+            await syncDataController.syncReunionToSQLServer();
+            await syncDataController.syncParticipantOfReunionToSQLServer();
+            await syncDataController.syncActionOfReunionToSQLServer();
+          }
+          //sync pnc
+          if (SharedPreference.getIsVisiblePNC() == 1) {
+            await syncDataController.syncPNCToSQLServer();
+            await syncDataController.syncProductPNCToSQLServer();
+            await syncDataController.syncTypeCausePNCToSQLServer();
+            await syncDataController.syncTypeProductPNCToSQLServer();
+          }
+          //sync incident env
+          if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
+            await syncDataController.syncIncidentEnvironnementToSQLServer();
+            await syncDataController.syncTypeCauseIncEnvToSQLServer();
+            await syncDataController.syncTypeConsequenceIncEnvToSQLServer();
+            await syncDataController.syncActionIncEnvRattacherToSQLServer();
+          }
+          //sync incident sec
+          if (SharedPreference.getIsVisibleIncidentSecurite() == 1) {
+            await syncDataController.syncIncidentSecuriteToSQLServer();
+            await syncDataController.syncTypeCauseIncSecToSQLServer();
+            await syncDataController.syncTypeConsequenceIncSecToSQLServer();
+            await syncDataController.syncCauseTypiqueIncSecToSQLServer();
+            await syncDataController.syncSiteLesionIncSecToSQLServer();
+            await syncDataController.syncActionIncSecRattacherToSQLServer();
+          }
+          //sync visite securite
+          if (SharedPreference.getIsVisibleVisiteSecurite() == 1) {
+            await syncDataController.syncVisiteSecuriteToSQLServer();
+            await syncDataController.syncEquipeVSToSQLServer();
+            await syncDataController.syncCheckListVSToSQLServer();
+            await syncDataController.syncActionVSRattacherToSQLServer();
+          }
 
-      //----------------------------sync from db local to web service------------------------------
-      //sync action
-      if (SharedPreference.getIsVisibleAction() == 1) {
-        await syncDataController.syncActionToSQLServer();
-        await syncDataController.syncSousActionToSQLServer();
-        await syncDataController.syncTypeCauseActionToSQLServer();
-      }
-      //sync audit
-      if (SharedPreference.getIsVisibleAudit() == 1) {
-        await syncDataController.syncAuditToSQLServer();
-        await syncDataController.syncConstatAuditToSQLServer();
-        await syncDataController.syncAuditeurInterneToSQLServer();
-      }
-      //sync reunion
-      if (SharedPreference.getIsVisibleReunion() == 1) {
-        await syncDataController.syncReunionToSQLServer();
-        await syncDataController.syncParticipantOfReunionToSQLServer();
-        await syncDataController.syncActionOfReunionToSQLServer();
-      }
-      //sync pnc
-      if (SharedPreference.getIsVisiblePNC() == 1) {
-        await syncDataController.syncPNCToSQLServer();
-        await syncDataController.syncProductPNCToSQLServer();
-        await syncDataController.syncTypeCausePNCToSQLServer();
-      }
-      //sync incident env
-      if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
-        await syncDataController.syncIncidentEnvironnementToSQLServer();
-        await syncDataController.syncTypeCauseIncEnvToSQLServer();
-        await syncDataController.syncTypeConsequenceIncEnvToSQLServer();
-        await syncDataController.syncActionIncEnvRattacherToSQLServer();
-      }
-      //sync incident sec
-      if (SharedPreference.getIsVisibleIncidentSecurite() == 1) {
-        await syncDataController.syncIncidentSecuriteToSQLServer();
-        await syncDataController.syncTypeCauseIncSecToSQLServer();
-        await syncDataController.syncTypeConsequenceIncSecToSQLServer();
-        await syncDataController.syncCauseTypiqueIncSecToSQLServer();
-        await syncDataController.syncSiteLesionIncSecToSQLServer();
-        await syncDataController.syncActionIncSecRattacherToSQLServer();
-      }
-      //sync visite securite
-      if (SharedPreference.getIsVisibleVisiteSecurite() == 1) {
-        await syncDataController.syncVisiteSecuriteToSQLServer();
-        await syncDataController.syncEquipeVSToSQLServer();
-        await syncDataController.syncCheckListVSToSQLServer();
-        await syncDataController.syncActionVSRattacherToSQLServer();
-      }
+          //---------------------------sync from web service to DB Local-------------------------
+          await apiControllersCall.getDomaineAffectation();
+          await apiControllersCall.getChampCache();
+          await apiControllersCall.getChampObligatoireAction();
 
-      //---------------------------sync from web service to DB Local-------------------------
-      await apiControllersCall.getDomaineAffectation();
-      await apiControllersCall.getChampCache();
-      await apiControllersCall.getChampObligatoireAction();
+          ///action
+          if (SharedPreference.getIsVisibleAction() == 1) {
+            //agenda
+            await apiControllersCall.getActionsRealisation();
+            await apiControllersCall.getActionsSuivi();
+            await apiControllersCall.getActionsSuiteAudit();
+            //module action
+            await apiControllersCall.getAction();
+            await apiControllersCall.getSourceAction();
+            await apiControllersCall.getTypeAction();
+            await apiControllersCall.getResponsableCloture();
+            await apiControllersCall.getAuditAction();
+            await apiControllersCall.getTypeCauseAction();
+            await apiControllersCall.getTypeCauseActionARattacher();
+            await apiControllersCall.getPriorite();
+            await apiControllersCall.getGravite();
+            await apiControllersCall.getProcessusEmploye();
+            await apiControllersCall.getAllSousAction();
+          }
 
-      ///action
-      if (SharedPreference.getIsVisibleAction() == 1) {
-        //agenda
-        await apiControllersCall.getActionsRealisation();
-        await apiControllersCall.getActionsSuivi();
-        await apiControllersCall.getActionsSuiteAudit();
-        //module action
-        await apiControllersCall.getAction();
-        await apiControllersCall.getSourceAction();
-        await apiControllersCall.getTypeAction();
-        await apiControllersCall.getResponsableCloture();
-        await apiControllersCall.getAuditAction();
-        await apiControllersCall.getTypeCauseAction();
-        await apiControllersCall.getTypeCauseActionARattacher();
-        await apiControllersCall.getPriorite();
-        await apiControllersCall.getGravite();
-        await apiControllersCall.getProcessusEmploye();
-        await apiControllersCall.getAllSousAction();
-      }
+          ///pnc
+          if (SharedPreference.getIsVisiblePNC() == 1) {
+            //agenda
+            await apiControllersCall.getPNCAValider();
+            await apiControllersCall.getPNCACorriger();
+            await apiControllersCall.getPNCInvestigationEffectuer();
+            await apiControllersCall.getPNCInvestigationApprouver();
+            await apiControllersCall.getPNCASuivre();
+            await apiControllersCall.getPNCApprobationFinale();
+            await apiControllersCall.getPNCDecisionTraitementAValidater();
+            //module pnc
+            await apiControllersCall.getPNC();
+            await apiControllersCall.getAllProductsPNC();
+            await apiControllersCall.getAllTypeCausePNC();
+            await apiControllersCall.getChampObligatoirePNC();
+            await apiControllersCall.getFournisseurs();
+            await apiControllersCall.getTypePNC();
+            await apiControllersCall.getGravitePNC();
+            await apiControllersCall.getSourcePNC();
+            await apiControllersCall.getAtelierPNC();
+            await apiControllersCall.getClients();
+            await apiControllersCall.getAllTypeCausePNCARattacher();
+            //save is one product in shared preference
+            await PNCService().parametrageProduct().then((param) {
+              Future oneProduct =
+                  SharedPreference.setIsOneProduct(param['seulProduit']);
+              if (param['seulProduit'] == 0) {
+                apiControllersCall.getAllTypeProductPNC();
+              }
+            }, onError: (error) {
+              ShowSnackBar.snackBar(
+                  'Error one product', error.toString(), Colors.red);
+            });
+          }
 
-      ///pnc
-      if (SharedPreference.getIsVisiblePNC() == 1) {
-        //agenda
-        await apiControllersCall.getPNCAValider();
-        await apiControllersCall.getPNCACorriger();
-        await apiControllersCall.getPNCInvestigationEffectuer();
-        await apiControllersCall.getPNCInvestigationApprouver();
-        await apiControllersCall.getPNCASuivre();
-        await apiControllersCall.getPNCApprobationFinale();
-        await apiControllersCall.getPNCDecisionTraitementAValidater();
-        //module pnc
-        await apiControllersCall.getPNC();
-        await apiControllersCall.getAllProductsPNC();
-        await apiControllersCall.getAllTypeCausePNC();
-        await apiControllersCall.getChampObligatoirePNC();
-        await apiControllersCall.getFournisseurs();
-        await apiControllersCall.getTypePNC();
-        await apiControllersCall.getGravitePNC();
-        await apiControllersCall.getSourcePNC();
-        await apiControllersCall.getAtelierPNC();
-        await apiControllersCall.getClients();
-        await apiControllersCall.getAllTypeCausePNCARattacher();
-        //save is one product in shared preference
-        await PNCService().parametrageProduct().then((param) {
-          Future oneProduct =
-              SharedPreference.setIsOneProduct(param['seulProduit']);
-        }, onError: (error) {
-          ShowSnackBar.snackBar(
-              'Error one product', error.toString(), Colors.red);
-        });
-      }
+          ///reunion
+          if (SharedPreference.getIsVisibleReunion() == 1) {
+            //agenda
+            await apiControllersCall.getReunionInformer();
+            await apiControllersCall.getReunionPlanifier();
 
-      ///reunion
-      if (SharedPreference.getIsVisibleReunion() == 1) {
-        //agenda
-        await apiControllersCall.getReunionInformer();
-        await apiControllersCall.getReunionPlanifier();
+            ///module reunion
+            await apiControllersCall.getReunion();
+            await apiControllersCall.getParticipantsReunion();
+            await apiControllersCall.getActionReunionRattacher();
+            await apiControllersCall.getTypeReunion();
+          }
+          //incident env
+          if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
+            //agenda
+            await apiControllersCall.getIncidentEnvDecisionTraitement();
+            await apiControllersCall.getIncidentEnvATraiter();
+            await apiControllersCall.getIncidentEnvACloturer();
 
-        ///module reunion
-        await apiControllersCall.getReunion();
-        await apiControllersCall.getParticipantsReunion();
-        await apiControllersCall.getActionReunionRattacher();
-        await apiControllersCall.getTypeReunion();
-      }
-      //incident env
-      if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
-        //agenda
-        await apiControllersCall.getIncidentEnvDecisionTraitement();
-        await apiControllersCall.getIncidentEnvATraiter();
-        await apiControllersCall.getIncidentEnvACloturer();
+            ///module incident environnement
+            await apiControllersCall.getIncidentEnvironnement();
+            await apiControllersCall.getChampObligatoireIncidentEnv();
+            await apiControllersCall.getTypeIncidentEnv();
+            await apiControllersCall.getTypeCauseIncidentEnvRattacher();
+            await apiControllersCall.getTypeCauseIncidentEnv();
+            await apiControllersCall.getCategoryIncidentEnv();
+            await apiControllersCall.getTypeConsequenceIncidentEnvRattacher();
+            await apiControllersCall.getTypeConsequenceIncidentEnv();
+            await apiControllersCall.getLieuIncidentEnv();
+            await apiControllersCall.getSourceIncidentEnv();
+            await apiControllersCall.getCoutEstimeIncidentEnv();
+            await apiControllersCall.getGraviteIncidentEnv();
+            await apiControllersCall.getSecteurIncidentEnv();
+            await apiControllersCall.getActionIncEnvRattacher();
+          }
+          //incident securite
+          if (SharedPreference.getIsVisibleIncidentSecurite() == 1) {
+            //agenda
+            await apiControllersCall.getIncidentSecuriteDecisionTraitement();
+            await apiControllersCall.getIncidentSecuriteATraiter();
+            await apiControllersCall.getIncidentSecuriteACloturer();
 
-        ///module incident environnement
-        await apiControllersCall.getIncidentEnvironnement();
-        await apiControllersCall.getChampObligatoireIncidentEnv();
-        await apiControllersCall.getTypeIncidentEnv();
-        await apiControllersCall.getTypeCauseIncidentEnvRattacher();
-        await apiControllersCall.getTypeCauseIncidentEnv();
-        await apiControllersCall.getCategoryIncidentEnv();
-        await apiControllersCall.getTypeConsequenceIncidentEnvRattacher();
-        await apiControllersCall.getTypeConsequenceIncidentEnv();
-        await apiControllersCall.getLieuIncidentEnv();
-        await apiControllersCall.getSourceIncidentEnv();
-        await apiControllersCall.getCoutEstimeIncidentEnv();
-        await apiControllersCall.getGraviteIncidentEnv();
-        await apiControllersCall.getSecteurIncidentEnv();
-        await apiControllersCall.getActionIncEnvRattacher();
-      }
-      //incident securite
-      if (SharedPreference.getIsVisibleIncidentSecurite() == 1) {
-        //agenda
-        await apiControllersCall.getIncidentSecuriteDecisionTraitement();
-        await apiControllersCall.getIncidentSecuriteATraiter();
-        await apiControllersCall.getIncidentSecuriteACloturer();
+            ///module incident securite
+            await apiControllersCall.getIncidentSecurite();
+            await apiControllersCall.getChampObligatoireIncidentSecurite();
+            await apiControllersCall.getPosteTravailIncidentSecurite();
+            await apiControllersCall.getTypeIncidentSecurite();
+            await apiControllersCall.getCategoryIncidentSecurite();
+            await apiControllersCall.getCauseTypiqueIncidentSecurite();
+            await apiControllersCall.getTypeCauseIncidentSecRattacher();
+            await apiControllersCall.getTypeConsequenceIncSecRattacher();
+            await apiControllersCall.getCauseTypiqueIncSecRattacher();
+            await apiControllersCall.getSiteLesionIncSecRattacher();
+            await apiControllersCall.getTypeCauseIncidentSecurite();
+            await apiControllersCall.getTypeConsequenceIncidentSecurite();
+            await apiControllersCall.getSiteLesionIncidentSecurite();
+            await apiControllersCall.getGraviteIncidentSecurite();
+            await apiControllersCall.getSecteurIncidentSecurite();
+            await apiControllersCall.getCoutEstemeIncedentSecurite();
+            await apiControllersCall.getEvenementDeclencheurIncidentSecurite();
+            await apiControllersCall.getActionIncSecRattacher();
+          }
+          //audit
+          if (SharedPreference.getIsVisibleAudit() == 1) {
+            //agenda
+            await apiControllersCall.getAuditEnTantQueAudite();
+            await apiControllersCall.getAuditEnTantQueAuditeur();
+            await apiControllersCall.getRapportAuditsAValider();
+            //Module Audit
+            await apiControllersCall.getAudits();
+            await apiControllersCall.getChampAudit();
+            await apiControllersCall.getTypeAudit();
+            await apiControllersCall.getGraviteAudit();
+            await apiControllersCall.getTypeConstatAudit();
+            await apiControllersCall.getConstatsActionProv();
+            await apiControllersCall.getConstatsAction();
+            await apiControllersCall.getChampAuditByRefAudit();
+            await apiControllersCall.getAuditeurInterne();
+            await apiControllersCall.getAuditeurInterneARattacher();
+            await apiControllersCall.getCheckListAudit();
+            await apiControllersCall.getAuditeurExterneRattacher();
+            await apiControllersCall.getAllAuditeursExterne();
+            await apiControllersCall.getEmployeHabiliteAudit();
+            //await apiControllersCall.getCritereCheckListAudit();
+          }
 
-        ///module incident securite
-        await apiControllersCall.getIncidentSecurite();
-        await apiControllersCall.getChampObligatoireIncidentSecurite();
-        await apiControllersCall.getPosteTravailIncidentSecurite();
-        await apiControllersCall.getTypeIncidentSecurite();
-        await apiControllersCall.getCategoryIncidentSecurite();
-        await apiControllersCall.getCauseTypiqueIncidentSecurite();
-        await apiControllersCall.getTypeCauseIncidentSecRattacher();
-        await apiControllersCall.getTypeConsequenceIncSecRattacher();
-        await apiControllersCall.getCauseTypiqueIncSecRattacher();
-        await apiControllersCall.getSiteLesionIncSecRattacher();
-        await apiControllersCall.getTypeCauseIncidentSecurite();
-        await apiControllersCall.getTypeConsequenceIncidentSecurite();
-        await apiControllersCall.getSiteLesionIncidentSecurite();
-        await apiControllersCall.getGraviteIncidentSecurite();
-        await apiControllersCall.getSecteurIncidentSecurite();
-        await apiControllersCall.getCoutEstemeIncedentSecurite();
-        await apiControllersCall.getEvenementDeclencheurIncidentSecurite();
-        await apiControllersCall.getActionIncSecRattacher();
-      }
-      //audit
-      if (SharedPreference.getIsVisibleAudit() == 1) {
-        //agenda
-        await apiControllersCall.getAuditEnTantQueAudite();
-        await apiControllersCall.getAuditEnTantQueAuditeur();
-        await apiControllersCall.getRapportAuditsAValider();
-        //Module Audit
-        await apiControllersCall.getAudits();
-        await apiControllersCall.getChampAudit();
-        await apiControllersCall.getTypeAudit();
-        await apiControllersCall.getGraviteAudit();
-        await apiControllersCall.getTypeConstatAudit();
-        await apiControllersCall.getConstatsActionProv();
-        await apiControllersCall.getConstatsAction();
-        await apiControllersCall.getChampAuditByRefAudit();
-        await apiControllersCall.getAuditeurInterne();
-        await apiControllersCall.getAuditeurInterneARattacher();
-      }
+          ///Module Visite Securite
+          if (SharedPreference.getIsVisibleVisiteSecurite() == 1) {
+            await apiControllersCall.getVisiteSecurite();
+            await apiControllersCall.getCheckList();
+            await apiControllersCall.getUniteVisiteSecurite();
+            await apiControllersCall.getZoneVisiteSecurite();
+            await apiControllersCall.getSiteVisiteSecurite();
+            await apiControllersCall.getEquipeVisiteSecuriteFromAPI();
+            await apiControllersCall.getCheckListVSRattacher();
+            await apiControllersCall.getTauxCheckListVS();
+            await apiControllersCall.getActionVSRattacher();
+          }
 
-      ///Module Visite Securite
-      if (SharedPreference.getIsVisibleVisiteSecurite() == 1) {
-        await apiControllersCall.getVisiteSecurite();
-        await apiControllersCall.getCheckList();
-        await apiControllersCall.getUniteVisiteSecurite();
-        await apiControllersCall.getZoneVisiteSecurite();
-        await apiControllersCall.getSiteVisiteSecurite();
-        await apiControllersCall.getEquipeVisiteSecuriteFromAPI();
-        await apiControllersCall.getCheckListVSRattacher();
-        await apiControllersCall.getTauxCheckListVS();
-        await apiControllersCall.getActionVSRattacher();
-      }
-
-      ///module documentation
-      if (SharedPreference.getIsVisibleDocumentation() == 1) {
-        await apiControllersCall.getDocument();
-        await apiControllersCall.getTypeDocument();
-      }
-      //agenda pnc
-      await apiControllersCall.getPNCDecision();
-      await apiControllersCall.getPNCATraiter();
-      //domaine affectation
-      await apiControllersCall.getEmploye();
-      await apiControllersCall.getProduct();
-      await apiControllersCall.getSite();
-      await apiControllersCall.getProcessus();
-      await apiControllersCall.getDirection();
-      await apiControllersCall.getActivity();
-      await apiControllersCall.getService();
+          ///module documentation
+          if (SharedPreference.getIsVisibleDocumentation() == 1) {
+            await apiControllersCall.getDocument();
+            await apiControllersCall.getTypeDocument();
+          }
+          //agenda pnc
+          await apiControllersCall.getPNCDecision();
+          await apiControllersCall.getPNCATraiter();
+          //domaine affectation
+          await apiControllersCall.getEmploye();
+          await apiControllersCall.getProduct();
+          await apiControllersCall.getSite();
+          await apiControllersCall.getProcessus();
+          await apiControllersCall.getDirection();
+          await apiControllersCall.getActivity();
+          await apiControllersCall.getService();
+        } else {
+          ShowSnackBar.snackBar('Expired Licence', 'Your licence has expired',
+              Colors.lightBlueAccent);
+        }
+      }, onError: (errorLicenceEnd) {
+        ShowSnackBar.snackBar(
+            "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+      });
     }
   }
 

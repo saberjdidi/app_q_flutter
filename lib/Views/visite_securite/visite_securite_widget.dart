@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:qualipro_flutter/Utils/shared_preference.dart';
 import 'package:readmore/readmore.dart';
 import 'dart:ui' as ui;
 import '../../Models/incident_securite/incident_securite_model.dart';
@@ -12,8 +13,16 @@ class VisiteSecuriteWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final langue = SharedPreference.getLangue();
     DateTime dt = DateTime.parse(model.dateVisite.toString());
-    final date = DateFormat('dd/MM/yyyy').format(dt);
+    var date;
+    if (langue == 'fr') {
+      date = DateFormat('dd/MM/yyyy').format(dt);
+    } else if (langue == 'en') {
+      date = DateFormat('MM/dd/yyyy').format(dt);
+    } else {
+      date = DateFormat('dd/MM/yyyy').format(dt);
+    }
 
     return Card(
       shadowColor: Color(0xFFedf0f8),
@@ -30,17 +39,19 @@ class VisiteSecuriteWidget extends StatelessWidget {
           Expanded(
               flex: 1,
               child: ListTile(
-                title:  Row(
+                title: Row(
                   children: [
                     Expanded(
                       flex: 2,
-                      child: Text("Reference ${model.id} ${model.online == 1 ?'' :'*'}",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Brand-Regular",
-                            fontSize: 15.0,
-                            color: Colors.blue)),),
-                   /* Padding(
+                      child: Text(
+                          "Reference ${model.id} ${model.online == 1 ? '' : '*'}",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Brand-Regular",
+                              fontSize: 15.0,
+                              color: Colors.blue)),
+                    ),
+                    /* Padding(
                       padding: const EdgeInsets.only(top: 10.0),
                       child: Text(message_status, style:
                       TextStyle(fontWeight: FontWeight.bold,
@@ -52,23 +63,33 @@ class VisiteSecuriteWidget extends StatelessWidget {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  /*  Text("${model.nc}", style:
+                    /*  Text("${model.nc}", style:
                     TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontFamily: "Brand-Bold"),),*/
                     Row(
                       children: [
                         Expanded(
                           flex: 2,
-                            child: Text("${date}", style:
-                            TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontFamily: "Brand-Bold"),),
+                          child: Text(
+                            "Date : ${date}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                                fontFamily: "Brand-Bold"),
+                          ),
                         ),
-
-                        (model.site=="" || model.site==null) ? Text('')
+                        (model.site == "" || model.site == null)
+                            ? Text('')
                             : Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text('Site : ${model.site}', style: TextStyle(fontSize: 15,
-                              fontStyle: FontStyle.normal, fontWeight: FontWeight.w500,
-                              color: Color(0xFF18516C)),),
-                        ),
+                                padding: const EdgeInsets.all(3.0),
+                                child: Text(
+                                  'Site : ${model.site}',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF18516C)),
+                                ),
+                              ),
                       ],
                     ),
                     Padding(
@@ -109,8 +130,7 @@ class VisiteSecuriteWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
-          )
+              ))
         ],
       ),
     );

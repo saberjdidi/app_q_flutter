@@ -39,6 +39,7 @@ class DBTable {
   static const String atelier_pnc = "AtelierPNC";
   static const String pnc = "PNC";
   static const String product_pnc = "ProductPNC";
+  static const String type_product_pnc = "TypeProductPNC";
   static const String type_cause_pnc = "TypeCausePNC";
   static const String type_cause_a_rattacher_pnc = "TypeCauseARattacherPNC";
   static const String reunion = "Reunion";
@@ -110,10 +111,19 @@ class DBTable {
   static const String auditeur_interne = "AuditeurInterne";
   static const String auditeur_interne_a_rattacher =
       "AuditeurInterneARattacher";
+  static const String auditeurs_externe = "AuditeursExterne";
+  static const String auditeur_externe_rattacher = "AuditeurExterneRattacher";
+  static const String employe_habilite_audit = "EmployeHabiliteAudit";
   static const String type_audit = "TypeAudit";
   static const String gravite_audit = "GraviteAudit";
   static const String type_constat_audit = "TypeConstatAudit";
   static const String constat_audit = "ConstatAudit";
+  static const String checklist_audit = "CheckListAudit";
+  static const String critere_checklist_audit = "CritereCheckListAudit";
+  static const String upload_image_inc_env = "UploadImageIncEnv";
+  static const String upload_image_inc_sec = "UploadImageIncSec";
+  static const String upload_image_pnc = "UploadImagePNC";
+  static const String upload_image_visite_sec = "UploadImageVisiteSec";
 
   //agenda
   static const String action_realisation = "ActionRealisation";

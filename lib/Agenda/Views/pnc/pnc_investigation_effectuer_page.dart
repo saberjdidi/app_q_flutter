@@ -1,6 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
@@ -14,19 +15,20 @@ import '../../../Views/home_page.dart';
 import 'remplir_pnc_investigation_effectuer.dart';
 
 class PNCInvestigationEffectuerPage extends StatefulWidget {
-
   PNCInvestigationEffectuerPage({Key? key}) : super(key: key);
 
   @override
-  State<PNCInvestigationEffectuerPage> createState() => _PNCInvestigationEffectuerPageState();
+  State<PNCInvestigationEffectuerPage> createState() =>
+      _PNCInvestigationEffectuerPageState();
 }
 
-class _PNCInvestigationEffectuerPageState extends State<PNCInvestigationEffectuerPage> {
-
+class _PNCInvestigationEffectuerPageState
+    extends State<PNCInvestigationEffectuerPage> {
   PNCService service = PNCService();
   final matricule = SharedPreference.getMatricule();
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
-  List<PNCSuivreModel> listPNCInvestigation = List<PNCSuivreModel>.empty(growable: true);
+  List<PNCSuivreModel> listPNCInvestigation =
+      List<PNCSuivreModel>.empty(growable: true);
   List<PNCSuivreModel> listFiltered = [];
   TextEditingController controller = TextEditingController();
   String _searchResult = '';
@@ -40,10 +42,10 @@ class _PNCInvestigationEffectuerPageState extends State<PNCInvestigationEffectue
   void getPNCInvestigation() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
+      if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
         var response = await LocalPNCService().readPNCInvestigationEffectuer();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = PNCSuivreModel();
             model.nnc = data['nnc'];
@@ -62,11 +64,12 @@ class _PNCInvestigationEffectuerPageState extends State<PNCInvestigationEffectue
             });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-       //rest api
-        await PNCService().getPNCInvestigationEffectuer(matricule).then((resp) async {
+        //rest api
+        await PNCService().getPNCInvestigationEffectuer(matricule).then(
+            (resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -87,16 +90,13 @@ class _PNCInvestigationEffectuerPageState extends State<PNCInvestigationEffectue
               });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-    }
-
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -111,18 +111,21 @@ class _PNCInvestigationEffectuerPageState extends State<PNCInvestigationEffectue
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
             'Investigation à Effectuer : ${listPNCInvestigation.length}',
@@ -133,152 +136,193 @@ class _PNCInvestigationEffectuerPageState extends State<PNCInvestigationEffectue
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listPNCInvestigation.isNotEmpty ?
-            RefreshWidget(
-              keyRefresh: keyRefresh,
-              onRefresh: () async {
-                controller.clear();
-                listPNCInvestigation.clear();
-                getPNCInvestigation();
-              },
-              child: Column(
-                children: <Widget>[
-                  Card(
-                    //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: InkWell(
-                            onTap: (){
+            child: listPNCInvestigation.isNotEmpty
+                ? RefreshWidget(
+                    keyRefresh: keyRefresh,
+                    onRefresh: () async {
+                      controller.clear();
+                      listPNCInvestigation.clear();
+                      getPNCInvestigation();
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Card(
+                          //margin: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                          child: TextField(
+                            controller: controller,
+                            decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.clear();
+                                      _searchResult = '';
+                                      listFiltered = listPNCInvestigation;
+                                    });
+                                  },
+                                  child: controller.text.trim() == ''
+                                      ? Text('')
+                                      : Icon(Icons.cancel),
+                                ),
+                                hintText: 'Search',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                        const BorderSide(color: Colors.blue))),
+                            onChanged: (value) {
                               setState(() {
-                                controller.clear();
-                                _searchResult = '';
-                                listFiltered = listPNCInvestigation;
+                                _searchResult = value;
+                                listFiltered = listPNCInvestigation
+                                    .where((user) =>
+                                        user.nnc
+                                            .toString()
+                                            .contains(_searchResult) ||
+                                        user.typeNC!
+                                            .toLowerCase()
+                                            .contains(_searchResult))
+                                    .toList();
                               });
                             },
-                            child: controller.text.trim()=='' ?Text('') :Icon(Icons.cancel),
                           ),
-                          hintText: 'Search',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: Colors.blue)
-                          )
-                      ),
-                      onChanged: (value){
-                        setState(() {
-                          _searchResult = value;
-                          listFiltered = listPNCInvestigation.where((user) =>
-                          user.nnc.toString().contains(_searchResult)
-                              || user.typeNC!.toLowerCase().contains(_searchResult)
-                          ).toList();
-                        });
-                      },
-                    ),
-                  ),
-                  Flexible(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        final num_pnc = listFiltered[index].nnc;
+                        ),
+                        Flexible(
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              final num_pnc = listFiltered[index].nnc;
 
-                        return
-                          Column(
-                          children: [
-                            ListTile(
-                              title: Text(
-                                'PNC N°${num_pnc}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                        style: Theme.of(context).textTheme.bodyLarge,
-                                        children: [
-                                          WidgetSpan(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                                              child: Icon(Icons.calendar_today),
-                                            ),
+                              return Card(
+                                color: Color(0xFFFCF9F9),
+                                child: ListTile(
+                                  title: Text(
+                                    'PNC N°${num_pnc}',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        RichText(
+                                          text: TextSpan(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                            children: [
+                                              WidgetSpan(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 2.0),
+                                                  child: Icon(
+                                                      Icons.calendar_today),
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      '${listFiltered[index].dateDetect}'),
+
+                                              //TextSpan(text: '${action.declencheur}'),
+                                            ],
                                           ),
-                                          TextSpan(text: '${listFiltered[index].dateDetect}'),
-
-                                          //TextSpan(text: '${action.declencheur}'),
-                                        ],
-
-                                      ),
-                                    ),
-
-                                    listFiltered[index].nomClt =='' ?Text('')
-                                    : Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: RichText(
-                                        textAlign: TextAlign.start,
-                                        text: TextSpan(
-                                          style: Theme.of(context).textTheme.bodyLarge,
-                                          children: [
-                                            TextSpan(text: 'Client : ${listFiltered[index].nomClt}'),
-                                          ],
-
                                         ),
-                                      ),
+                                        listFiltered[index].nomClt == ''
+                                            ? Text('')
+                                            : Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 5),
+                                                child: RichText(
+                                                  textAlign: TextAlign.start,
+                                                  text: TextSpan(
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge,
+                                                    children: [
+                                                      TextSpan(
+                                                          text:
+                                                              'Client : ${listFiltered[index].nomClt}'),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(0),
+                                          child: Html(
+                                            data:
+                                                'Produit : ${listFiltered[index].produit}', //htmlData,
+                                            //tagsList: Html.tags..remove(Platform.isAndroid ? "-" : ""),
+                                            style: {
+                                              "body": Style(
+                                                  fontSize: FontSize.large,
+                                                  fontWeight: FontWeight.w500,
+                                                  margin: EdgeInsets.zero,
+                                                  textTransform:
+                                                      TextTransform.none),
+                                            },
+                                          ),
+                                        ),
+                                        Html(
+                                          data:
+                                              'Type : ${listFiltered[index].typeNC}', //htmlData,
+                                          style: {
+                                            "body": Style(
+                                                color: Color(0xFF3B465E),
+                                                fontSize: FontSize.large,
+                                                fontWeight: FontWeight.w500,
+                                                margin: EdgeInsets.zero,
+                                                padding: EdgeInsets.zero,
+                                                textTransform:
+                                                    TextTransform.none),
+                                          },
+                                        ),
+                                        /* ReadMoreText(
+                                          "Type : ${listFiltered[index].typeNC}",
+                                          style: TextStyle(
+                                              color: Color(0xFF3B465E),
+                                              fontWeight: FontWeight.bold),
+                                          trimLines: 3,
+                                          colorClickableText:
+                                              CustomColors.bleuCiel,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'more',
+                                          trimExpandedText: 'less',
+                                          moreStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: CustomColors.bleuCiel),
+                                        ) */
+                                      ],
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                                      child: Text('Produit : ${listFiltered[index].produit}',
-                                          style: TextStyle(color: Colors.blueAccent)),
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () async {
+                                      Get.to(RemplirPNCInvestigationEffectuer(
+                                        nnc: listFiltered[index].nnc,
+                                      ));
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.green,
                                     ),
-
-                                    ReadMoreText(
-                                      "Type : ${listFiltered[index].typeNC}",
-                                      style: TextStyle(
-                                          color: Color(0xFF3B465E),
-                                          fontWeight: FontWeight.bold),
-                                      trimLines: 3,
-                                      colorClickableText: CustomColors.bleuCiel,
-                                      trimMode: TrimMode.Line,
-                                      trimCollapsedText: 'more',
-                                      trimExpandedText: 'less',
-                                      moreStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: CustomColors.bleuCiel),
-                                    )
-                                  ],
+                                    tooltip: 'investigation',
+                                  ),
                                 ),
-                              ),
-                              trailing: IconButton(
-                                onPressed: () async {
-                                  Get.to(RemplirPNCInvestigationEffectuer(nnc: listFiltered[index].nnc,));
-                                },
-                                icon: Icon(Icons.edit, color: Colors.green,),
-                                tooltip: 'investigation',
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.0,
-                              color: Colors.blue,
-                            ),
-                          ],
-                        );
-                      },
-                      itemCount: listFiltered.length,
-                      //itemCount: actionsList.length + 1,
+                              );
+                            },
+                            itemCount: listFiltered.length,
+                            //itemCount: actionsList.length + 1,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : const Center(
+                    child: Text('Empty List',
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
       ),
     );
   }
-
 }

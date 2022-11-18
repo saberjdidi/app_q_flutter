@@ -1,4 +1,3 @@
-
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +38,14 @@ class _PNCNavigationBarPageState extends State<PNCNavigationBarPage> {
         margin: EdgeInsets.only(top: 12.0),
         child: Column(
           children: [
-            Icon(Icons.home, size: 25,),
-            Text('home'.tr, style: TextStyle(color: Colors.white, fontSize: 10),)
+            Icon(
+              Icons.home,
+              size: 25,
+            ),
+            Text(
+              'home'.tr,
+              style: TextStyle(color: Colors.white, fontSize: 10),
+            )
           ],
         ),
       ),
@@ -48,8 +53,12 @@ class _PNCNavigationBarPageState extends State<PNCNavigationBarPage> {
         margin: EdgeInsets.only(top: 12.0),
         child: Column(
           children: [
-            Icon(Icons.plus_one, size: 25,),
-            Text('product'.tr, style: TextStyle(color: Colors.white, fontSize: 10))
+            Icon(
+              Icons.plus_one,
+              size: 25,
+            ),
+            Text('product'.tr,
+                style: TextStyle(color: Colors.white, fontSize: 10))
           ],
         ),
       ),
@@ -57,12 +66,16 @@ class _PNCNavigationBarPageState extends State<PNCNavigationBarPage> {
         margin: EdgeInsets.only(top: 12.0),
         child: Column(
           children: [
-            Icon(Icons.person_search_rounded, size: 25,),
-            Text('Decideur', style: TextStyle(color: Colors.white, fontSize: 10))
+            Icon(
+              Icons.person_search_rounded,
+              size: 25,
+            ),
+            Text('Decideur',
+                style: TextStyle(color: Colors.white, fontSize: 10))
           ],
         ),
       )
-     /* Icon(Icons.home, size: 25,),
+      /* Icon(Icons.home, size: 25,),
       Icon(Icons.plus_one, size: 25,),
       Icon(Icons.person_search_rounded, size: 25,), */
     ];
@@ -73,7 +86,7 @@ class _PNCNavigationBarPageState extends State<PNCNavigationBarPage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'PNC',
+          'P.N.C',
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: (lightPrimary),
@@ -83,20 +96,19 @@ class _PNCNavigationBarPageState extends State<PNCNavigationBarPage> {
       ),
       body: screens[index],
       bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          iconTheme: IconThemeData(color: Colors.white)
-        ),
+        data: Theme.of(context)
+            .copyWith(iconTheme: IconThemeData(color: Colors.white)),
         child: CurvedNavigationBar(
           key: navigationKey,
           backgroundColor: Colors.transparent,
-           color: Colors.blue,
-           buttonBackgroundColor: Colors.cyan,
-           height: 45,
+          color: Colors.blue,
+          buttonBackgroundColor: Colors.cyan,
+          height: 45,
           animationCurve: Curves.easeInOut,
           animationDuration: Duration(milliseconds: 300),
           index: index,
           items: items,
-          onTap: (index)=>setState(()=> this.index =index ),
+          onTap: (index) => setState(() => this.index = index),
         ),
       ),
     );

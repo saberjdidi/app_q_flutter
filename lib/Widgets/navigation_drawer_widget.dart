@@ -9,6 +9,7 @@ import '../Controllers/reunion/reunion_controller.dart';
 import '../Route/app_route.dart';
 import '../Utils/custom_colors.dart';
 import '../Utils/shared_preference.dart';
+import '../Views/dashboard_screen.dart';
 import 'divider.dart';
 import 'multi_language.dart';
 
@@ -21,7 +22,6 @@ class NavigationDrawerWidget extends StatefulWidget {
 }
 
 class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
-
   @override
   void initState() {
     super.initState();
@@ -33,22 +33,22 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     LicenceModel response = await LicenceService().getLicenceInfo();
     setState(() {
       print('licence data : ${response.licence}');
-
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     logout() {
       AwesomeDialog(
           context: context,
           animType: AnimType.SCALE,
           dialogType: DialogType.INFO,
-          body: Center(child: Text(
-            'exit'.tr,
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),),
+          body: Center(
+            child: Text(
+              'exit'.tr,
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
           title: 'signout'.tr,
           btnOk: ElevatedButton(
             style: ButtonStyle(
@@ -72,23 +72,35 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
               LicenceModel response = await LicenceService().getLicenceInfo();
               await SharedPreference.setLicenceKey(response.licence.toString());
-              await SharedPreference.setWebServiceKey(response.webservice.toString());
+              await SharedPreference.setWebServiceKey(
+                  response.webservice.toString());
               await SharedPreference.setNbDaysKey(response.nbDays.toString());
-              await SharedPreference.setDeviceIdKey(response.deviceId.toString());
-              await SharedPreference.setDeviceNameKey(response.deviceName.toString());
-              await SharedPreference.setIsVisibleAction(int.parse(response.action.toString()));
-              await SharedPreference.setIsVisibleAudit(int.parse(response.audit.toString()));
-              await SharedPreference.setIsVisiblePNC(int.parse(response.pnc.toString()));
-              await SharedPreference.setIsVisibleDocumentation(int.parse(response.docm.toString()));
-              await SharedPreference.setIsVisibleReunion(int.parse(response.reunion.toString()));
-              await SharedPreference.setIsVisibleIncidentEnvironnement(int.parse(response.incinv.toString()));
-              await SharedPreference.setIsVisibleIncidentSecurite(int.parse(response.incsecu.toString()));
-              await SharedPreference.setIsVisibleVisiteSecurite(int.parse(response.visite.toString()));
+              await SharedPreference.setDeviceIdKey(
+                  response.deviceId.toString());
+              await SharedPreference.setDeviceNameKey(
+                  response.deviceName.toString());
+              await SharedPreference.setIsVisibleAction(
+                  int.parse(response.action.toString()));
+              await SharedPreference.setIsVisibleAudit(
+                  int.parse(response.audit.toString()));
+              await SharedPreference.setIsVisiblePNC(
+                  int.parse(response.pnc.toString()));
+              await SharedPreference.setIsVisibleDocumentation(
+                  int.parse(response.docm.toString()));
+              await SharedPreference.setIsVisibleReunion(
+                  int.parse(response.reunion.toString()));
+              await SharedPreference.setIsVisibleIncidentEnvironnement(
+                  int.parse(response.incinv.toString()));
+              await SharedPreference.setIsVisibleIncidentSecurite(
+                  int.parse(response.incsecu.toString()));
+              await SharedPreference.setIsVisibleVisiteSecurite(
+                  int.parse(response.visite.toString()));
               Get.offAll(LoginScreen());
             },
             child: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('Ok',
+              child: Text(
+                'Ok',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -98,7 +110,10 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
               ),
             ),
           ),
-          closeIcon: Icon(Icons.close, color: Colors.red,),
+          closeIcon: Icon(
+            Icons.close,
+            color: Colors.red,
+          ),
           btnCancel: ElevatedButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(
@@ -115,7 +130,8 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
             },
             child: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('Cancel',
+              child: Text(
+                'Cancel',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -124,8 +140,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                 ),
               ),
             ),
-          )
-      ).show();
+          )).show();
     }
 
     return Drawer(
@@ -139,7 +154,9 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
             icon: Icons.home,
             text: 'home'.tr,
             onTap: () => navigate(0),
-            tileColor: Get.currentRoute == AppRoute.dashboard ? CustomColors.whiteGrey : null,
+            tileColor: Get.currentRoute == AppRoute.dashboard
+                ? CustomColors.whiteGrey
+                : null,
             textIconColor: Get.currentRoute == AppRoute.dashboard
                 ? Colors.blue
                 : Colors.black,
@@ -150,7 +167,9 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
               icon: Icons.pending_actions,
               text: "Action",
               onTap: () => navigate(1),
-              tileColor: Get.currentRoute == AppRoute.action ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.action
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.action
                   ? Colors.blue
                   : Colors.black,
@@ -162,7 +181,9 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
               icon: Icons.check_box_outlined,
               text: "Audit",
               onTap: () => navigate(8),
-              tileColor: Get.currentRoute == AppRoute.audit ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.audit
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.audit
                   ? Colors.blue
                   : Colors.black,
@@ -172,21 +193,26 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
             visible: SharedPreference.getIsVisiblePNC() == 1 ? true : false,
             child: buildDrawerItem(
               icon: Icons.compare_rounded,
-              text: "PNC",
+              text: "P.N.C",
               onTap: () => navigate(2),
-              tileColor: Get.currentRoute == AppRoute.pnc ? CustomColors.whiteGrey : null,
-              textIconColor: Get.currentRoute == AppRoute.pnc
-                  ? Colors.blue
-                  : Colors.black,
+              tileColor: Get.currentRoute == AppRoute.pnc
+                  ? CustomColors.whiteGrey
+                  : null,
+              textIconColor:
+                  Get.currentRoute == AppRoute.pnc ? Colors.blue : Colors.black,
             ),
           ),
           Visibility(
-            visible: SharedPreference.getIsVisibleDocumentation() == 1 ? true : false,
+            visible: SharedPreference.getIsVisibleDocumentation() == 1
+                ? true
+                : false,
             child: buildDrawerItem(
               icon: Icons.description,
               text: "Documentation",
               onTap: () => navigate(3),
-              tileColor: Get.currentRoute == AppRoute.documentation ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.documentation
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.documentation
                   ? Colors.blue
                   : Colors.black,
@@ -196,45 +222,59 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
             visible: SharedPreference.getIsVisibleReunion() == 1 ? true : false,
             child: buildDrawerItem(
               icon: Icons.album_outlined,
-              text: "Reunion",
+              text: 'reunion'.tr,
               onTap: () => navigate(4),
-              tileColor: Get.currentRoute == AppRoute.reunion ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.reunion
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.reunion
                   ? Colors.blue
                   : Colors.black,
             ),
           ),
           Visibility(
-            visible: SharedPreference.getIsVisibleIncidentEnvironnement() == 1 ? true : false,
+            visible: SharedPreference.getIsVisibleIncidentEnvironnement() == 1
+                ? true
+                : false,
             child: buildDrawerItem(
               icon: Icons.approval,
-              text: "Incident Environnemental",
+              text: 'incident_environnement'.tr,
               onTap: () => navigate(5),
-              tileColor: Get.currentRoute == AppRoute.incident_environnement ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.incident_environnement
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.incident_environnement
                   ? Colors.blue
                   : Colors.black,
             ),
           ),
           Visibility(
-            visible: SharedPreference.getIsVisibleIncidentSecurite() == 1 ? true : false,
+            visible: SharedPreference.getIsVisibleIncidentSecurite() == 1
+                ? true
+                : false,
             child: buildDrawerItem(
               icon: Icons.security,
-              text: "Incident Securite",
+              text: 'incident_securite'.tr,
               onTap: () => navigate(6),
-              tileColor: Get.currentRoute == AppRoute.incident_securite ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.incident_securite
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.incident_securite
                   ? Colors.blue
                   : Colors.black,
             ),
           ),
           Visibility(
-            visible: SharedPreference.getIsVisibleVisiteSecurite() == 1 ? true : false,
+            visible: SharedPreference.getIsVisibleVisiteSecurite() == 1
+                ? true
+                : false,
             child: buildDrawerItem(
               icon: Icons.settings_display,
-              text: "Visite Securite",
+              text: 'visite_securite'.tr,
               onTap: () => navigate(7),
-              tileColor: Get.currentRoute == AppRoute.visite_securite ? CustomColors.whiteGrey : null,
+              tileColor: Get.currentRoute == AppRoute.visite_securite
+                  ? CustomColors.whiteGrey
+                  : null,
               textIconColor: Get.currentRoute == AppRoute.visite_securite
                   ? Colors.blue
                   : Colors.black,
@@ -243,7 +283,7 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
           DividerWidget(),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               Get.defaultDialog(
                   title: 'choose_langue'.tr,
                   backgroundColor: Colors.white,
@@ -254,40 +294,47 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   buttonColor: Colors.blue,
                   barrierDismissible: false,
                   radius: 20,
-                  content: MultiLanguage()
-              );
+                  content: MultiLanguage());
             },
             child: ListTile(
               leading: Icon(Icons.translate, color: Colors.black),
-              title: Text('language'.tr,
-                style: TextStyle(
-                    fontSize: 15.0,
-                    color: Colors.black
-                ),
+              title: Text(
+                'language'.tr,
+                style: TextStyle(fontSize: 15.0, color: Colors.black),
               ),
             ),
           ),
           // MultiLanguage(),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               logout();
             },
             child: ListTile(
               leading: Icon(Icons.logout, color: Colors.black),
-              title: Text('signout'.tr,
-                style: TextStyle(
-                    fontSize: 15.0,
-                    color: Colors.black
-                ),
+              title: Text(
+                'signout'.tr,
+                style: TextStyle(fontSize: 15.0, color: Colors.black),
               ),
             ),
           ),
+          /* GestureDetector(
+            onTap: () {
+              Get.to(DashboardScreen());
+            },
+            child: ListTile(
+              leading: Icon(Icons.settings, color: Colors.black),
+              title: Text(
+                'Settings',
+                style: TextStyle(fontSize: 15.0, color: Colors.black),
+              ),
+            ),
+          ) */
         ],
       ),
     );
   }
 
-  Widget builDrawerHeader(){
+  Widget builDrawerHeader() {
     String? nomprenom = SharedPreference.getNomPrenom();
 
     return Container(
@@ -296,15 +343,35 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         decoration: BoxDecoration(color: Colors.blue),
         child: Row(
           children: [
-            Image.asset("assets/images/user_icon.png", height: 65.0, width: 65.0,),
-            SizedBox(width: 16.0,),
+            Image.asset(
+              "assets/images/user_icon.png",
+              height: 65.0,
+              width: 65.0,
+            ),
+            SizedBox(
+              width: 16.0,
+            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Qualipro", style: TextStyle(fontSize: 16.0, fontFamily: "Brand-Bold", color: Colors.white),),
-                SizedBox(height: 6.0,),
-                Text('${nomprenom}',
-                  style: TextStyle(fontSize: 14.0, fontFamily: "Brand-Bold", color: Colors.white, ),),
+                Text(
+                  "Qualipro",
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      fontFamily: "Brand-Bold",
+                      color: Colors.white),
+                ),
+                SizedBox(
+                  height: 6.0,
+                ),
+                Text(
+                  '${nomprenom}',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontFamily: "Brand-Bold",
+                    color: Colors.white,
+                  ),
+                ),
               ],
             )
           ],
@@ -345,47 +412,39 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
   navigate(int index) {
     if (index == 0) {
       Get.offAllNamed(AppRoute.dashboard);
-    }
-    else if (index == 1) {
+    } else if (index == 1) {
       //Get.offAllNamed(AppRoute.action);
       //Get.find<ActionController>().listAction.clear();
       //Get.find<ActionController>().getActions();
       Get.toNamed(AppRoute.action);
-    }
-    else if (index == 2) {
+    } else if (index == 2) {
       //Get.find<PNCController>().listPNC.clear();
       //Get.find<PNCController>().getPNC();
       //Get.offAllNamed(AppRoute.pnc);
       Get.toNamed(AppRoute.pnc);
-    }
-    else if (index == 3) {
+    } else if (index == 3) {
       //Get.find<DocumentationController>().listDocument.clear();
       //Get.find<DocumentationController>().getDocument();
       //Get.offAllNamed(AppRoute.documentation);
       Get.toNamed(AppRoute.documentation);
-    }
-    else if (index == 4) {
+    } else if (index == 4) {
       Get.find<ReunionController>().listReunion.clear();
       Get.find<ReunionController>().getReunion();
       //Get.offAllNamed(AppRoute.reunion);
       Get.toNamed(AppRoute.reunion);
-    }
-    else if (index == 5) {
+    } else if (index == 5) {
       //Get.find<IncidentEnvironnementController>().listIncident.clear();
       //Get.find<IncidentEnvironnementController>().getIncident();
       Get.toNamed(AppRoute.incident_environnement);
-    }
-    else if (index == 6) {
+    } else if (index == 6) {
       //Get.find<IncidentSecuriteController>().listIncident.clear();
       //Get.find<IncidentSecuriteController>().getIncident();
       Get.toNamed(AppRoute.incident_securite);
-    }
-    else if (index == 7) {
+    } else if (index == 7) {
       //Get.find<VisiteSecuriteController>().listVisiteSecurite.clear();
       //Get.find<VisiteSecuriteController>().getData();
       Get.toNamed(AppRoute.visite_securite);
-    }
-    else if (index == 8) {
+    } else if (index == 8) {
       // Get.find<AuditController>().listAudit.clear();
       //Get.find<AuditController>().getData();
       Get.toNamed(AppRoute.audit);

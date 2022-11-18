@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'dart:ui' as ui;
 import '../../Models/incident_environnement/incident_env_model.dart';
@@ -18,35 +19,35 @@ class IncidentEnvWidget extends StatelessWidget {
 
     switch (status) {
       case 0:
-        message_status = "Non encore réalisée";
+        message_status = 'non_encore_realise'.tr;
         color_status = Color(0xffd2430c);
         break;
       case 1:
-        message_status = "En attente de validation";
+        message_status = 'en_attente_de_validation'.tr;
         color_status = Color(0xff0da713);
         break;
       case 2:
-        message_status = "Refusée";
+        message_status = 'fiche_refuse'.tr;
         color_status = Color(0xffd00e38);
         break;
       case 3:
-        message_status = "En attente de correction";
+        message_status = 'en_attente_de_correction'.tr;
         color_status = Color(0xff6ace11);
         break;
       case 4:
-        message_status = "En attente de décision";
+        message_status = 'en_attente_de_decision'.tr;
         color_status = Color(0xff0f6fe5);
         break;
       case 5:
-        message_status = "En attente de traitement";
+        message_status = 'en_attente_de_traitement'.tr;
         color_status = Color(0xff1aa0d5);
         break;
       case 6:
-        message_status = "En attente de clôture";
+        message_status = 'en_attente_de_cloture'.tr;
         color_status = Color(0xffe5650f);
         break;
       case 7:
-        message_status = "Clôturée";
+        message_status = 'cloture'.tr;
         color_status = Color(0xffe00a23);
         break;
       case 8:
@@ -54,8 +55,8 @@ class IncidentEnvWidget extends StatelessWidget {
         color_status = Color(0xff898f97);
         break;
       default:
-      message_status = "";
-      color_status = Color(0xff898f97);
+        message_status = "";
+        color_status = Color(0xff898f97);
     }
     return Card(
       shadowColor: Color(0xFFedf0f8),
@@ -72,45 +73,58 @@ class IncidentEnvWidget extends StatelessWidget {
           Expanded(
               flex: 1,
               child: ListTile(
-                title:  Row(
+                title: Row(
                   children: [
                     Expanded(
                       flex: 2,
-                      child: Text("Incident N° ${model.n} ${model.online == 1 ?'' :'*'}",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Brand-Regular",
-                            fontSize: 15.0,
-                            color: Colors.blue)),),
+                      child: Text(
+                          "Incident N° ${model.n} ${model.online == 1 ? '' : '*'}",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Brand-Regular",
+                              fontSize: 15.0,
+                              color: Colors.blue)),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0),
-                      child: Text(message_status, style:
-                      TextStyle(fontWeight: FontWeight.bold,
-                          color: color_status,
-                          fontFamily: "Brand-Bold"),),
+                      child: Text(
+                        message_status,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: color_status,
+                            fontFamily: "Brand-Bold"),
+                      ),
                     )
                   ],
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  /*  Text("${model.nc}", style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontFamily: "Brand-Bold"),),*/
                     Row(
                       children: [
                         Expanded(
                           flex: 2,
-                            child: Text("${model.delaiTrait}", style:
-                            TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontFamily: "Brand-Bold"),),
+                          child: Text(
+                            "Date Detection : ${model.dateDetect}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                                fontFamily: "Brand-Bold"),
+                          ),
                         ),
-
-                        (model.lieu=="" || model.lieu==null) ? Text('')
+                        (model.lieu == "" || model.lieu == null)
+                            ? Text('')
                             : Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text('Lieu : ${model.lieu}', style: TextStyle(fontSize: 15,
-                              fontStyle: FontStyle.normal, fontWeight: FontWeight.w400,
-                              color: Color(0xFF18516C)),),
-                        ),
+                                padding: const EdgeInsets.all(3.0),
+                                child: Text(
+                                  '${'lieu'.tr} : ${model.lieu}',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontStyle: FontStyle.normal,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF18516C)),
+                                ),
+                              ),
                       ],
                     ),
                     Padding(
@@ -131,70 +145,69 @@ class IncidentEnvWidget extends StatelessWidget {
                             color: CustomColors.bleuCiel),
                       ),
                     ),
-                    model.type == '' ? Text('')
-                    : Padding(
-                      padding: const EdgeInsets.only(top: 5.0),
-                      child: ReadMoreText(
-                        "Type : ${model.type}",
-                        style: TextStyle(
-                            color: Color(0xFF3B465E),
-                            fontWeight: FontWeight.bold),
-                        trimLines: 2,
-                        colorClickableText: CustomColors.bleuCiel,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'more',
-                        trimExpandedText: 'less',
-                        moreStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff4f515a),
-                            fontFamily: "Brand-Bold"),
-                      ),
-                    ),
-
-                    model.site == '' ? Text('')
+                    model.type == ''
+                        ? Text('')
                         : Padding(
-                      padding: const EdgeInsets.only(top: 5.0),
-                      child: ReadMoreText(
-                        "Site : ${model.site}",
-                        style: TextStyle(
-                            color: Color(0xFF3B465E),
-                            fontWeight: FontWeight.bold),
-                        trimLines: 2,
-                        colorClickableText: CustomColors.bleuCiel,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'more',
-                        trimExpandedText: 'less',
-                        moreStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff1d1e21),
-                            fontFamily: "Brand-Bold"),
-                      ),
-                    ),
-
-                    model.processus == '' ? Text('')
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: ReadMoreText(
+                              "Type : ${model.type}",
+                              style: TextStyle(
+                                  color: Color(0xFF3B465E),
+                                  fontWeight: FontWeight.bold),
+                              trimLines: 2,
+                              colorClickableText: CustomColors.bleuCiel,
+                              trimMode: TrimMode.Line,
+                              trimCollapsedText: 'more',
+                              trimExpandedText: 'less',
+                              moreStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff4f515a),
+                                  fontFamily: "Brand-Bold"),
+                            ),
+                          ),
+                    model.site == ''
+                        ? Text('')
                         : Padding(
-                      padding: const EdgeInsets.only(top: 5.0),
-                      child: ReadMoreText(
-                        "Processus : ${model.processus}",
-                        style: TextStyle(
-                            color: Color(0xFF3B465E),
-                            fontWeight: FontWeight.bold),
-                        trimLines: 2,
-                        colorClickableText: CustomColors.bleuCiel,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'more',
-                        trimExpandedText: 'less',
-                        moreStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff4f515a),
-                            fontFamily: "Brand-Bold"),
-                      ),
-                    ),
-
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: ReadMoreText(
+                              "Site : ${model.site}",
+                              style: TextStyle(
+                                  color: Color(0xFF3B465E),
+                                  fontWeight: FontWeight.bold),
+                              trimLines: 2,
+                              colorClickableText: CustomColors.bleuCiel,
+                              trimMode: TrimMode.Line,
+                              trimCollapsedText: 'more',
+                              trimExpandedText: 'less',
+                              moreStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff1d1e21),
+                                  fontFamily: "Brand-Bold"),
+                            ),
+                          ),
+                    model.processus == ''
+                        ? Text('')
+                        : Padding(
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: ReadMoreText(
+                              "Processus : ${model.processus}",
+                              style: TextStyle(
+                                  color: Color(0xFF3B465E),
+                                  fontWeight: FontWeight.bold),
+                              trimLines: 2,
+                              colorClickableText: CustomColors.bleuCiel,
+                              trimMode: TrimMode.Line,
+                              trimCollapsedText: 'more',
+                              trimExpandedText: 'less',
+                              moreStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff4f515a),
+                                  fontFamily: "Brand-Bold"),
+                            ),
+                          ),
                   ],
                 ),
-              )
-          )
+              ))
         ],
       ),
     );

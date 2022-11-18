@@ -8,9 +8,7 @@ import 'package:qualipro_flutter/Services/reunion/reunion_service.dart';
 import 'package:qualipro_flutter/Utils/shared_preference.dart';
 import 'package:qualipro_flutter/Utils/snack_bar.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
-
 import '../../../Models/reunion/action_reunion.dart';
-import '../../../Services/reunion/local_reunion_service.dart';
 import '../../../Utils/custom_colors.dart';
 
 class DecisionPage extends StatefulWidget {
@@ -111,7 +109,7 @@ class _DecisionPageState extends State<DecisionPage> {
             ),
           ),
           title: Text(
-            'Decisions of Reunion N°${widget.nReunion}',
+            'Decisions ${'of'.tr} ${'reunion'.tr} N°${widget.nReunion}',
             style: TextStyle(color: Colors.black, fontSize: 17),
           ),
           backgroundColor: (lightPrimary),
@@ -292,12 +290,12 @@ class _DecisionPageState extends State<DecisionPage> {
                             ),
                             Center(
                               child: Text(
-                                'Ajouter Action',
+                                '${'new'.tr} Action',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "Brand-Bold",
                                     color: Color(0xFF0769D2),
-                                    fontSize: 30.0),
+                                    fontSize: 20.0),
                               ),
                             ),
                             SizedBox(
@@ -329,14 +327,14 @@ class _DecisionPageState extends State<DecisionPage> {
                                         actionModel = data;
                                         selectedNAction = data?.nAct;
                                         selectedAction = data?.act;
-                                        print(
+                                        debugPrint(
                                             'Action: $selectedAction, num: ${selectedNAction}');
                                       },
                                       dropdownBuilder: _customDropDownAction,
                                       popupItemBuilder:
                                           _customPopupItemBuilderAction,
                                       validator: (u) => u == null
-                                          ? "Action est obligatoire "
+                                          ? "Action ${'is_required'.tr}"
                                           : null,
                                     ),
                                   ),
@@ -364,8 +362,8 @@ class _DecisionPageState extends State<DecisionPage> {
                                             EdgeInsets.all(14)),
                                       ),
                                       icon: Icon(Icons.save),
-                                      label: const Text(
-                                        'Save',
+                                      label: Text(
+                                        'save'.tr,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
                                       ),
@@ -462,7 +460,7 @@ class _DecisionPageState extends State<DecisionPage> {
                                       ),
                                       icon: Icon(Icons.cancel),
                                       label: Text(
-                                        'Cancel',
+                                        'cancel'.tr,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
                                       ),
@@ -497,11 +495,11 @@ class _DecisionPageState extends State<DecisionPage> {
         dialogType: DialogType.ERROR,
         body: Center(
           child: Text(
-            'Are you sure to delete this item ${nAct}',
+            '${'delete_item'.tr} ${nAct}',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
-        title: 'Delete',
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -559,7 +557,7 @@ class _DecisionPageState extends State<DecisionPage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Cancel',
+              'cancel'.tr,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

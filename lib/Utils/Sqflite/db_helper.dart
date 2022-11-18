@@ -117,6 +117,10 @@ class DBHelper {
         "CREATE TABLE ${DBTable.type_cause_pnc}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, nnc INTEGER, idTypeCause INTEGER, codetypecause INTEGER, typecause TEXT)");
     batch.execute(
         "CREATE TABLE ${DBTable.type_cause_a_rattacher_pnc}(id INTEGER PRIMARY KEY AUTOINCREMENT, codetypecause INTEGER, typecause TEXT)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.type_product_pnc} (id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, nnc INTEGER, idProduct INTEGER, idTabNcProductType INTEGER, codeTypeNC INTEGER, typeNC TEXT, color TEXT, pourcentage REAL)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.upload_image_pnc} (id INTEGER PRIMARY KEY AUTOINCREMENT, idFiche INTEGER, image TEXT, fileName TEXT)");
     //---------------------------------Module Reunion------------------------------------------------------
     batch.execute(
         "CREATE TABLE ${DBTable.type_reunion}(id INTEGER PRIMARY KEY AUTOINCREMENT, codeTypeR INTEGER, typeReunion TEXT)");
@@ -137,6 +141,8 @@ class DBHelper {
         "CREATE TABLE ${DBTable.champ_obligatoire_incident_env}(id INTEGER PRIMARY KEY AUTOINCREMENT, incCat INTEGER, incTypecons INTEGER, incTypecause INTEGER, lieu INTEGER, desIncident INTEGER, typeIncident INTEGER, dateIncident INTEGER, actionImmediates INTEGER, descIncident INTEGER, descCauses INTEGER, gravite INTEGER)");
     batch.execute(
         "CREATE TABLE ${DBTable.incident_environnement}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, n INTEGER, incident TEXT, dateDetect TEXT, lieu TEXT, type TEXT, source TEXT, act INTEGER, secteur TEXT, poste TEXT, site TEXT, processus TEXT, domaine TEXT, direction TEXT, service TEXT, typeCause TEXT, typeConseq TEXT, delaiTrait TEXT, traite INTEGER, cloture INTEGER, categorie TEXT, gravite TEXT, statut INTEGER, codeLieu TEXT, codeSecteur TEXT, codeType INTEGER, codeGravite INTEGER, codeSource INTEGER, codeCoutEsteme INTEGER, detectedEmployeMatricule TEXT, origineEmployeMatricule TEXT, rapport TEXT, codeCategory INTEGER, heure TEXT, codeSite INTEGER, codeProcessus INTEGER, codeDirection INTEGER, codeService INTEGER, codeActivity INTEGER, descriptionConsequence TEXT, descriptionCause TEXT, actionImmediate TEXT, quantity TEXT, numInterne TEXT, isps TEXT, listTypeCause BLOB, listTypeConsequence BLOB)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.upload_image_inc_env} (id INTEGER PRIMARY KEY AUTOINCREMENT, idFiche INTEGER, image TEXT, fileName TEXT)");
     batch.execute(
         "CREATE TABLE ${DBTable.type_cause_incident_env}(id INTEGER PRIMARY KEY AUTOINCREMENT, idTypeCause INTEGER, typeCause TEXT)");
     batch.execute(
@@ -166,6 +172,8 @@ class DBHelper {
         "CREATE TABLE ${DBTable.champ_obligatoire_incident_securite}(id INTEGER PRIMARY KEY AUTOINCREMENT, incidentGrav INTEGER, incidentCat INTEGER, incidentTypeCons INTEGER, incidentTypeCause INTEGER, incidentPostet INTEGER, incidentSecteur INTEGER, incidentDescInc INTEGER, incidentDescCons INTEGER, incidentDescCause INTEGER, incidentAct INTEGER, incidentNbrj INTEGER, incidentDesig INTEGER, incidentClot INTEGER, risqueClot INTEGER, incidentSemaine INTEGER, incidentSiteLesion INTEGER, incidentCauseTypique INTEGER, incidentEventDeclencheur INTEGER, dateVisite INTEGER, comportementsObserve INTEGER, comportementRisquesObserves INTEGER, correctionsImmediates INTEGER)");
     batch.execute(
         "CREATE TABLE ${DBTable.incident_securite}(id INTEGER PRIMARY KEY AUTOINCREMENT, ref INTEGER, online INTEGER, typeIncident TEXT, site TEXT, dateInc TEXT, contract TEXT, statut INTEGER, designation TEXT, gravite TEXT, categorie TEXT, typeConsequence TEXT, typeCause TEXT, secteur TEXT, dateCreation TEXT, detectedEmployeMatricule TEXT, codeType TEXT, codePoste TEXT, codeGravite TEXT, codeCategory TEXT, codeSecteur TEXT, codeEvenementDeclencheur TEXT, heure TEXT, codeCoutEsteme INTEGER, codeSite INTEGER, codeProcessus INTEGER, codeDirection INTEGER, codeService INTEGER, codeActivity INTEGER, descriptionIncident TEXT, descriptionConsequence TEXT, descriptionCause TEXT, actionImmediate TEXT, nombreJour INTEGER, numInterne TEXT, isps TEXT, week TEXT, listTypeCause BLOB, listTypeConsequence BLOB, listCauseTypique BLOB, listSiteLesion BLOB)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.upload_image_inc_sec} (id INTEGER PRIMARY KEY AUTOINCREMENT, idFiche INTEGER, image TEXT, fileName TEXT)");
     batch.execute(
         "CREATE TABLE ${DBTable.poste_travail}(id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT, poste TEXT)");
     batch.execute(
@@ -221,6 +229,8 @@ class DBHelper {
         "CREATE TABLE ${DBTable.taux_checklist_vs} (id INTEGER, taux INTEGER)");
     batch.execute(
         "CREATE TABLE ${DBTable.action_visite_securite_rattacher} (id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, idFiche INTEGER, nAct INTEGER, act TEXT)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.upload_image_visite_sec} (id INTEGER PRIMARY KEY AUTOINCREMENT, idFiche INTEGER, image TEXT, fileName TEXT)");
     //---------------------------------------Module Audit-----------------------------------------
     batch.execute(
         "CREATE TABLE ${DBTable.audit}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, idAudit INTEGER, refAudit TEXT, dateDebPrev TEXT, etat INTEGER, dateDeb TEXT, champ TEXT, site TEXT, interne TEXT, cloture TEXT, typeA TEXT, validation INTEGER, dateFinPrev TEXT, audit TEXT, objectif TEXT, rapportClot TEXT, codeTypeA INTEGER, codeSite INTEGER, idProcess INTEGER, idDomaine INTEGER, idDirection INTEGER, idService INTEGER, listCodeChamp BLOB)");
@@ -240,7 +250,16 @@ class DBHelper {
         "CREATE TABLE ${DBTable.auditeur_interne}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, refAudit TEXT, mat TEXT, nompre TEXT, affectation TEXT)");
     batch.execute(
         "CREATE TABLE ${DBTable.auditeur_interne_a_rattacher}(id INTEGER PRIMARY KEY AUTOINCREMENT, refAudit TEXT, mat TEXT, nompre TEXT)");
-
+    batch.execute(
+        "CREATE TABLE ${DBTable.checklist_audit} (id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, refAudit TEXT, codeChamp INTEGER, champ TEXT, tauxEval REAL, tauxConf REAL, nbConst INTEGER)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.critere_checklist_audit} (online INTEGER, refAudit TEXT, idChamp INTEGER, idCrit INTEGER, critere TEXT, evaluation INTEGER, commentaire TEXT)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.auditeur_externe_rattacher}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, refAudit TEXT, codeAuditeur INTEGER, organisme TEXT, nompre TEXT, affectation TEXT)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.auditeurs_externe}(id INTEGER PRIMARY KEY AUTOINCREMENT, codeAuditeur INTEGER, organisme TEXT, nompre TEXT)");
+    batch.execute(
+        "CREATE TABLE ${DBTable.employe_habilite_audit}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, refAudit TEXT, mat TEXT, nompre TEXT)");
     //------------------------------------Agenda-----------------------------------------------------
     //action
     batch.execute(
@@ -1415,6 +1434,52 @@ class DBHelper {
     return res;
   }
 
+  // type product nnc
+  readTypeProductNNC(int? nnc, int? idProduct) async {
+    Database? mydb = await db;
+    var response = mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.type_product_pnc} WHERE nnc = '$nnc' AND idProduct = '$idProduct' ");
+    return response;
+  }
+
+  readTypeProductNNCByOnline() async {
+    Database? mydb = await db;
+    var response = mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.type_product_pnc} WHERE online = '0'");
+    debugPrint('type product pnc : $response');
+    return response;
+  }
+
+  insertTypeProductNNC(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableTypeProductNNC() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.type_product_pnc}');
+    return res;
+  }
+
+  readTypeProductPNCARattacher(idProduct) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        ''' SELECT A.codeTypeNC, A.typeNC FROM ${DBTable.type_pnc} A '''
+        ''' LEFT OUTER JOIN ${DBTable.type_product_pnc} B ON A.codeTypeNC = B.codeTypeNC AND idProduct = '$idProduct' '''
+        ''' WHERE B.codeTypeNC IS NULL ''');
+    debugPrint('response : $response');
+    return response;
+  }
+
+  getMaxIdTypeProductPNC() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT IFNULL(MAX(idTabNcProductType), 0) FROM ${DBTable.type_product_pnc}");
+    return response.last.values.first;
+  }
+
   //----------------------------------------PNC---------------------------------------------
   readPNC() async {
     Database? mydb = await db;
@@ -1508,7 +1573,14 @@ class DBHelper {
     var response = await mydb!
         .rawQuery("SELECT * FROM ${DBTable.reunion} ORDER BY nReunion DESC");
     //var response = await mydb!.query(table, where: 'codeSite=?$codeSite');
-    print(response);
+    debugPrint('response : $response');
+    return response;
+  }
+
+  searchReunion(nReunion, type, order) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.reunion} WHERE nReunion LIKE '%$nReunion%' AND codeTypeReunion LIKE '%$type%' AND ordreJour LIKE '%$order%'  ORDER BY nReunion DESC");
     return response;
   }
 
@@ -1797,6 +1869,94 @@ class DBHelper {
         .rawQuery('SELECT COUNT (*) from ${DBTable.incident_environnement}');
     int? count = Sqflite.firstIntValue(x);
     return count;
+  }
+
+  //upload images inc env
+  readImagesIncidentEnvironnement() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.upload_image_inc_env} ORDER BY idFiche ASC");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  uploadImageIncidentEnvironnement(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableImageIncidentEnvironnement() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.upload_image_inc_env}');
+    return res;
+  }
+
+  //upload images inc sec
+  readImagesIncidentSecurite() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.upload_image_inc_sec} ORDER BY idFiche ASC");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  uploadImageIncidentSecurite(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableImageIncidentSecurite() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.upload_image_inc_sec}');
+    return res;
+  }
+
+  //upload images pnc
+  readImagesPNC() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.upload_image_pnc} ORDER BY idFiche ASC");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  uploadImagePNC(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableImagePNC() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.upload_image_pnc}');
+    return res;
+  }
+
+  //upload images visite securite
+  readImagesVisiteSecurite() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.upload_image_visite_sec} ORDER BY idFiche ASC");
+    debugPrint('response image vs : $response');
+    return response;
+  }
+
+  uploadImageVisiteSecurite(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableImageVisiteSecurite() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.upload_image_visite_sec}');
+    return res;
   }
 
   //------------------------------------------------Champ Obligatoire Incident Env------------------------------------------------
@@ -3343,6 +3503,170 @@ class DBHelper {
     final res = await mydb!
         .rawDelete('DELETE FROM ${DBTable.auditeur_interne_a_rattacher}');
     return res;
+  }
+
+  //auditeur interne
+  readAuditeurExterneRattacher(refAudit) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.auditeur_externe_rattacher} WHERE refAudit = '$refAudit' ");
+    print(response);
+    return response;
+  }
+
+  readAuditeurExterneRattacherByOnline() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.auditeur_externe_rattacher} WHERE online = '0' ");
+    print(response);
+    return response;
+  }
+
+  insertAuditeurExterneRattacher(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableAuditeurExterneRattacher() async {
+    Database? mydb = await db;
+    final res = await mydb!
+        .rawDelete('DELETE FROM ${DBTable.auditeur_externe_rattacher}');
+    return res;
+  }
+
+  //all auditeur externe
+  readAuditeurExterneARattacher(refAudit) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        '''SELECT DISTINCT AIR.codeAuditeur, AIR.organisme, AIR.nompre FROM ${DBTable.auditeurs_externe} AIR '''
+        ''' LEFT OUTER JOIN ${DBTable.auditeur_externe_rattacher} AI ON AIR.codeAuditeur = AI.codeAuditeur  AND AI.refAudit= '$refAudit' '''
+        ''' WHERE AI.codeAuditeur IS NULL  ''');
+    //var response = await mydb!.query(table, where: 'codeSite=?$codeSite');
+    debugPrint('response auditeur externe of $refAudit : $response');
+    return response;
+  }
+
+  insertAllAuditeurExterne(data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(DBTable.auditeurs_externe, data);
+    return response;
+  }
+
+  Future<int> deleteTableAuditeursExterne() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.auditeurs_externe}');
+    return res;
+  }
+
+  //employe habilite audit
+  readEmployeHabiliteAudit(refAudit) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.employe_habilite_audit} WHERE refAudit = '$refAudit' ");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  readEmployeHabiliteAuditByOnline() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.employe_habilite_audit} WHERE online = '0' ");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  insertEmployeHabiliteAudit(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableEmployeHabiliteAudit() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.employe_habilite_audit}');
+    return res;
+  }
+
+  readEmployeHabiliteAuditARattacher(refAudit) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        '''SELECT DISTINCT AIR.mat, AIR.nompre FROM ${DBTable.employe} AIR '''
+        ''' LEFT OUTER JOIN ${DBTable.employe_habilite_audit} AI ON AIR.mat = AI.mat  AND AI.refAudit= '$refAudit' '''
+        ''' WHERE AI.mat IS NULL  ''');
+    //var response = await mydb!.query(table, where: 'codeSite=?$codeSite');
+    debugPrint('response employe habilite of $refAudit : $response');
+    return response;
+  }
+
+  //checklist audit
+  readCheckListAudit(refAudit) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.checklist_audit} WHERE refAudit = '$refAudit' ");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  readCheckListAuditByOnline() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.checklist_audit} WHERE online = '0' ");
+    print(response);
+    return response;
+  }
+
+  insertCheckListAudit(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableCheckListAudit() async {
+    Database? mydb = await db;
+    final response =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.checklist_audit}');
+    return response;
+  }
+
+  //------------------------------------------------Critere CheckList Audit------------------------------------------------
+  readCritereCheckListAudit(refAudit, idChamp) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.critere_checklist_audit} WHERE refAudit = '$refAudit' AND idChamp = '$idChamp' ");
+    debugPrint('response : $response');
+    return response;
+  }
+
+  readCritereCheckListAuditByOnline() async {
+    Database? mydb = await db;
+    var response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.critere_checklist_audit} WHERE online = '0'");
+    debugPrint('critere checklist offline : $response');
+    return response;
+  }
+
+  insertCritereCheckListAudit(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableCritereCheckListAudit() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.critere_checklist_audit}');
+    return res;
+  }
+
+  updateCritereCheckListAudit(data) async {
+    Database? mydb = await db;
+    var response = await mydb!.rawUpdate(
+        "UPDATE ${DBTable.critere_checklist_audit} SET online='${data['online']}', refAudit='${data['refAudit']}', idChamp='${data['idChamp']}', idCrit='${data['idCrit']}', critere='${data['critere']}', evaluation='${data['evaluation']}', commentaire='${data['commentaire']}' WHERE refAudit='${data['refAudit']}' AND idChamp='${data['idChamp']}' ");
+    debugPrint('update critere checklist : $response');
+    return response;
   }
 
   //-------------------------------------------Agenda------------------------------------------------------

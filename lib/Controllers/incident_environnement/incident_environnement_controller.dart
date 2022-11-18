@@ -173,9 +173,6 @@ class IncidentEnvironnementController extends GetxController {
           model.gravite = data['gravite'];
           model.statut = data['statut'];
           listIncident.add(model);
-          listIncident.forEach((element) {
-            print('element incident ${element.n} - ${element.incident}');
-          });
           searchNumero.clear();
           //searchType.clear();
           searchDesignation.clear();
@@ -218,9 +215,6 @@ class IncidentEnvironnementController extends GetxController {
             model.gravite = data['gravite'];
             model.statut = data['statut'];
             listIncident.add(model);
-            listIncident.forEach((element) {
-              print('element incident ${element.n} - ${element.incident}');
-            });
             searchNumero.clear();
             searchDesignation.clear();
             searchCodeType = '';

@@ -1,4 +1,3 @@
-
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,7 +24,7 @@ class LoginController extends GetxController {
   var isPasswordHidden = true.obs;
   BeginLicenceModel? licenceDevice;
   LicenceEndModel? licenceEndModel;
-  var isLicenceEnd = 0.obs;
+  var listBeginLicenceModel = List<BeginLicenceModel>.empty(growable: true).obs;
 
   @override
   void onInit() async {
@@ -50,7 +49,7 @@ class LoginController extends GetxController {
   }
 
   String? validateEmail(String value) {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       isDataProcessing(false);
       return "Email required";
     }
@@ -61,7 +60,7 @@ class LoginController extends GetxController {
   }
 
   String? validatePassword(String value) {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       isDataProcessing(false);
       return "Password required";
     }
@@ -82,38 +81,45 @@ class LoginController extends GetxController {
       isDataProcessing.value = true;
 
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-
-        if(licenceEndModel?.retour == 0){
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Mode Offline",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+        debugPrint('licence End : ${licenceEndModel?.retour}');
+        if (licenceEndModel?.retour == 0) {
           var response = await LoginService().readUser();
-          response.forEach((data){
+          response.forEach((data) {
             print('login=${data['login']}, password=${data['password']}');
-            if(usernameController.text.trim() == data['login'] && passwordController.text.trim() == data['password']){
+            if (usernameController.text.trim() == data['login'] &&
+                passwordController.text.trim() == data['password']) {
               print('login success');
-              Future mat =  SharedPreference.setMatricule(data['mat'].toString());
-              Future nomprenom =  SharedPreference.setNomPrenom(data['nompre'].toString());
-              Future language = SharedPreference.setLangue(Get.deviceLocale!.languageCode);
+              Future mat =
+                  SharedPreference.setMatricule(data['mat'].toString());
+              Future nomprenom =
+                  SharedPreference.setNomPrenom(data['nompre'].toString());
+              Future language =
+                  SharedPreference.setLangue(Get.deviceLocale!.languageCode);
 
               Get.off(HomePage());
-            }
-            else {
-              Get.snackbar("Connexion failed", "Your Username or Password incorrect", colorText: Colors.red,
-                  snackPosition: SnackPosition.BOTTOM);
+            } else {
+              Get.snackbar(
+                  "Connexion failed", "Your Username or Password incorrect",
+                  colorText: Colors.red, snackPosition: SnackPosition.BOTTOM);
             }
           });
-        }
-        else {
-          Get.snackbar("Licence expired", "Your licence has expired", colorText: Colors.lightBlue,
-              snackPosition: SnackPosition.BOTTOM);
+        } else if (licenceEndModel?.retour == 1) {
+          Get.snackbar("Licence expired", "Your licence has expired",
+              colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
           Get.off(LicencePage());
+        } else {
+          Get.snackbar(
+              "Licence ${licenceDevice?.DeviceId}", "Verify Licence End",
+              colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
+          //Get.off(LicencePage());
         }
-
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-        Get.snackbar(
-            "Internet Connection", "Mode Online", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        Get.snackbar("Internet Connection", "Mode Online",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
         await LoginService().loginService({
           "login": usernameController.text.trim(),
@@ -133,7 +139,8 @@ class LoginController extends GetxController {
             await LoginService().deleteTableUser();
             //save user in db local
             await LoginService().saveUser(model);
-            print('Inserting data in table user : ${model.nompre}, login:${model.login}, password:${model.password} ');
+            print(
+                'Inserting data in table user : ${model.nompre}, login:${model.login}, password:${model.password} ');
 
             await SharedPreference.setMatricule(model.mat.toString());
             await SharedPreference.setNomPrenom(model.nompre.toString());
@@ -146,27 +153,31 @@ class LoginController extends GetxController {
             await LoginService().insertAutorisationService({
               "device": device_name,
               "mat": matricule
-            }).then((responseInsertAutorisation){
-              debugPrint('responseInsertAutorisation : ${responseInsertAutorisation['retour']}');
-            },
-                onError: (errorLicenceEnd){
-                  ShowSnackBar.snackBar("Error Autorisation", errorLicenceEnd.toString(), Colors.red);
-                });
+            }).then((responseInsertAutorisation) {
+              debugPrint(
+                  'responseInsertAutorisation : ${responseInsertAutorisation['retour']}');
+            }, onError: (errorLicenceEnd) {
+              ShowSnackBar.snackBar(
+                  "Error Autorisation", errorLicenceEnd.toString(), Colors.red);
+            });
             //check permission
-            await LoginService().checkPermissionService({
-              "mat": matricule
-            }).then((responseCheckPermission){
-              debugPrint('responseCheckPermission : ${responseCheckPermission['autorisation']}');
-              if(responseCheckPermission['autorisation'] == 1){
+            await LoginService()
+                .checkPermissionService({"mat": matricule}).then(
+                    (responseCheckPermission) {
+              debugPrint(
+                  'responseCheckPermission : ${responseCheckPermission['autorisation']}');
+              if (responseCheckPermission['autorisation'] == 1) {
                 Get.off(OnBoardingPage());
+              } else {
+                ShowSnackBar.snackBar(
+                    'Check Permission',
+                    'You dont have right to enter in Application ',
+                    Colors.lightBlueAccent);
               }
-              else {
-                ShowSnackBar.snackBar('Check Permission', 'You dont have right to enter in Application ', Colors.lightBlueAccent);
-              }
-            },
-                onError: (errorLicenceEnd){
-                  ShowSnackBar.snackBar("Error Licence End", errorLicenceEnd.toString(), Colors.red);
-                });
+            }, onError: (errorLicenceEnd) {
+              ShowSnackBar.snackBar(
+                  "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+            });
 
             //Get.off(DashboardScreen());
             //Get.offAll(DashboardScreen());
@@ -176,12 +187,10 @@ class LoginController extends GetxController {
           isDataProcessing(false);
         });
       }
-
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
       isDataProcessing.value = false;
     }

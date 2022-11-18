@@ -2,11 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Controllers/incident_environnement/incident_environnement_controller.dart';
-import 'package:qualipro_flutter/Models/incident_environnement/type_cause_incident_model.dart';
 import 'package:qualipro_flutter/Models/incident_environnement/type_consequence_incident_model.dart';
-import 'package:qualipro_flutter/Services/incident_environnement/incident_environnement_service.dart';
 import 'package:qualipro_flutter/Services/incident_securite/incident_securite_service.dart';
 import 'package:qualipro_flutter/Services/incident_securite/local_incident_securite_service.dart';
 import '../../../Controllers/api_controllers_call.dart';
@@ -19,16 +15,20 @@ import 'new_type_consequence_incident_securite.dart';
 class TypeConsequenceIncidentSecuritePage extends StatefulWidget {
   final numIncident;
 
- const TypeConsequenceIncidentSecuritePage({Key? key, required this.numIncident}) : super(key: key);
+  const TypeConsequenceIncidentSecuritePage(
+      {Key? key, required this.numIncident})
+      : super(key: key);
 
   @override
-  State<TypeConsequenceIncidentSecuritePage> createState() => _TypeConsequenceIncidentSecuritePageState();
+  State<TypeConsequenceIncidentSecuritePage> createState() =>
+      _TypeConsequenceIncidentSecuritePageState();
 }
 
-class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceIncidentSecuritePage> {
-  
+class _TypeConsequenceIncidentSecuritePageState
+    extends State<TypeConsequenceIncidentSecuritePage> {
   final matricule = SharedPreference.getMatricule();
-  List<TypeConsequenceIncidentModel> listType = List<TypeConsequenceIncidentModel>.empty(growable: true);
+  List<TypeConsequenceIncidentModel> listType =
+      List<TypeConsequenceIncidentModel>.empty(growable: true);
 
   bool isVisibleBtnDelete = true;
 
@@ -37,16 +37,19 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
     super.initState();
     getTypeConsequence();
   }
+
   void getTypeConsequence() async {
     try {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         isVisibleBtnDelete = false;
-        final response = await LocalIncidentSecuriteService().readTypeConsequenceIncSecRattacher(widget.numIncident);
-        response.forEach((data){
+        final response = await LocalIncidentSecuriteService()
+            .readTypeConsequenceIncSecRattacher(widget.numIncident);
+        response.forEach((data) {
           setState(() {
             var model = TypeConsequenceIncidentModel();
-            model.online = data['online'];;
+            model.online = data['online'];
+            ;
             model.idIncident = data['incident'];
             model.idIncidentConseq = data['idIncidentConseq'];
             model.idConsequence = data['idTypeConseq'];
@@ -54,11 +57,13 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
             listType.add(model);
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         isVisibleBtnDelete = true;
         //rest api
-        await IncidentSecuriteService().getTypeConsequenceIncSecRattacher(widget.numIncident, matricule, 1).then((resp) async {
+        await IncidentSecuriteService()
+            .getTypeConsequenceIncSecRattacher(widget.numIncident, matricule, 1)
+            .then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
             setState(() {
@@ -71,15 +76,13 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
               listType.add(model);
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-     }
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -94,24 +97,27 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               //Get.back();
               Get.find<IncidentSecuriteController>().listIncident.clear();
               Get.find<IncidentSecuriteController>().getIncident();
               Get.toNamed(AppRoute.incident_securite);
               //Get.offAllNamed(AppRoute.reunion);
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
-            'Type Consequence of Incident N°${widget.numIncident}',
+            'Type Consequence Incident N°${widget.numIncident}',
             style: TextStyle(color: Colors.black, fontSize: 17),
           ),
           backgroundColor: (lightPrimary),
@@ -119,81 +125,76 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listType.isNotEmpty ?
-            Container(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return
-                    Card(
-                      color: Color(0xFFE9EAEE),
-                      child: ListTile(
-                        leading: Text(
-                          '${listType[index].idConsequence}',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-                        ),
-                        title: Text(
-                          '${listType[index].typeConsequence}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      /*  subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: RichText(
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              children: [
-                                TextSpan(text: '${listType[index].typeCause}'),
-
-                                //TextSpan(text: '${action.declencheur}'),
-                              ],
-
+            child: listType.isNotEmpty
+                ? Container(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Card(
+                          color: Color(0xFFE9EAEE),
+                          child: ListTile(
+                            leading: Text(
+                              '${listType[index].idConsequence}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.lightBlue),
+                            ),
+                            title: Text(
+                              '${listType[index].typeConsequence}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Visibility(
+                              visible: isVisibleBtnDelete,
+                              child: InkWell(
+                                  onTap: () {
+                                    deleteTypeConsequence(
+                                        context, listType[index].idConsequence);
+                                  },
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  )),
                             ),
                           ),
-                        ), */
-                        trailing: Visibility(
-                          visible: isVisibleBtnDelete,
-                          child: InkWell(
-                              onTap: (){
-                                deleteTypeConsequence(context, listType[index].idConsequence);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red,)
-                          ),
-                        ),
-                      ),
-                    );
-                },
-                itemCount: listType.length,
-                //itemCount: actionsList.length + 1,
-              ),
-            )
-                : Center(child: Text('empty_list'.tr, style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                        );
+                      },
+                      itemCount: listType.length,
+                      //itemCount: actionsList.length + 1,
+                    ),
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            Get.to(NewTypeConsequenceIncidentSecurite(numIncident: widget.numIncident));
+          onPressed: () {
+            Get.to(NewTypeConsequenceIncidentSecurite(
+                numIncident: widget.numIncident));
           },
           child: const Icon(
             Icons.add,
             color: Colors.white,
-            size: 32,),
+            size: 32,
+          ),
           backgroundColor: Colors.blue,
         ),
       ),
     );
   }
+
   //delete item
-  deleteTypeConsequence(context, idConsequence){
+  deleteTypeConsequence(context, idConsequence) {
     AwesomeDialog(
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          'Are you sure to delete this item ${idConsequence}',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
-        title: 'Delete',
+        body: Center(
+          child: Text(
+            '${'delete_item'.tr} ${idConsequence}',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -206,10 +207,14 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
             ),
           ),
           onPressed: () async {
-
-            await IncidentSecuriteService().deleteTypeConsequenceIncidentById(widget.numIncident, idConsequence).then((resp) async {
-              ShowSnackBar.snackBar("Successfully", "Type Consequence Deleted", Colors.green);
-              listType.removeWhere((element) => element.idConsequence == idConsequence);
+            await IncidentSecuriteService()
+                .deleteTypeConsequenceIncidentById(
+                    widget.numIncident, idConsequence)
+                .then((resp) async {
+              ShowSnackBar.snackBar(
+                  "Successfully", "Type Consequence Deleted", Colors.green);
+              listType.removeWhere(
+                  (element) => element.idConsequence == idConsequence);
               setState(() {});
               await ApiControllersCall().getTypeConsequenceIncSecRattacher();
               Navigator.of(context).pop();
@@ -220,7 +225,8 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Ok',
+            child: Text(
+              'Ok',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -230,7 +236,10 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
             ),
           ),
         ),
-        closeIcon: Icon(Icons.close, color: Colors.red,),
+        closeIcon: Icon(
+          Icons.close,
+          color: Colors.red,
+        ),
         btnCancel: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
@@ -247,7 +256,8 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Cancel',
+            child: Text(
+              'Cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -256,7 +266,7 @@ class _TypeConsequenceIncidentSecuritePageState extends State<TypeConsequenceInc
               ),
             ),
           ),
-        )
-    )..show();
+        ))
+      ..show();
   }
 }

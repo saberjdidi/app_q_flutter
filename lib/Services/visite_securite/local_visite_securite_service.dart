@@ -3,6 +3,7 @@ import 'package:qualipro_flutter/Models/site_model.dart';
 import 'package:qualipro_flutter/Models/visite_securite/checklist_critere_model.dart';
 import 'package:qualipro_flutter/Models/visite_securite/taux_checklist_vs.dart';
 import 'package:qualipro_flutter/Utils/Sqflite/db_helper.dart';
+import '../../Models/incident_environnement/upload_image_model.dart';
 import '../../Models/visite_securite/action_visite_securite.dart';
 import '../../Models/visite_securite/checklist_model.dart';
 import '../../Models/visite_securite/equipe_model.dart';
@@ -275,5 +276,21 @@ class LocalVisiteSecuriteService {
 
   readActionVSARattacher(idFiche) async {
     return await dbHelper.readActionVSARattacher(idFiche);
+  }
+
+  //upload image
+  Future<List<UploadImageModel>> readImagesVisiteSecurite() async {
+    final response = await dbHelper.readImagesVisiteSecurite();
+    final List result = response;
+    return result.map(((e) => UploadImageModel.fromDBLocal(e))).toList();
+  }
+
+  uploadImageVisiteSecurite(UploadImageModel model) async {
+    return await dbHelper.uploadImageVisiteSecurite(
+        DBTable.upload_image_visite_sec, model.dataMap());
+  }
+
+  deleteTableImageVisiteSecurite() async {
+    return await dbHelper.deleteTableImageVisiteSecurite();
   }
 }

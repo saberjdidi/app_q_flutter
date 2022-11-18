@@ -12,15 +12,13 @@ import '../../../Services/static_data.dart';
 import 'new_product.dart';
 
 class ProductsPage extends StatefulWidget {
-
- const ProductsPage({Key? key}) : super(key: key);
+  const ProductsPage({Key? key}) : super(key: key);
 
   @override
   State<ProductsPage> createState() => _ProductsPageState();
 }
 
 class _ProductsPageState extends State<ProductsPage> {
-
   LocalActionService localService = LocalActionService();
   //ActionService actionService = ActionService();
   final matricule = SharedPreference.getMatricule();
@@ -32,22 +30,24 @@ class _ProductsPageState extends State<ProductsPage> {
     //checkConnectivity();
     getProducts();
   }
+
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
       //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
     }
   }
+
   void getProducts() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
+      if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         var response = await localService.readProduct();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = ProductModel();
             model.codePdt = data['codePdt'];
@@ -58,17 +58,15 @@ class _ProductsPageState extends State<ProductsPage> {
             productList.add(model);
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         /* //static data
          setState(() {
            productList.addAll(listProducts);
          }); */
-        await ApiServicesCall().getProduct({
-          "codeProduit": "",
-          "produit": ""
-        }).then((resp) async {
+        await ApiServicesCall()
+            .getProduct({"codeProduit": "", "produit": ""}).then((resp) async {
           resp.forEach((data) async {
             setState(() {
               var model = ProductModel();
@@ -80,16 +78,13 @@ class _ProductsPageState extends State<ProductsPage> {
               productList.add(model);
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
-
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -104,14 +99,14 @@ class _ProductsPageState extends State<ProductsPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: Text(
-            'Products',
+            '${'product'.tr}s',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.lightBlue,
@@ -119,70 +114,71 @@ class _ProductsPageState extends State<ProductsPage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: productList.isNotEmpty ?
-            Container(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return
-                    Column(
-                      children: [
-                        ListTile(
-                          title: Text(
-                            ' ${productList[index].produit}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: RichText(
-                              text: TextSpan(
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                children: [
-                                  /*  WidgetSpan(
+            child: productList.isNotEmpty
+                ? Container(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: Text(
+                                ' ${productList[index].produit}',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                    children: [
+                                      /*  WidgetSpan(
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                                           child: Icon(Icons.person),
                                         ),
                                       ),*/
-                                  TextSpan(text: '${productList[index].codePdt}'),
+                                      TextSpan(
+                                          text:
+                                              '${productList[index].codePdt}'),
 
-                                  //TextSpan(text: '${action.declencheur}'),
-                                ],
-
+                                      //TextSpan(text: '${action.declencheur}'),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        Divider(
-                          thickness: 1.0,
-                          color: Colors.blue,
-                        ),
-                      ],
-                    );
-                },
-                itemCount: productList.length,
-                //itemCount: actionsList.length + 1,
-              ),
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                            Divider(
+                              thickness: 1.0,
+                              color: Colors.blue,
+                            ),
+                          ],
+                        );
+                      },
+                      itemCount: productList.length,
+                      //itemCount: actionsList.length + 1,
+                    ),
+                  )
+                : Center(
+                    child: Text('empty_list'.tr,
+                        style: TextStyle(
+                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
+                  )),
         floatingActionButton: Container(
           padding: EdgeInsets.only(bottom: 30.0),
           child: FloatingActionButton.small(
-            onPressed: (){
+            onPressed: () {
               Get.to(NewProduct());
             },
             child: const Icon(
               Icons.add,
               color: Colors.white,
-              size: 32,),
+              size: 32,
+            ),
             backgroundColor: Colors.blue,
           ),
         ),
       ),
     );
   }
-
 }

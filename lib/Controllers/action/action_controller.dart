@@ -26,6 +26,8 @@ import '../../Route/app_route.dart';
 import '../../Services/action/action_service.dart';
 import '../../Services/action/local_action_service.dart';
 import '../../Services/api_services_call.dart';
+import '../../Services/licence_service.dart';
+import '../../Services/login_service.dart';
 import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
@@ -33,7 +35,6 @@ import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
 class ActionController extends GetxController {
-
   var listAction = List<ActionModel>.empty(growable: true).obs;
   //List<ActionModel> listAction = List<ActionModel>.empty(growable: true);
   var filterAction = List<ActionModel>.empty(growable: true);
@@ -46,13 +47,20 @@ class ActionController extends GetxController {
 
   //add action
   final addItemFormKey = GlobalKey<FormState>();
-  late TextEditingController declencheurController, dateController, dateSaisieController, actionController, descriptionController,
-      causeController, commentaireController, refInterneController, objectifController;
+  late TextEditingController declencheurController,
+      dateController,
+      dateSaisieController,
+      actionController,
+      descriptionController,
+      causeController,
+      commentaireController,
+      refInterneController,
+      objectifController;
   DateTime dateTime = DateTime.now();
   final declencheur = SharedPreference.getNomPrenom();
   final matricule = SharedPreference.getMatricule();
   final currentYear = DateFormat.y().format(DateTime.now());
-  
+
   //type
   int? selectedCodeTypeAct = 0;
   TypeActionModel? typeActionModel = null;
@@ -130,7 +138,8 @@ class ActionController extends GetxController {
 
   //domaine affectation
   getDomaineAffectation() async {
-    List<DomaineAffectationModel> domaineList = await List<DomaineAffectationModel>.empty(growable: true);
+    List<DomaineAffectationModel> domaineList =
+        await List<DomaineAffectationModel>.empty(growable: true);
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
       var response = await localActionService.readDomaineAffectationByModule(
@@ -162,7 +171,8 @@ class ActionController extends GetxController {
         model.vEmpService = data['vEmpService'];
         domaineList.add(model);
 
-        print('fiche: ${model.fiche}, site visible :${site_visible}, site obligatoire :${site_obligatoire}');
+        print(
+            'fiche: ${model.fiche}, site visible :${site_visible}, site obligatoire :${site_obligatoire}');
         site_visible = model.vSite!;
         processus_visible = model.vProcessus;
         activity_visible = model.vDomaine;
@@ -175,8 +185,8 @@ class ActionController extends GetxController {
         direction_obligatoire = model.oDirection;
         service_obligatoire = model.oService;
       });
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
       await ApiServicesCall().getDomaineAffectation().then((resp) async {
         resp.forEach((data) async {
           var model = DomaineAffectationModel();
@@ -204,7 +214,7 @@ class ActionController extends GetxController {
           model.vEmpDirection = data['vEmpDirection'];
           model.vEmpService = data['vEmpService'];
           domaineList.add(model);
-          if(model.module == "Action" && model.fiche == "Action"){
+          if (model.module == "Action" && model.fiche == "Action") {
             site_visible = model.vSite!;
             processus_visible = model.vProcessus;
             activity_visible = model.vDomaine;
@@ -216,20 +226,21 @@ class ActionController extends GetxController {
             activity_obligatoire = model.oDomaine;
             direction_obligatoire = model.oDirection;
             service_obligatoire = model.oService;
-            print('fiche: ${model.fiche}, site visible :${site_visible}, site obligatoire :${site_obligatoire}');
+            print(
+                'fiche: ${model.fiche}, site visible :${site_visible}, site obligatoire :${site_obligatoire}');
           }
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     }
   }
+
   //champ cache
   getChampCache() async {
     try {
-      List<ChampCacheModel> listChampCache = await List<ChampCacheModel>.empty(
-          growable: true);
+      List<ChampCacheModel> listChampCache =
+          await List<ChampCacheModel>.empty(growable: true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         var response = await localActionService.readChampCacheByModule(
@@ -246,43 +257,43 @@ class ActionController extends GetxController {
           model.visible = data['visible'];
           listChampCache.add(model);
 
-          if (model.nomParam == "Date saisie" && model.module == "Action" &&
+          if (model.nomParam == "Date saisie" &&
+              model.module == "Action" &&
               model.fiche == "Fiche Action") {
             date_saisie_visible = model.visible;
             //date_saisie_visible = 0;
           }
-         /* else if (model.nomParam == "Produit" && model.module == "Action" &&
+          /* else if (model.nomParam == "Produit" && model.module == "Action" &&
               model.fiche == "Fiche Action") {
             product_visible = model.visible;
             //product_visible = 0;
           } */
-          else
-          if (model.nomParam == "Types de causes" && model.module == "Action" &&
+          else if (model.nomParam == "Types de causes" &&
+              model.module == "Action" &&
               model.fiche == "Fiche Action") {
             type_cause_visible = model.visible;
-          }
-          else if (model.nomParam == "Objectif" && model.module == "Action" &&
+          } else if (model.nomParam == "Objectif" &&
+              model.module == "Action" &&
               model.fiche == "Fiche Action") {
             objectif_visible = model.visible;
             //objectif_visible = 0;
-          }
-          else if (model.nomParam == "Réf audit" && model.module == "Action" &&
+          } else if (model.nomParam == "Réf audit" &&
+              model.module == "Action" &&
               model.fiche == "Fiche Action") {
             ref_audit_visible = model.visible;
             //ref_audit_visible = 0;
-          }
-          else if (model.nomParam == "A l'origine de l'action" &&
-              model.module == "Action" && model.fiche == "Fiche Action") {
+          } else if (model.nomParam == "A l'origine de l'action" &&
+              model.module == "Action" &&
+              model.fiche == "Fiche Action") {
             origine_action_visible = model.visible;
             //origine_action_visible = 0;
           }
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-        await ApiServicesCall().getChampCache({
-          "module": "Action",
-          "fiche": "Fiche Action"
-        }).then((resp) async {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        await ApiServicesCall()
+            .getChampCache({"module": "Action", "fiche": "Fiche Action"}).then(
+                (resp) async {
           resp.forEach((data) async {
             //print('get champ obligatoire : ${data} ');
             var model = ChampCacheModel();
@@ -294,97 +305,102 @@ class ActionController extends GetxController {
             model.visible = data['visible'];
             listChampCache.add(model);
 
-            if (model.nomParam == "Date saisie" && model.module == "Action" &&
+            if (model.nomParam == "Date saisie" &&
+                model.module == "Action" &&
                 model.fiche == "Fiche Action") {
               date_saisie_visible = model.visible;
               //date_saisie_visible = 0;
             }
-           /* else if (model.nomParam == "Produit" && model.module == "Action" &&
+            /* else if (model.nomParam == "Produit" && model.module == "Action" &&
                 model.fiche == "Fiche Action") {
               product_visible = model.visible;
               //product_visible = 0;
             } */
-            else if (model.nomParam == "Types de causes" && model.module == "Action" &&
+            else if (model.nomParam == "Types de causes" &&
+                model.module == "Action" &&
                 model.fiche == "Fiche Action") {
               type_cause_visible = model.visible;
-            }
-            else if (model.nomParam == "Objectif" && model.module == "Action" &&
+            } else if (model.nomParam == "Objectif" &&
+                model.module == "Action" &&
                 model.fiche == "Fiche Action") {
               objectif_visible = model.visible;
               //objectif_visible = 0;
-            }
-            else if (model.nomParam == "Réf audit" && model.module == "Action" &&
+            } else if (model.nomParam == "Réf audit" &&
+                model.module == "Action" &&
                 model.fiche == "Fiche Action") {
               ref_audit_visible = model.visible;
               //ref_audit_visible = 0;
-            }
-            else if (model.nomParam == "A l'origine de l'action" &&
-                model.module == "Action" && model.fiche == "Fiche Action") {
+            } else if (model.nomParam == "A l'origine de l'action" &&
+                model.module == "Action" &&
+                model.fiche == "Fiche Action") {
               origine_action_visible = model.visible;
               //origine_action_visible = 0;
             }
           });
-        }
-            , onError: (err) {
-              isDataProcessing(false);
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing(false);
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
       }
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
     }
-    catch (exception) {
-    isDataProcessing(false);
-    ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-}
+  }
 
-  bool _dataValidation(){
-    if(actionController.text.trim()==''){
-      Message.taskErrorOrWarning("Alert", "Designation is required");
+  bool _dataValidation() {
+    if (actionController.text.trim() == '') {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'designation'.tr} ${'is_required'.tr}");
       return false;
-    }
-    else if(dateController.text.trim()==''){
-      Message.taskErrorOrWarning("Alert", "Date is required");
+    } else if (dateController.text.trim() == '') {
+      Message.taskErrorOrWarning('warning'.tr, "Date ${'is_required'.tr}");
       return false;
-    }
-    else if(typeActionModel == null){
-      Message.taskErrorOrWarning("Alert", "Type is required");
+    } else if (typeActionModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Type ${'is_required'.tr}");
       return false;
-    }
-    else if(sourceActionModel == null){
-      Message.taskErrorOrWarning("Alert", "Source is required");
+    } else if (sourceActionModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Source ${'is_required'.tr}");
       return false;
-    }
-    else if(site_visible == 1 && site_obligatoire == 1 && siteModel == null){
-      Message.taskErrorOrWarning("Alert", "Site is required");
+    } else if (site_visible == 1 &&
+        site_obligatoire == 1 &&
+        siteModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Site ${'is_required'.tr}");
       return false;
-    }
-    else if(processus_visible == 1 && processus_obligatoire == 1 && processusModel == null){
-      Message.taskErrorOrWarning("Alert", "Processus is required");
+    } else if (processus_visible == 1 &&
+        processus_obligatoire == 1 &&
+        processusModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Processus ${'is_required'.tr}");
       return false;
-    }
-    else if(direction_visible == 1 && direction_obligatoire == 1 && directionModel == null){
-      Message.taskErrorOrWarning("Alert", "Direction is required");
+    } else if (direction_visible == 1 &&
+        direction_obligatoire == 1 &&
+        directionModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Direction ${'is_required'.tr}");
       return false;
-    }
-    else if(service_visible == 1 && service_obligatoire == 1 && serviceModel == null){
-      Message.taskErrorOrWarning("Alert", "Service is required");
+    } else if (service_visible == 1 &&
+        service_obligatoire == 1 &&
+        serviceModel == null) {
+      Message.taskErrorOrWarning('warning'.tr, "Service ${'is_required'.tr}");
       return false;
-    }
-    else if(activity_visible == 1 && activity_obligatoire == 1 && activityModel == null){
-      Message.taskErrorOrWarning("Alert", "Activity is required");
+    } else if (activity_visible == 1 &&
+        activity_obligatoire == 1 &&
+        activityModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'activity'.tr} ${'is_required'.tr}");
       return false;
     }
     return true;
   }
+
   selectedDate(BuildContext context) async {
     var datePicker = await showDatePicker(
         context: context,
         initialDate: dateTime,
         firstDate: DateTime(2000),
         lastDate: DateTime.now()
-      //lastDate: DateTime.now()
-    );
-    if(datePicker != null){
+        //lastDate: DateTime.now()
+        );
+    if (datePicker != null) {
       dateTime = datePicker;
       dateController.text = DateFormat('yyyy-MM-dd').format(datePicker);
       //dateController.text = DateFormat.yMMMMd().format(datePicker);
@@ -398,7 +414,7 @@ class ActionController extends GetxController {
 
     //search
     searchNumAction.text = '';
-    searchAction.text ='';
+    searchAction.text = '';
     searchType = '';
     //add action
     declencheurController = TextEditingController();
@@ -424,19 +440,23 @@ class ActionController extends GetxController {
     actionController.dispose();
     descriptionController.dispose();
   }
+
+  var checkOffline = 1.obs;
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     print('count: ${countActionLocal}');
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-    }
-    else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-      Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
-     /* if(countActionLocal > 0){
+      checkOffline.value = 0;
+      //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      checkOffline.value = 1;
+      //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM);
+      /* if(countActionLocal > 0){
           ShowSnackBar.snackBar("Synchronization", " data synchronized", Colors.cyan.shade400);
           await syncActionToWebService();
         } */
-     // await syncActionToWebService();
+      // await syncActionToWebService();
     }
   }
 
@@ -445,19 +465,21 @@ class ActionController extends GetxController {
       isDataProcessing.value = true;
       //check connection internet
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none){
+      if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //get local data
         var response;
-        if(searchNumAction.text == '' && searchAction.text == '' && searchType == ''){
+        if (searchNumAction.text == '' &&
+            searchAction.text == '' &&
+            searchType == '') {
           response = await localActionService.readAction();
           print('get actions');
-        }
-        else {
-          response = await localActionService.searchAction(searchNumAction.text, searchAction.text, searchType);
+        } else {
+          response = await localActionService.searchAction(
+              searchNumAction.text, searchAction.text, searchType);
           print('search actions');
         }
-        response.forEach((data){
+        response.forEach((data) {
           //print('id action : ${data['nAct']}');
           //print('id action int : ${int.parse(data['nAct'].toString())}');
           var model = ActionModel();
@@ -502,8 +524,8 @@ class ActionController extends GetxController {
           searchAction.clear();
           searchType = '';
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //rest api
         await ActionService().getActionMethod2({
@@ -545,68 +567,61 @@ class ActionController extends GetxController {
             searchType = '';
           });
           print('get data');
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
 
-       /* listAction = await ActionService().getAction(searchNumAction.text, searchAction.text, matricule.toString(), searchType) as List<ActionModel>;
+        /* listAction = await ActionService().getAction(searchNumAction.text, searchAction.text, matricule.toString(), searchType) as List<ActionModel>;
         searchNumAction.clear();
         searchAction.clear();
         searchType = ''; */
       }
-
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception action : ${exception.toString()}');
-    }
-    finally {
+    } finally {
       isDataProcessing.value = false;
     }
   }
 
   Future saveBtn() async {
-    if(_dataValidation() && addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && addItemFormKey.currentState!.validate()) {
       try {
         //print('code products : ${productList}');
         //currentYear = DateFormat.y().format(dateTime);
-        saveAction(
-            {
-              "action": actionController.text.trim(),
-              "typea": selectedCodeTypeAct,
-              "codesource": selectedCodeSourceAct,
-              "refAudit": selectedRefAuditAct,
-              "descpb": descriptionController.text.trim(),
-              "cause": causeController.text.trim(),
-              "datepa": dateController.text,
-              "cloture": 0,
-              "codesite": selectedSiteCode,
-              "matdeclencheur": matricule.toString(),
-              "commentaire": commentaireController.text.trim(),
-              "respsuivi": selectedResSuiviCode,
-              "nfiche": 0,
-              "imodule": 0,
-              "datesaisie": dateSaisieController.text,
-              "mat_origine": selectedOriginActionMat,
-              "objectif": objectifController.text.trim(),
-              "respclot": selectedRespClotureCode,
-              "annee": currentYear,
-              "ref_interne": refInterneController.text.trim(),
-              "direction": selectedDirectionCode,
-              "metier": 0,
-              "theme": 0,
-              "process": selectedProcessusCode,
-              "domaine": selectedActivityCode,
-              "service": selectedServiceCode,
-              //"prod": productList,
-              "typesCauses": typeCauseList
-            }
-        );
-
-      }
-      catch (ex){
+        saveAction({
+          "action": actionController.text.trim(),
+          "typea": selectedCodeTypeAct,
+          "codesource": selectedCodeSourceAct,
+          "refAudit": selectedRefAuditAct,
+          "descpb": descriptionController.text.trim(),
+          "cause": causeController.text.trim(),
+          "datepa": dateController.text,
+          "cloture": 0,
+          "codesite": selectedSiteCode,
+          "matdeclencheur": matricule.toString(),
+          "commentaire": commentaireController.text.trim(),
+          "respsuivi": selectedResSuiviCode,
+          "nfiche": 0,
+          "imodule": 0,
+          "datesaisie": dateSaisieController.text,
+          "mat_origine": selectedOriginActionMat,
+          "objectif": objectifController.text.trim(),
+          "respclot": selectedRespClotureCode,
+          "annee": currentYear,
+          "ref_interne": refInterneController.text.trim(),
+          "direction": selectedDirectionCode,
+          "metier": 0,
+          "theme": 0,
+          "process": selectedProcessusCode,
+          "domaine": selectedActivityCode,
+          "service": selectedServiceCode,
+          //"prod": productList,
+          "typesCauses": typeCauseList
+        });
+      } catch (ex) {
         Get.defaultDialog(
             title: "Exception",
             backgroundColor: Colors.lightBlue,
@@ -619,20 +634,23 @@ class ActionController extends GetxController {
             buttonColor: Colors.red,
             barrierDismissible: false,
             radius: 50,
-            content: Text('${ex.toString()}', style: TextStyle(color: Colors.black),)
-        );
+            content: Text(
+              '${ex.toString()}',
+              style: TextStyle(color: Colors.black),
+            ));
         //ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
       }
     }
   }
+
   Future<void> saveAction(Map data) async {
     try {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-       /* //var response_action_sync_before = await localActionService.readIdActionSyncMax();
+      if (connection == ConnectivityResult.none) {
+        /* //var response_action_sync_before = await localActionService.readIdActionSyncMax();
         //List<String> servicesList = ["one", "Two", "Thee"];
         //String serviceString = servicesList.join(", ");
 
@@ -672,12 +690,13 @@ class ActionController extends GetxController {
         modelSync.listTypeCause = bytesTypeCause;
         //save data in local db
         await localActionService.saveActionSync(modelSync);
-        print('Inserting action sync : ${modelSync.action}, listTypeCause: ${modelSync.listTypeCause}');
+        print(
+            'Inserting action sync : ${modelSync.action}, listTypeCause: ${modelSync.listTypeCause}');
 
         int max_num_action = await localActionService.getMaxNumAction();
         //save data in local db
         var model = ActionModel();
-        model.nAct = max_num_action+1;
+        model.nAct = max_num_action + 1;
         model.site = siteModel?.site;
         model.sourceAct = sourceActionModel?.sourceAct;
         model.typeAct = typeActionModel?.typeAct;
@@ -697,27 +716,27 @@ class ActionController extends GetxController {
 
         //save type cause in db local
         listTypeCauseOffline.forEach((element) async {
-          int max_type_cause = await LocalActionService().getMaxNumTypeCauseAction();
+          int max_type_cause =
+              await LocalActionService().getMaxNumTypeCauseAction();
           var model = TypeCauseModel();
           model.online = 3;
-          model.nAct = max_num_action+1;
-          model.idTypeCause = max_type_cause+1;
+          model.nAct = max_num_action + 1;
+          model.idTypeCause = max_type_cause + 1;
           model.codetypecause = element.codetypecause;
           model.typecause = element.typecause;
           await LocalActionService().saveTypeCauseAction(model);
         });
 
-
         Get.back();
         listAction.clear();
         getActions();
         //refreshList();
-        Get.snackbar("Mode Offline", "Action Successfully", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
+        Get.snackbar("Mode Offline", "Action Successfully",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         //Get.toNamed(AppRoute.action);
         clearData();
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
         await ActionService().saveAction(data).then((resp) {
           Get.back();
           listAction.clear();
@@ -731,13 +750,11 @@ class ActionController extends GetxController {
           print('Error : ${err.toString()}');
         });
       }
-
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
       print('Exception : ${exception.toString()}');
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
       //Get.back();
     }
@@ -784,18 +801,33 @@ class ActionController extends GetxController {
     try {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data", colorText: Colors.blue,
-            snackPosition: SnackPosition.TOP);
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-
+      if (connection == ConnectivityResult.none) {
+        Get.snackbar("No Connection", "Cannot synchronize Data",
+            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        //verify licence
+        final licenceDevice = await LicenceService().getBeginLicence();
+        String? device_id = licenceDevice?.DeviceId;
+        await LoginService().isLicenceEndService({
+          "deviceid": device_id.toString(),
+        }).then((responseLicenceEnd) {
+          debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+          if (responseLicenceEnd['retour'] == 0) {
+          } else {
+            ShowSnackBar.snackBar('Expired Licence', 'Your licence has expired',
+                Colors.lightBlueAccent);
+          }
+        }, onError: (errorLicenceEnd) {
+          ShowSnackBar.snackBar(
+              "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+        });
         //sync from db local to sql server
         await SyncDataController().syncActionToSQLServer();
         await SyncDataController().syncSousActionToSQLServer();
         await SyncDataController().syncTypeCauseActionToSQLServer();
-          //listAction.clear();
-          //getActions();
+        //listAction.clear();
+        //getActions();
         //save data in db local
         //await ApiControllersCall().getAction();
         await ActionService().getActionMethod2({
@@ -832,16 +864,15 @@ class ActionController extends GetxController {
             await localActionService.deleteAllAction();
             //save data in local db
             await localActionService.saveAction(model);
-            print('Inserting data in table Action : ${model.act} - nact:${model.nAct}');
-
+            print(
+                'Inserting data in table Action : ${model.act} - nact:${model.nAct}');
           });
           listAction.clear();
           getActions();
-        }
-            , onError: (err) {
-              isDataProcessing.value = false;
-              ShowSnackBar.snackBar("Error Action", err.toString(), Colors.red);
-            });
+        }, onError: (err) {
+          isDataProcessing.value = false;
+          ShowSnackBar.snackBar("Error Action", err.toString(), Colors.red);
+        });
 
         await ApiControllersCall().getAllSousAction();
         await ApiControllersCall().getTypeCauseAction();
@@ -849,8 +880,7 @@ class ActionController extends GetxController {
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally{
+    } finally {
       isDataProcessing(false);
     }
   }
@@ -860,8 +890,7 @@ class ActionController extends GetxController {
   Widget customDropDownActivity(BuildContext context, ActivityModel? item) {
     if (activityModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -870,6 +899,7 @@ class ActionController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderActivity(
       BuildContext context, activityModel, bool isSelected) {
     return Container(
@@ -877,10 +907,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(activityModel?.domaine ?? ''),
@@ -888,12 +918,12 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //source action
   Widget customDropDownSource(BuildContext context, SourceActionModel? item) {
     if (sourceActionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -902,6 +932,7 @@ class ActionController extends GetxController {
       );
     }
   }
+
   Widget customPopupItemBuilderSource(
       BuildContext context, sourceActionModel, bool isSelected) {
     return Container(
@@ -909,10 +940,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(sourceActionModel?.sourceAct ?? ''),
@@ -920,20 +951,24 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //type action
   Widget customDropDownType(BuildContext context, TypeActionModel? item) {
     if (typeActionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${typeActionModel?.typeAct}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${typeActionModel?.typeAct}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderType(
       BuildContext context, typeActionModel, bool isSelected) {
     return Container(
@@ -941,10 +976,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(typeActionModel?.typeAct ?? ''),
@@ -952,20 +987,24 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //ref audit
   Widget customDropDownRefAudit(BuildContext context, AuditActionModel? item) {
     if (auditActionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${auditActionModel?.idaudit}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${auditActionModel?.idaudit}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderRefAudit(
       BuildContext context, auditActionModel, bool isSelected) {
     return Container(
@@ -973,10 +1012,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(auditActionModel?.refAudit ?? ''),
@@ -984,21 +1023,23 @@ class ActionController extends GetxController {
       ),
     );
   }
-  //resp cloture
-  Widget customDropDownRespCloture(BuildContext context, RespClotureModel? item) {
 
+  //resp cloture
+  Widget customDropDownRespCloture(
+      BuildContext context, RespClotureModel? item) {
     if (respClotureModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${respClotureModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${respClotureModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderRespCloture(
       BuildContext context, respClotureModel, bool isSelected) {
     return Container(
@@ -1006,10 +1047,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(respClotureModel?.nompre ?? ''),
@@ -1022,20 +1063,24 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //site
   Widget customDropDownSite(BuildContext context, SiteModel? item) {
     if (siteModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${siteModel?.site}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${siteModel?.site}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderSite(
       BuildContext context, siteModel, bool isSelected) {
     return Container(
@@ -1043,10 +1088,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(siteModel?.site ?? ''),
@@ -1054,20 +1099,24 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //processus
   Widget customDropDownProcessus(BuildContext context, ProcessusModel? item) {
     if (processusModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${processusModel?.processus}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${processusModel?.processus}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderProcessus(
       BuildContext context, processusModel, bool isSelected) {
     return Container(
@@ -1075,10 +1124,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
@@ -1086,34 +1135,36 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //employe
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
-
     if (employeModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${employeModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${employeModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customDropDownRespSuivi(BuildContext context, EmployeModel? item) {
     if (resSuiviModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${resSuiviModel?.nompre}', style: TextStyle(color: Colors.black)),
+          title: Text('${resSuiviModel?.nompre}',
+              style: TextStyle(color: Colors.black)),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, employeModel, bool isSelected) {
     return Container(
@@ -1121,10 +1172,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(employeModel?.nompre ?? ''),
@@ -1132,20 +1183,24 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //direction
   Widget customDropDownDirection(BuildContext context, DirectionModel? item) {
     if (directionModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${directionModel?.direction}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${directionModel?.direction}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderDirection(
       BuildContext context, directionModel, bool isSelected) {
     return Container(
@@ -1153,10 +1208,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(directionModel?.direction ?? ''),
@@ -1164,20 +1219,24 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //service
   Widget customDropDownService(BuildContext context, ServiceModel? item) {
     if (serviceModel == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
-          title: Text('${serviceModel?.service}', style: TextStyle(color: Colors.black),),
+          title: Text(
+            '${serviceModel?.service}',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       );
     }
   }
+
   Widget customPopupItemBuilderService(
       BuildContext context, serviceModel, bool isSelected) {
     return Container(
@@ -1185,10 +1244,10 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(serviceModel?.service ?? ''),
@@ -1196,6 +1255,7 @@ class ActionController extends GetxController {
       ),
     );
   }
+
   //products
   Widget customDropDownMultiSelectionProduct(
       BuildContext context, List<ProductModel?> selectedItems) {
@@ -1222,13 +1282,13 @@ class ActionController extends GetxController {
                 e?.mat.toString() ?? '',
               ),*/
               title: Text(e?.produit ?? ''),
-
             ),
           ),
         );
       }).toList(),
     );
   }
+
   Widget customPopupItemBuilderProduct(
       BuildContext context, ProductModel? item, bool isSelected) {
     /*if(isSelected == true){
@@ -1239,21 +1299,22 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item?.produit ?? ''),
         subtitle: Text(item?.codePdt?.toString() ?? ''),
         leading: CircleAvatar(
-          // this does not work - throws 404 error
-          // backgroundImage: NetworkImage(item.avatar ?? ''),
-        ),
+            // this does not work - throws 404 error
+            // backgroundImage: NetworkImage(item.avatar ?? ''),
+            ),
       ),
     );
   }
+
   //types causes
   Widget customDropDownMultiSelectionTypeCause(
       BuildContext context, List<TypeCauseModel?> selectedItems) {
@@ -1261,7 +1322,7 @@ class ActionController extends GetxController {
       return ListTile(
         contentPadding: EdgeInsets.all(0),
         //leading: CircleAvatar(),
-        title: Text("No item selected"),
+        title: Text(""),
       );
     }
 
@@ -1273,13 +1334,13 @@ class ActionController extends GetxController {
             child: ListTile(
               contentPadding: EdgeInsets.all(0),
               title: Text(e?.typecause ?? ''),
-
             ),
           ),
         );
       }).toList(),
     );
   }
+
   Widget customPopupItemBuilderTypeCause(
       BuildContext context, TypeCauseModel? item, bool isSelected) {
     return Container(
@@ -1287,18 +1348,18 @@ class ActionController extends GetxController {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item?.typecause ?? ''),
         subtitle: Text(item?.codetypecause?.toString() ?? ''),
         leading: CircleAvatar(
-          // this does not work - throws 404 error
-          // backgroundImage: NetworkImage(item.avatar ?? ''),
-        ),
+            // this does not work - throws 404 error
+            // backgroundImage: NetworkImage(item.avatar ?? ''),
+            ),
       ),
     );
   }

@@ -214,10 +214,12 @@ class LicenceController extends GetxController {
   Future<void> getAddressFromLatLong(Position position) async {
     List<Placemark> placemark =
         await placemarkFromCoordinates(position.latitude, position.longitude);
-    print(placemark);
+
     Placemark place = placemark[0];
+    print('place : $place');
     location.value =
         '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+    print('location.value : ${location.value}');
   }
 
   //device info
@@ -288,7 +290,16 @@ class LicenceController extends GetxController {
             Position position = await _determinePosition();
             debugPrint(
                 'location : Lat: ${position.latitude} - Long: ${position.longitude}');
-            getAddressFromLatLong(position);
+            //getAddressFromLatLong(position);
+            List<Placemark> placemark = await placemarkFromCoordinates(
+                position.latitude, position.longitude);
+
+            Placemark place = placemark[0];
+            print('place : $place');
+            String currentLocation =
+                '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+            print('currentLocation : ${currentLocation}');
+            //end localisation
 
             ShowSnackBar.snackBar(
                 "Successfully", result['licence'], Colors.green);
@@ -315,7 +326,7 @@ class LicenceController extends GetxController {
                 'devicename': device_name.value,
                 'loginNB': '1',
                 'date': Timestamp.now(),
-                'address': location.value,
+                'address': currentLocation, //location.value,
                 //'lat_lang' : GeoPoint(position.latitude, position.longitude)
               }).then((value) {
                 debugPrint('Devices added successfully');
@@ -349,74 +360,12 @@ class LicenceController extends GetxController {
                   .update({
                 'loginNB': loginNB.value.toString(),
                 'date': Timestamp.now(), //DateTime.now()
-                'address': location.value,
+                'address': currentLocation //location.value,
               }).then((value) {
                 debugPrint('Devices update successfully');
               }).onError((error, stackTrace) async {
                 debugPrint('stackTrace : ${stackTrace.toString()}');
               });
-
-              /* for(var i=0; i<docsDevices.docs.length; i++){
-            if(docsDevices.docs[i]['deviceid'] == device_id.value){
-              isExistDeviceId.value = true;
-              loginNB.value = int.parse(docsDevices.docs[i]['loginNB'].toString()) + 1;
-              print('isExistDeviceId : $isExistDeviceId');
-            }
-            else {
-              isExistDeviceId.value = false;
-              print('isExistDeviceId : $isExistDeviceId');
-            }
-            print('id test : ${docsDevices.docs[i].id}');
-            print('name test : ${docsDevices.docs[i].data()['devicename']}');
-          }
-         /* docsDevices.docs.forEach((element) {
-            if(element['deviceid'] == device_id.value){
-              isExistDeviceId.value = true;
-              loginNB.value = int.parse(element['loginNB'].toString()) + 1;
-              print('isExistDeviceId : $isExistDeviceId');
-            }
-            else {
-              isExistDeviceId.value = false;
-              print('isExistDeviceId : $isExistDeviceId');
-            }
-            print('id test : ${element.id}');
-            print('name test : ${element.data()['devicename']}');
-          }); */
-
-          if(isExistDeviceId.value == true){
-            await FirebaseFirestore.instance
-                .collection('licences')
-                .doc(uid)
-                .collection('tests')
-                .doc(device_id.value)
-                .update({
-              'loginNB' : loginNB.value.toString()
-            })
-                .then((value) {
-              debugPrint('Data update successfully');
-            }).onError((error, stackTrace) async {
-              debugPrint('stackTrace : ${stackTrace.toString()}');
-            });
-          }
-          else {
-            await FirebaseFirestore.instance
-                .collection('licences')
-                .doc(uid)
-                .collection('tests')
-                .doc(device_id.value)
-                .set({
-              'uid' : uid,
-              'deviceid' : device_id.value,
-              'devicename' : device_name.value,
-              'loginNB' : '1',
-              'date' : Timestamp.now()
-               })
-                .then((value) {
-              debugPrint('Data upload successfully');
-            }).onError((error, stackTrace) async {
-              debugPrint('stackTrace : ${stackTrace.toString()}');
-            });
-          } */
             }
             var modelLicence = LicenceModel();
             modelLicence.client = result['client'];
@@ -443,89 +392,117 @@ class LicenceController extends GetxController {
                 int.parse(result['module']['incsecu'].toString());
             modelLicence.visite =
                 int.parse(result['module']['visite'].toString());
-            await LicenceService().deleteTableLicenceInfo();
-            await LicenceService().saveLicenceInfo(modelLicence);
             //debugPrint('licence : client:${modelLicence.client} - licence:${modelLicence.licence} - webservice:${modelLicence.webservice} ');
-            //debugPrint('module : action:${modelLicence.action} ,audit:${modelLicence.audit}, pnc:${modelLicence.pnc}, incenv:${modelLicence.incinv}, incsec:${modelLicence.incsecu}, reunion:${modelLicence.reunion}');
             //saving url in shared preference
             await SharedPreference.setWebServiceKey(
                 modelLicence.webservice.toString());
+            //save licence info in sqlite
+            await LicenceService().deleteTableLicenceInfo();
+            await LicenceService().saveLicenceInfo(modelLicence);
+
             //begin licence
-            await LoginService().beginLicenceService({
-              "days": int.parse(modelLicence.nbDays.toString()),
-              "deviceid": modelLicence.deviceId.toString(),
-              "key": modelLicence.licence.toString()
-            }).then((responseBeginLicence) async {
-              debugPrint(
-                  'responseBeginLicence : ${responseBeginLicence['done']}');
-              //save licence info in db local
-              await LoginService()
-                  .LicenceDeviceByLicenceId(modelLicence.deviceId.toString())
-                  .then((data) async {
-                //delete table if exist
-                await LicenceService().deleteTableBeginLicence();
-                var model = BeginLicenceModel();
-                String? dateLicenceStart = DateFormat('yyyy-MM-dd')
-                    .format(DateTime.parse(data['licenseStart']));
-                String? dateLicenceEnd = DateFormat('yyyy-MM-dd')
-                    .format(DateTime.parse(data['licenseEnd']));
-                model.LicenseStart = dateLicenceStart;
-                model.LicenseEnd = dateLicenceEnd;
-                model.DeviceId = data['deviceId'];
-                model.LicenseKey = data['licenseKey'];
-                //save data
-                await LicenceService().saveBeginLicence(model);
-                debugPrint(
-                    'Inserting data in table MobileLicence : ${model.LicenseEnd} - ${model.DeviceId} ');
-              }, onError: (errorSavingLicence) {
-                ShowSnackBar.snackBar("Error saving Licence in DB Local",
-                    errorSavingLicence.toString(), Colors.red);
-              });
-              //verify licence if 0(licence not expired) or 1(licence expired)
-              await LoginService().isLicenceEndService({
+            if (isExistDeviceId.value == false) {
+              await LoginService().beginLicenceService({
+                "days": int.parse(modelLicence.nbDays.toString()),
                 "deviceid": modelLicence.deviceId.toString(),
-              }).then((responseLicenceEnd) async {
+                "key": modelLicence.licence.toString()
+              }).then((responseBeginLicence) async {
                 debugPrint(
-                    'responseLicenceEnd : ${responseLicenceEnd['retour']}');
-                if (responseLicenceEnd['retour'] == 0) {
-                  //save data in shared preference
-                  await SharedPreference.setLicenceKey(
-                      modelLicence.licence.toString());
-                  await SharedPreference.setNbDaysKey(
-                      modelLicence.nbDays.toString());
-                  await SharedPreference.setDeviceIdKey(
-                      modelLicence.deviceId.toString());
-                  await SharedPreference.setDeviceNameKey(
-                      modelLicence.deviceName.toString());
-                  await SharedPreference.setIsVisibleAction(
-                      int.parse(modelLicence.action.toString()));
-                  await SharedPreference.setIsVisibleAudit(
-                      int.parse(modelLicence.audit.toString()));
-                  await SharedPreference.setIsVisiblePNC(
-                      int.parse(modelLicence.pnc.toString()));
-                  await SharedPreference.setIsVisibleDocumentation(
-                      int.parse(modelLicence.docm.toString()));
-                  await SharedPreference.setIsVisibleReunion(
-                      int.parse(modelLicence.reunion.toString()));
-                  await SharedPreference.setIsVisibleIncidentEnvironnement(
-                      int.parse(modelLicence.incinv.toString()));
-                  await SharedPreference.setIsVisibleIncidentSecurite(
-                      int.parse(modelLicence.incsecu.toString()));
-                  await SharedPreference.setIsVisibleVisiteSecurite(
-                      int.parse(modelLicence.visite.toString()));
-                  //navigate to login page
-                  Get.off(LoginScreen());
-                } else {
-                  ShowSnackBar.snackBar(modelLicence.licence.toString(),
-                      'Your licence has expired', Colors.lightBlueAccent);
-                }
-              }, onError: (errorLicenceEnd) {
-                ShowSnackBar.snackBar("Error Licence End",
-                    errorLicenceEnd.toString(), Colors.red);
+                    'responseBeginLicence : ${responseBeginLicence['done']}');
+                //save licence info in db local
+                /* await LoginService()
+                      .LicenceDeviceByLicenceId(modelLicence.deviceId.toString())
+                      .then((data) async {
+                    //delete table if exist
+                    await LicenceService().deleteTableBeginLicence();
+                    var model = BeginLicenceModel();
+                    String? dateLicenceStart = DateFormat('yyyy-MM-dd')
+                        .format(DateTime.parse(data['licenseStart']));
+                    String? dateLicenceEnd = DateFormat('yyyy-MM-dd')
+                        .format(DateTime.parse(data['licenseEnd']));
+                    model.LicenseStart = dateLicenceStart;
+                    model.LicenseEnd = dateLicenceEnd;
+                    model.DeviceId = data['deviceId'];
+                    model.LicenseKey = data['licenseKey'];
+                    //save data in sqlite
+                    await LicenceService().saveBeginLicence(model);
+                    debugPrint(
+                        'Inserting data in table MobileLicence : ${model.LicenseEnd} - ${model.DeviceId} ');
+                  }, onError: (errorSavingLicence) {
+                    ShowSnackBar.snackBar("Error saving Licence in DB Local",
+                        errorSavingLicence.toString(), Colors.red);
+                  }); */
+              }, onError: (errorBeginLicence) {
+                ShowSnackBar.snackBar("Error saving Licence in DB",
+                    errorBeginLicence.toString(), Colors.red);
               });
-            }, onError: (errorBeginLicence) {
-              ShowSnackBar.snackBar("Error saving Licence in DB",
-                  errorBeginLicence.toString(), Colors.red);
+            }
+
+            //save licence info in db local
+            await LoginService()
+                .LicenceDeviceByLicenceId(modelLicence.deviceId.toString())
+                .then((data) async {
+              //delete table if exist
+              await LicenceService().deleteTableBeginLicence();
+              var model = BeginLicenceModel();
+              String? dateLicenceStart = DateFormat('yyyy-MM-dd')
+                  .format(DateTime.parse(data['licenseStart']));
+              String? dateLicenceEnd = DateFormat('yyyy-MM-dd')
+                  .format(DateTime.parse(data['licenseEnd']));
+              model.LicenseStart = dateLicenceStart;
+              model.LicenseEnd = dateLicenceEnd;
+              model.DeviceId = data['deviceId'];
+              model.LicenseKey = data['licenseKey'];
+              //save data in sqlite
+              await LicenceService().saveBeginLicence(model);
+              debugPrint(
+                  'Inserting data in table MobileLicence : ${model.LicenseEnd} - ${model.DeviceId} ');
+            }, onError: (errorSavingLicence) {
+              ShowSnackBar.snackBar("Error saving Licence in DB Local",
+                  errorSavingLicence.toString(), Colors.red);
+            });
+
+            //verify licence if 0(licence not expired) or 1(licence expired)
+            await LoginService().isLicenceEndService({
+              "deviceid": modelLicence.deviceId.toString(),
+            }).then((responseLicenceEnd) async {
+              debugPrint(
+                  'responseLicenceEnd : ${responseLicenceEnd['retour']}');
+              if (responseLicenceEnd['retour'] == 0) {
+                //save data in shared preference
+                await SharedPreference.setLicenceKey(
+                    modelLicence.licence.toString());
+                await SharedPreference.setNbDaysKey(
+                    modelLicence.nbDays.toString());
+                await SharedPreference.setDeviceIdKey(
+                    modelLicence.deviceId.toString());
+                await SharedPreference.setDeviceNameKey(
+                    modelLicence.deviceName.toString());
+                await SharedPreference.setIsVisibleAction(
+                    int.parse(modelLicence.action.toString()));
+                await SharedPreference.setIsVisibleAudit(
+                    int.parse(modelLicence.audit.toString()));
+                await SharedPreference.setIsVisiblePNC(
+                    int.parse(modelLicence.pnc.toString()));
+                await SharedPreference.setIsVisibleDocumentation(
+                    int.parse(modelLicence.docm.toString()));
+                await SharedPreference.setIsVisibleReunion(
+                    int.parse(modelLicence.reunion.toString()));
+                await SharedPreference.setIsVisibleIncidentEnvironnement(
+                    int.parse(modelLicence.incinv.toString()));
+                await SharedPreference.setIsVisibleIncidentSecurite(
+                    int.parse(modelLicence.incsecu.toString()));
+                await SharedPreference.setIsVisibleVisiteSecurite(
+                    int.parse(modelLicence.visite.toString()));
+                //navigate to login page
+                Get.off(LoginScreen());
+              } else {
+                ShowSnackBar.snackBar(modelLicence.licence.toString(),
+                    'Your licence has expired', Colors.lightBlueAccent);
+              }
+            }, onError: (errorLicenceEnd) {
+              ShowSnackBar.snackBar(
+                  "Error Licence End", errorLicenceEnd.toString(), Colors.red);
             });
           }
         } else {
