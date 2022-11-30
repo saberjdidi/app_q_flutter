@@ -16,33 +16,31 @@ class ParticipantReunionModel {
   String? mail;
 
   ParticipantReunionModel(
-      {
-        this.online,
-        this.mat,
-        this.nompre,
-        this.aparticipe,
-        this.intExt,
-        this.id,
-        this.confirm,
-        this.comment,
-        this.hasconfirmed,
-        this.message,
-        this.vis,
-        this.enab,
-        this.aconfirme,
-        this.mail,
-        this.nReunion
-      });
+      {this.online,
+      this.mat,
+      this.nompre,
+      this.aparticipe,
+      this.intExt,
+      this.id,
+      this.confirm,
+      this.comment,
+      this.hasconfirmed,
+      this.message,
+      this.vis,
+      this.enab,
+      this.aconfirme,
+      this.mail,
+      this.nReunion});
 
-  Map<String, dynamic> dataMap(){
+  Map<String, dynamic> dataMap() {
     var map = <String, dynamic>{
-      'online' : online,
-      'mat' : mat,
-      'nompre' : nompre,
-      'aparticipe' : aparticipe,
-      'confirm' : confirm,
-      'comment' : comment,
-      'nReunion' : nReunion,
+      'online': online,
+      'mat': mat,
+      'nompre': nompre,
+      'aparticipe': aparticipe,
+      'confirm': confirm,
+      'comment': comment,
+      'nReunion': nReunion,
     };
     return map;
   }

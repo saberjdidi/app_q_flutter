@@ -9,6 +9,7 @@ import '../../Models/reunion/type_reunion_model.dart';
 import '../../Services/reunion/reunion_service.dart';
 import '../../Utils/custom_colors.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
@@ -55,9 +56,9 @@ class ReunionPage extends GetView<ReunionController> {
                 Get.find<ReunionController>().listReunion.clear();
                 Get.find<ReunionController>().getReunion();
               },
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(height: 1.0),
                 shrinkWrap: true,
-                primary: false,
                 itemCount: controller.listReunion.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
@@ -113,12 +114,7 @@ class ReunionPage extends GetView<ReunionController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

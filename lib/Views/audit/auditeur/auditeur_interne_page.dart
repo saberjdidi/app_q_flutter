@@ -128,6 +128,18 @@ class _AuditeurInternePageState extends State<AuditeurInternePage> {
                   child: ListView.builder(
                       itemCount: listAuditeur.length,
                       itemBuilder: (context, index) {
+                        String? affectation = listAuditeur[index].affectation;
+                        var message_affectation;
+                        if (affectation == 'RA') {
+                          message_affectation = 'Responsable Audit';
+                        } else if (affectation == 'A') {
+                          message_affectation = 'Auditeur';
+                        } else if (affectation == 'O') {
+                          message_affectation = 'Observateur';
+                        } else {
+                          message_affectation = affectation;
+                        }
+
                         return Card(
                           color: Color(0xFFE9EAEE),
                           child: ListTile(
@@ -152,7 +164,7 @@ class _AuditeurInternePageState extends State<AuditeurInternePage> {
                                 Padding(
                                   padding: const EdgeInsets.all(2.0),
                                   child: Text(
-                                    'Affectation : ${listAuditeur[index].affectation}',
+                                    'Affectation : $message_affectation',
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.w600),
@@ -334,6 +346,36 @@ class _AuditeurInternePageState extends State<AuditeurInternePage> {
                                             contentPadding: EdgeInsets.fromLTRB(
                                                 12, 12, 0, 0),
                                             border: OutlineInputBorder(),
+                                          ),
+                                          popupTitle: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10),
+                                                  child: Text(
+                                                    '${'list'.tr} ${'auditeur'.tr}s',
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.close,
+                                                      color: Colors.red,
+                                                    ))
+                                              ],
+                                            ),
                                           ),
                                           onFind: (String? filter) =>
                                               getAuditeurInterne(filter),
@@ -614,12 +656,13 @@ class _AuditeurInternePageState extends State<AuditeurInternePage> {
             await AuditService()
                 .deleteAutideurInterne(mat, widget.numFiche)
                 .then((resp) async {
-              ShowSnackBar.snackBar("Successfully", "Auditeur Interne Deleted",
-                  Colors.orangeAccent);
               listAuditeur.removeWhere((element) => element.mat == mat);
               setState(() {});
               await ApiControllersCall().getAuditeurInterne();
+              //Get.back();
               Navigator.of(context).pop();
+              ShowSnackBar.snackBar("Successfully", "Auditeur Interne Deleted",
+                  Colors.orangeAccent);
             }, onError: (err) {
               ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
               print('Error : ${err.toString()}');
@@ -659,7 +702,7 @@ class _AuditeurInternePageState extends State<AuditeurInternePage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'cancel'.tr,
+              'Cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

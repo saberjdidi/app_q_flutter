@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
-import 'package:qualipro_flutter/Views/incident_securite/type_cause/type_cause_incident_securite_page.dart';
-import '../../Controllers/incident_securite/incident_securite_controller.dart';
 import '../../Controllers/visite_securite/visite_securite_controller.dart';
-import '../../Services/visite_securite/local_visite_securite_service.dart';
 import '../../Utils/custom_colors.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
@@ -15,7 +13,6 @@ import 'checklist/checklist_critere_page.dart';
 import 'equipe/equipe_visite_sec_page.dart';
 import 'image_visite_sec.dart';
 import 'new_visite_sec_page.dart';
-import 'new_visite_securite.dart';
 import 'visite_securite_widget.dart';
 
 class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
@@ -29,7 +26,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Visite Securite',
+          'visite_securite'.tr,
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: (lightPrimary),
@@ -144,7 +141,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                                                       ),
                                                       icon: Icon(Icons.person),
                                                       label: Text(
-                                                        'Equipe',
+                                                        'equipe'.tr,
                                                         style: TextStyle(
                                                             fontSize: 16,
                                                             color:
@@ -324,12 +321,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),
@@ -343,7 +335,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
         children: [
           SpeedDialChild(
               child: Icon(Icons.add, color: Colors.blue, size: 32),
-              label: '${'new'.tr} Visite Securite',
+              label: '${'new'.tr} ${'visite_securite'.tr}',
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               onTap: () async {
@@ -355,7 +347,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
               labelBackgroundColor: Colors.white,
               backgroundColor: Colors.white,
               child: Icon(Icons.search, color: Colors.blue, size: 32),
-              label: '${'search'.tr} Visite Securite',
+              label: '${'search'.tr} ${'visite_securite'.tr}',
               onTap: () {
                 showDialog<void>(
                   context: context,
@@ -363,14 +355,14 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       scrollable: true,
-                      title: const Center(
+                      title: Center(
                         child: Text(
-                          'Search Visite Securite',
+                          '${'search'.tr} ${'visite_securite'.tr}',
                           style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontFamily: "Signatra",
                               color: Color(0xFF0769D2),
-                              fontSize: 30.0),
+                              fontSize: 20.0),
                         ),
                       ),
                       titlePadding: EdgeInsets.only(top: 2.0),
@@ -386,7 +378,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                                   keyboardType: TextInputType.number,
                                   textInputAction: TextInputAction.next,
                                   decoration: new InputDecoration(
-                                      hintText: 'Numero',
+                                      hintText: 'number'.tr,
                                       border: InputBorder.none),
                                 ),
                                 trailing: new IconButton(
@@ -409,7 +401,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                                   keyboardType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
                                   decoration: new InputDecoration(
-                                      hintText: 'Unite',
+                                      hintText: 'unite'.tr,
                                       border: InputBorder.none),
                                 ),
                                 trailing: new IconButton(
@@ -450,7 +442,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                       actionsPadding: EdgeInsets.all(1.0),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: Text('cancel'.tr),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -476,7 +468,7 @@ class VisiteSecuritePage extends GetView<VisiteSecuriteController> {
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              'Search',
+                              'search'.tr,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,

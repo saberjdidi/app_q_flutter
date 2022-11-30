@@ -13,7 +13,6 @@ import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Models/image_model.dart';
 import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
@@ -167,7 +166,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
     taux_realisation = int.parse(realisationController.text.toString());
     if (taux_realisation > 100) {
       Message.taskErrorOrWarning(
-          "Taux Realisation", "Veuillez saisir donnée inférieur ou égal à 100");
+          'warning'.tr, 'saisir_donne_inferieur_ou_égal_100'.tr);
       return false;
     } else if (datePickerFinReal.isBefore(datePickerDebutReal)) {
       AwesomeDialog(
@@ -176,7 +175,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
         dialogType: DialogType.ERROR,
         body: Center(
           child: Text(
-            'Date Fin doit être supérieur au Date Debut',
+            'date_fin_supérieure_egale_date_debut'.tr,
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -285,8 +284,8 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Taux Realisation',
-                            hintText: 'realisation',
+                            labelText: 'taux_realisation'.tr,
+                            hintText: 'taux_realisation'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -318,8 +317,8 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Cout',
-                            hintText: 'cout',
+                            labelText: 'cout'.tr,
+                            hintText: 'cout'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -353,7 +352,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                               selectedDate(context);
                             },
                             decoration: InputDecoration(
-                                labelText: 'Date Saisie',
+                                labelText: 'date_saisie'.tr,
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -383,74 +382,86 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                           visible: message == "Objet n'existe pas"
                               ? date_realisation_visible = true
                               : date_realisation_visible = false,
-                          child: TextFormField(
-                            controller: dateRealisationController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            validator: (value) =>
-                                Validator.validateField(value: value!),
-                            onChanged: (value) {
+                          child: InkWell(
+                            onTap: () {
                               selectedDate(context);
                             },
-                            decoration: InputDecoration(
-                                labelText: 'Date realisation',
-                                hintText: 'date',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    selectedDate(context);
-                                  },
-                                  child: Icon(Icons.calendar_today),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.lightBlue, width: 1),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)))),
-                            style: TextStyle(fontSize: 14.0),
+                            child: TextFormField(
+                              enabled: false,
+                              controller: dateRealisationController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) =>
+                                  Validator.validateField(value: value!),
+                              onChanged: (value) {
+                                selectedDate(context);
+                              },
+                              decoration: InputDecoration(
+                                  labelText: 'Date realisation',
+                                  hintText: 'date',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      selectedDate(context);
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
+                            ),
                           ),
                         ),
                         Visibility(
                           visible: message == "existe"
                               ? date_debut_realisation_visible = true
                               : date_debut_realisation_visible = false,
-                          child: TextFormField(
-                            controller: dateDebutRealisationController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            validator: (value) =>
-                                Validator.validateField(value: value!),
-                            onChanged: (value) {
+                          child: InkWell(
+                            onTap: () {
                               selectedDateDebutReal(context);
                             },
-                            decoration: InputDecoration(
-                                labelText: 'Date Debut realisation',
-                                hintText: 'date',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    selectedDateDebutReal(context);
-                                  },
-                                  child: Icon(Icons.calendar_today),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.lightBlue, width: 1),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)))),
-                            style: TextStyle(fontSize: 14.0),
+                            child: TextFormField(
+                              enabled: false,
+                              controller: dateDebutRealisationController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) =>
+                                  Validator.validateField(value: value!),
+                              onChanged: (value) {
+                                selectedDateDebutReal(context);
+                              },
+                              decoration: InputDecoration(
+                                  labelText: 'Date ${'debut'.tr} realisation',
+                                  hintText: 'date',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      selectedDateDebutReal(context);
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -460,37 +471,43 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                           visible: message == "existe"
                               ? date_fin_realisation_visible = true
                               : date_fin_realisation_visible = false,
-                          child: TextFormField(
-                            controller: dateFinRealisationController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            validator: (value) =>
-                                Validator.validateField(value: value!),
-                            onChanged: (value) {
+                          child: InkWell(
+                            onTap: () {
                               selectedDateFinReal(context);
                             },
-                            decoration: InputDecoration(
-                                labelText: 'Date Fin realisation',
-                                hintText: 'date',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    selectedDateFinReal(context);
-                                  },
-                                  child: Icon(Icons.calendar_today),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.lightBlue, width: 1),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)))),
-                            style: TextStyle(fontSize: 14.0),
+                            child: TextFormField(
+                              enabled: false,
+                              controller: dateFinRealisationController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) =>
+                                  Validator.validateField(value: value!),
+                              onChanged: (value) {
+                                selectedDateFinReal(context);
+                              },
+                              decoration: InputDecoration(
+                                  labelText: 'Date ${'fin'.tr} realisation',
+                                  hintText: 'date',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      selectedDateFinReal(context);
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -503,8 +520,8 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Commentaire',
-                                hintText: 'commentaire',
+                                labelText: 'comment'.tr,
+                                hintText: 'comment'.tr,
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -529,7 +546,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                         ),
                         MaterialButton(
                             color: Colors.blue,
-                            child: const Text("Upload Images",
+                            child: Text("${'upload'.tr} Images",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),
@@ -569,7 +586,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -737,7 +754,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
       child: Column(
         children: <Widget>[
           Text(
-            "Choose Photo",
+            "${'choose'.tr} Photo",
             style: TextStyle(
               fontSize: 20.0,
             ),
@@ -748,7 +765,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             ConstrainedBox(
               constraints: BoxConstraints.tightFor(
-                  width: MediaQuery.of(context).size.width / 3, height: 50),
+                  width: MediaQuery.of(context).size.width / 2.5, height: 50),
               child: ElevatedButton.icon(
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all(
@@ -759,7 +776,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                   backgroundColor: MaterialStateProperty.all(Color(0xFD18A3A8)),
                   padding: MaterialStateProperty.all(EdgeInsets.all(14)),
                 ),
-                icon: Icon(Icons.image),
+                icon: Icon(Icons.camera_alt_rounded),
                 label: Text(
                   'Camera',
                   style: TextStyle(fontSize: 16, color: Colors.white),
@@ -772,11 +789,11 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                       dialogType: DialogType.ERROR,
                       body: Center(
                         child: Text(
-                          "You can choose 5 images maximum",
+                          'choose_max_5_images'.tr,
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
                       ),
-                      title: 'Cancel',
+                      title: 'cancel'.tr,
                       btnOkOnPress: () {
                         Navigator.of(context).pop();
                       },
@@ -792,7 +809,7 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
             ),
             ConstrainedBox(
               constraints: BoxConstraints.tightFor(
-                  width: MediaQuery.of(context).size.width / 3, height: 50),
+                  width: MediaQuery.of(context).size.width / 2.5, height: 50),
               child: ElevatedButton.icon(
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all(
@@ -816,11 +833,11 @@ class _RemplirActionRealisationState extends State<RemplirActionRealisation> {
                       dialogType: DialogType.ERROR,
                       body: Center(
                         child: Text(
-                          "You can choose 5 images maximum",
+                          'choose_max_5_images'.tr,
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
                       ),
-                      title: 'Cancel',
+                      title: 'cancel'.tr,
                       btnOkOnPress: () {
                         Navigator.of(context).pop();
                       },

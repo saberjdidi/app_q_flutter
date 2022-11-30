@@ -252,6 +252,31 @@ class NewAuditPage extends GetView<NewAuditController> {
                                 controller.customPopupItemBuilderType,
                             validator: (u) =>
                                 u == null ? "Type ${'is_required'.tr} " : null,
+                            popupTitle: Center(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      '${'list'.tr} Type Audits',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      icon: Icon(
+                                        Icons.close,
+                                        color: Colors.red,
+                                      ))
+                                ],
+                              ),
+                            ),
                           ),
                           SizedBox(
                             height: 10.0,
@@ -273,7 +298,7 @@ class NewAuditPage extends GetView<NewAuditController> {
                               ),
                               mode: Mode.DIALOG,
                               isFilteredOnline: true,
-                              showClearButton: false,
+                              showClearButton: true,
                               showSelectedItems: true,
                               compareFn: (item, selectedItem) =>
                                   item?.codeChamp == selectedItem?.codeChamp,
@@ -320,10 +345,40 @@ class NewAuditPage extends GetView<NewAuditController> {
                                 isAlwaysShown: true,
                                 thickness: 7,
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} ${'champ_audit'.tr}',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                          SizedBox(
-                            height: 10.0,
+                          Visibility(
+                            visible: controller.site_visible.value == 1
+                                ? controller.isVisibileSite = true
+                                : controller.isVisibileSite = false,
+                            child: SizedBox(
+                              height: 10.0,
+                            ),
                           ),
                           Visibility(
                               visible: controller.site_visible.value == 1
@@ -345,6 +400,32 @@ class NewAuditPage extends GetView<NewAuditController> {
                                       EdgeInsets.fromLTRB(12, 12, 0, 0),
                                   border: OutlineInputBorder(),
                                 ),
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} Sites',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 onFind: (String? filter) => getSite(filter),
                                 onChanged: (data) {
                                   controller.siteModel = data;
@@ -354,7 +435,7 @@ class NewAuditPage extends GetView<NewAuditController> {
                                     controller.selectedCodeSite = 0;
                                     controller.siteIncident = "";
                                   }
-                                  print(
+                                  debugPrint(
                                       'site: ${controller.siteModel?.site}, code: ${controller.selectedCodeSite}');
                                 },
                                 dropdownBuilder: controller.customDropDownSite,
@@ -366,8 +447,13 @@ class NewAuditPage extends GetView<NewAuditController> {
                                         ? "site ${'is_required'.tr} "
                                         : null,
                               )),
-                          SizedBox(
-                            height: 10.0,
+                          Visibility(
+                            visible: controller.processus_visible.value == 1
+                                ? controller.isVisibileProcessus = true
+                                : controller.isVisibileProcessus = false,
+                            child: SizedBox(
+                              height: 10.0,
+                            ),
                           ),
                           Visibility(
                               visible: controller.processus_visible.value == 1
@@ -389,6 +475,32 @@ class NewAuditPage extends GetView<NewAuditController> {
                                       EdgeInsets.fromLTRB(12, 12, 0, 0),
                                   border: OutlineInputBorder(),
                                 ),
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} Processus',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 onFind: (String? filter) =>
                                     getProcessus(filter),
                                 onChanged: (data) {
@@ -401,7 +513,7 @@ class NewAuditPage extends GetView<NewAuditController> {
                                     controller.selectedCodeProcessus = 0;
                                     controller.processusIncident = "";
                                   }
-                                  print(
+                                  debugPrint(
                                       'processus: ${controller.processusModel?.processus}, code: ${controller.selectedCodeProcessus}');
                                 },
                                 dropdownBuilder:
@@ -415,8 +527,13 @@ class NewAuditPage extends GetView<NewAuditController> {
                                         ? "processus ${'is_required'.tr} "
                                         : null,
                               )),
-                          SizedBox(
-                            height: 10.0,
+                          Visibility(
+                            visible: controller.direction_visible.value == 1
+                                ? controller.isVisibileDirection = true
+                                : controller.isVisibileDirection = false,
+                            child: SizedBox(
+                              height: 10.0,
+                            ),
                           ),
                           Visibility(
                               visible: controller.direction_visible.value == 1
@@ -438,6 +555,32 @@ class NewAuditPage extends GetView<NewAuditController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Directions',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) =>
                                       getDirection(filter),
                                   onChanged: (data) {
@@ -450,7 +593,7 @@ class NewAuditPage extends GetView<NewAuditController> {
                                       controller.selectedCodeDirection = 0;
                                       controller.directionIncident = "";
                                     }
-                                    print(
+                                    debugPrint(
                                         'direction: ${controller.directionModel?.direction}, code: ${controller.selectedCodeDirection}');
                                   },
                                   dropdownBuilder:
@@ -492,8 +635,13 @@ class NewAuditPage extends GetView<NewAuditController> {
                                     }
                                     return Future.value(true);
                                   })),
-                          SizedBox(
-                            height: 10.0,
+                          Visibility(
+                            visible: controller.service_visible.value == 1
+                                ? controller.isVisibileService = true
+                                : controller.isVisibileService = false,
+                            child: SizedBox(
+                              height: 10.0,
+                            ),
                           ),
                           Visibility(
                               visible: controller.service_visible.value == 1
@@ -515,6 +663,32 @@ class NewAuditPage extends GetView<NewAuditController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Services',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) =>
                                       getService(filter),
                                   onChanged: (data) {
@@ -526,7 +700,7 @@ class NewAuditPage extends GetView<NewAuditController> {
                                       controller.selectedCodeService = 0;
                                       controller.serviceIncident = "";
                                     }
-                                    print(
+                                    debugPrint(
                                         'service: ${controller.serviceModel?.service}, code: ${controller.selectedCodeService}');
                                   },
                                   dropdownBuilder:
@@ -570,8 +744,13 @@ class NewAuditPage extends GetView<NewAuditController> {
                                     }
                                     return Future.value(true);
                                   })),
-                          SizedBox(
-                            height: 10.0,
+                          Visibility(
+                            visible: controller.activity_visible.value == 1
+                                ? controller.isVisibileActivity = true
+                                : controller.isVisibileActivity = false,
+                            child: SizedBox(
+                              height: 10.0,
+                            ),
                           ),
                           Visibility(
                               visible: controller.activity_visible.value == 1
@@ -594,6 +773,32 @@ class NewAuditPage extends GetView<NewAuditController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'activity'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) =>
                                       getActivity(filter),
                                   onChanged: (data) {
@@ -605,7 +810,7 @@ class NewAuditPage extends GetView<NewAuditController> {
                                       controller.selectedCodeActivity = 0;
                                       controller.activityIncident = "";
                                     }
-                                    print(
+                                    debugPrint(
                                         'activity:${controller.activityModel?.domaine}, code:${controller.selectedCodeActivity}');
                                   },
                                   dropdownBuilder:

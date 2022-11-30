@@ -6,6 +6,7 @@ import 'package:flutter_html/style.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Models/audit/audit_model.dart';
+import 'package:qualipro_flutter/Utils/shared_preference.dart';
 import 'package:readmore/readmore.dart';
 import 'dart:ui' as ui;
 import '../../Models/incident_environnement/incident_env_model.dart';
@@ -20,7 +21,16 @@ class AuditWidget extends StatelessWidget {
     final champ = model.champ;
     const htmlData = """<p>Bonjour Saphir</p>""";
     DateTime dt = DateTime.parse(model.dateDebPrev.toString());
-    final date = DateFormat('dd/MM/yyyy').format(dt);
+    final langue = SharedPreference.getLangue();
+    var date;
+    if (langue == 'en') {
+      date = DateFormat('MM/dd/yyyy').format(dt);
+    } else if (langue == 'fr') {
+      date = DateFormat('dd/MM/yyyy').format(dt);
+    } else {
+      date = DateFormat('dd/MM/yyyy').format(dt);
+    }
+
     final status = model.etat;
     String message_status = '';
     Color color_status = Color(0xff898f97);
@@ -82,7 +92,7 @@ class AuditWidget extends StatelessWidget {
                               color: Colors.blue)),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
+                      padding: const EdgeInsets.only(top: 10.0, left: 3.0),
                       child: Text(
                         message_status,
                         style: TextStyle(
@@ -102,13 +112,33 @@ class AuditWidget extends StatelessWidget {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: Text(
+                          child: RichText(
+                            text: TextSpan(
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              children: [
+                                WidgetSpan(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 2.0),
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                ),
+                                TextSpan(
+                                    text: '$date',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.black54)),
+
+                                //TextSpan(text: '${action.declencheur}'),
+                              ],
+                            ),
+                          ),
+                          /*Text(
                             "${date}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black54,
                                 fontFamily: "Brand-Bold"),
-                          ),
+                          ),*/
                         ),
                         (model.site == "" || model.site == null)
                             ? Text('')

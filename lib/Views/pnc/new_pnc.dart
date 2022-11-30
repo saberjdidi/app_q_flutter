@@ -10,14 +10,10 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qualipro_flutter/Models/client_model.dart';
 import 'package:qualipro_flutter/Models/fournisseur_model.dart';
-import 'package:qualipro_flutter/Models/gravite_model.dart';
 import 'package:qualipro_flutter/Models/pnc/atelier_pnc_model.dart';
 import 'package:qualipro_flutter/Models/pnc/isps_pnc_model.dart';
 import 'package:qualipro_flutter/Models/pnc/source_pnc_model.dart';
-import 'package:qualipro_flutter/Models/priorite_model.dart';
-import '../../Controllers/action/sous_action_controller.dart';
 import '../../../Models/employe_model.dart';
-import '../../../Models/processus_employe_model.dart';
 import '../../../Models/processus_model.dart';
 import '../../../Services/api_services_call.dart';
 import '../../../Utils/custom_colors.dart';
@@ -125,14 +121,16 @@ class NewPNCPage extends GetView<NewPNCController> {
                                         BorderRadius.all(Radius.circular(10))),
                               ),
                               style: TextStyle(fontSize: 14.0),
+                              minLines: 2,
+                              maxLines: 5,
                             ),
                             SizedBox(
                               height: 10.0,
                             ),
                             Visibility(
                                 visible: controller.detected_by_visible == 1
-                                    ? controller.isVisibileDetectedBy = true
-                                    : controller.isVisibileDetectedBy = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<EmployeModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -144,6 +142,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Employes',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getEmploye(filter),
@@ -301,8 +325,8 @@ class NewPNCPage extends GetView<NewPNCController> {
                             ),
                             Visibility(
                                 visible: controller.type_nc_visible == 1
-                                    ? controller.isVisibileTypeNC = true
-                                    : controller.isVisibileTypeNC = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<TypePNCModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -310,10 +334,36 @@ class NewPNCPage extends GetView<NewPNCController> {
                                   isFilteredOnline: true,
                                   compareFn: (i, s) => i?.isEqual(s) ?? false,
                                   dropdownSearchDecoration: InputDecoration(
-                                    labelText: "Type NC *",
+                                    labelText: "Type N.C *",
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Type N.C',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getTypePNC(filter),
@@ -355,6 +405,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'gravity'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) =>
                                       getGravitePNC(filter),
                                   onChanged: (data) {
@@ -391,10 +467,36 @@ class NewPNCPage extends GetView<NewPNCController> {
                                   compareFn: (i, s) => i?.isEqual(s) ?? false,
                                   dropdownSearchDecoration: InputDecoration(
                                     labelText:
-                                        "Source NC ${controller.source_obligatoire == 1 ? '*' : ''}",
+                                        "Source N.C ${controller.source_obligatoire == 1 ? '*' : ''}",
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Source N.C',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) => getSource(filter),
                                   onChanged: (data) {
@@ -417,13 +519,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                           ? "Source ${'is_required'.tr} "
                                           : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.atelier_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.atelier_visible == 1
-                                    ? controller.isVisibileAtelier = true
-                                    : controller.isVisibileAtelier = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<AtelierPNCModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -436,6 +543,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'atelier'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getAtelier(filter),
@@ -477,6 +610,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'product'.tr}s',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) =>
                                       getProduct(filter),
                                   onChanged: (data) {
@@ -499,13 +658,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       ? "${'product'.tr} ${'is_required'.tr} "
                                       : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.fournisseur_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.fournisseur_visible == 1
-                                    ? controller.isVisibileFournisseur = true
-                                    : controller.isVisibileFournisseur = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<FournisseurModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -518,6 +682,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'fournisseur'.tr}s',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getFournisseur(filter),
@@ -545,8 +735,13 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       ? "${'fournisseur'.tr} ${'is_required'.tr} "
                                       : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.site_visible.value == 1
+                                  ? controller.isVisibileSite = true
+                                  : controller.isVisibileSite = false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.site_visible.value == 1
@@ -567,6 +762,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Sites',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) => getSite(filter),
                                   onChanged: (data) {
@@ -591,8 +812,13 @@ class NewPNCPage extends GetView<NewPNCController> {
                                           ? "site ${'is_required'.tr} "
                                           : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.processus_visible.value == 1
+                                  ? controller.isVisibileProcessus = true
+                                  : controller.isVisibileProcessus = false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.processus_visible.value == 1
@@ -613,6 +839,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Processus',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getProcessus(filter),
@@ -637,8 +889,13 @@ class NewPNCPage extends GetView<NewPNCController> {
                                           ? "processus ${'is_required'.tr} "
                                           : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.direction_visible.value == 1
+                                  ? controller.isVisibileDirection = true
+                                  : controller.isVisibileDirection = false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.direction_visible.value == 1
@@ -660,6 +917,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} Directions',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getDirection(filter),
@@ -714,8 +997,13 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.service_visible.value == 1
+                                  ? controller.isVisibileService = true
+                                  : controller.isVisibileService = false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.service_visible.value == 1
@@ -736,6 +1024,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} Services',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getService(filter),
@@ -791,8 +1105,13 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.activity_visible.value == 1
+                                  ? controller.isVisibileActivity = true
+                                  : controller.isVisibileActivity = false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.activity_visible.value == 1
@@ -814,6 +1133,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'activity'.tr}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getActivity(filter),
@@ -870,13 +1215,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.origine_nc_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.origine_nc_visible == 1
-                                    ? controller.isVisibileOrigineNC = true
-                                    : controller.isVisibileOrigineNC = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<EmployeModel>(
                                     showSelectedItems: true,
                                     showClearButton: true,
@@ -889,6 +1239,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'origine_pnc'.tr}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getEmploye(filter),
@@ -935,13 +1311,16 @@ class NewPNCPage extends GetView<NewPNCController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible:
+                                  controller.isps_visible == 1 ? true : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                                visible: controller.isps_visible == 1
-                                    ? controller.isVisibileISPS = true
-                                    : controller.isVisibileISPS = false,
+                                visible:
+                                    controller.isps_visible == 1 ? true : false,
                                 child: DropdownSearch<ISPSPNCModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -955,6 +1334,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ISPS',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) => getISPS(filter),
                                   onChanged: (data) {
                                     controller.isps = data?.value;
@@ -964,20 +1369,25 @@ class NewPNCPage extends GetView<NewPNCController> {
                                   dropdownBuilder: _customDropDownISPS,
                                   popupItemBuilder: _customPopupItemBuilderISPS,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.num_interne_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                               visible: controller.num_interne_visible == 1
-                                  ? controller.isVisibileNumInterne = true
-                                  : controller.isVisibileNumInterne = false,
+                                  ? true
+                                  : false,
                               child: TextFormField(
                                 controller: controller.numInterneController,
                                 keyboardType: TextInputType.text,
                                 textInputAction: TextInputAction.next,
                                 decoration: InputDecoration(
                                     labelText:
-                                        '${'ref_interne'.tr} ${controller.num_interne_obligatoire == 1 ? '*' : ''}',
+                                        '${'ref_interne'.tr} ${controller.num_interne_obligatoire.value == 1 ? '*' : ''}',
                                     hintText: 'ref_interne'.tr,
                                     labelStyle: TextStyle(
                                       fontSize: 14.0,
@@ -994,11 +1404,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                 style: TextStyle(fontSize: 14.0),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.numero_of_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                              visible: true,
+                              visible: controller.numero_of_visible == 1
+                                  ? true
+                                  : false,
                               child: TextFormField(
                                 controller: controller.numeroOfController,
                                 keyboardType: TextInputType.number,
@@ -1022,11 +1439,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                 style: TextStyle(fontSize: 14.0),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.numero_lot_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                              visible: true,
+                              visible: controller.numero_lot_visible == 1
+                                  ? true
+                                  : false,
                               child: TextFormField(
                                 controller: controller.numeroLotController,
                                 keyboardType: TextInputType.number,
@@ -1050,13 +1474,16 @@ class NewPNCPage extends GetView<NewPNCController> {
                                 style: TextStyle(fontSize: 14.0),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible:
+                                  controller.unite_visible == 1 ? true : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                              visible: controller.unite_visible == 1
-                                  ? controller.isVisibileUnite = true
-                                  : controller.isVisibileUnite = false,
+                              visible:
+                                  controller.unite_visible == 1 ? true : false,
                               child: TextFormField(
                                 controller: controller.uniteController,
                                 keyboardType: TextInputType.text,
@@ -1080,11 +1507,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                 style: TextStyle(fontSize: 14.0),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.quantity_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                              visible: true,
+                              visible: controller.quantity_visible == 1
+                                  ? true
+                                  : false,
                               child: TextFormField(
                                 controller: controller.quantityDetectController,
                                 keyboardType: TextInputType.number,
@@ -1109,11 +1543,18 @@ class NewPNCPage extends GetView<NewPNCController> {
                                 style: TextStyle(fontSize: 14.0),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.quantity_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                              visible: true,
+                              visible: controller.quantity_visible == 1
+                                  ? true
+                                  : false,
                               child: TextFormField(
                                 controller:
                                     controller.quantityProductController,
@@ -1246,6 +1687,32 @@ class NewPNCPage extends GetView<NewPNCController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'client'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) => getClient(filter),
                                   onChanged: (data) {
                                     controller.clientModel = data;
@@ -1267,8 +1734,8 @@ class NewPNCPage extends GetView<NewPNCController> {
                             ),
                             Visibility(
                               visible: controller.product_bloque_visible == 1
-                                  ? controller.isVisibileProductBloque = true
-                                  : controller.isVisibileProductBloque = false,
+                                  ? true
+                                  : false,
                               child: CheckboxListTile(
                                 title: Text('${'product'.tr} ${'bloque'.tr}'),
                                 value: controller.checkProductBloque.value,
@@ -1292,8 +1759,8 @@ class NewPNCPage extends GetView<NewPNCController> {
                             ),
                             Visibility(
                               visible: controller.product_isole_visible == 1
-                                  ? controller.isVisibileProductIsole = true
-                                  : controller.isVisibileProductIsole = false,
+                                  ? true
+                                  : false,
                               child: CheckboxListTile(
                                 title: Text('${'product'.tr} ${'isole'.tr}'),
                                 value: controller.checkProductIsole.value,

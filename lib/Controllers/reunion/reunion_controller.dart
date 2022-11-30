@@ -2,16 +2,17 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
-
-import '../../Models/pnc/pnc_model.dart';
+import '../../Models/begin_licence_model.dart';
+import '../../Models/licence_end_model.dart';
 import '../../Models/reunion/reunion_model.dart';
-import '../../Models/reunion/type_reunion_model.dart';
-import '../../Services/pnc/pnc_service.dart';
+import '../../Services/licence_service.dart';
+import '../../Services/login_service.dart';
 import '../../Services/reunion/local_reunion_service.dart';
 import '../../Services/reunion/reunion_service.dart';
+import '../../Utils/http_response.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Views/licence/licence_page.dart';
 import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
@@ -29,12 +30,55 @@ class ReunionController extends GetxController {
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     getReunion();
+    checkLicence();
     //checkConnectivity();
     searchNumero.text = '';
     searchDesignation.text = '';
+  }
+
+  //check if licence end
+  BeginLicenceModel? licenceDevice;
+  LicenceEndModel? licenceEndModel;
+  var isLicenceEnd = 0.obs;
+  final deviceId = SharedPreference.getDeviceIdKey();
+  checkLicence() async {
+    var connection = await Connectivity().checkConnectivity();
+    if (connection == ConnectivityResult.none) {
+      licenceDevice = await LicenceService().getBeginLicence();
+      String? device_id = licenceDevice?.DeviceId;
+      licenceEndModel = await LicenceService().getIsLicenceEnd(device_id);
+      if (licenceEndModel?.retour == 0) {
+        debugPrint('licence of device : $device_id');
+      } else {
+        Get.snackbar("Licence ${SharedPreference.getLicenceKey().toString()}",
+            'licence_expired'.tr,
+            colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
+        SharedPreference.clearSharedPreference();
+        Get.off(LicencePage());
+      }
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      await LoginService().isLicenceEndService({
+        "deviceid": deviceId.toString(),
+      }).then((responseLicenceEnd) async {
+        debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+        if (responseLicenceEnd['retour'] == 0) {
+          debugPrint('licence of device : ${deviceId.toString()}');
+        } else {
+          ShowSnackBar.snackBar(
+              "Licence ${SharedPreference.getLicenceKey().toString()}",
+              'licence_expired'.tr,
+              Colors.lightBlueAccent);
+          SharedPreference.clearSharedPreference();
+          Get.off(LicencePage());
+        }
+      }, onError: (errorLicenceEnd) {
+        HttpResponse.StatusCode(errorLicenceEnd.toString());
+        //ShowSnackBar.snackBar("Error Licence End", errorLicenceEnd.toString(), Colors.red);
+      });
+    }
   }
 
   Future<void> checkConnectivity() async {
@@ -94,9 +138,9 @@ class ReunionController extends GetxController {
             //model.reunionPlus1 = data['reunion_plus1'];
             listReunion.add(model);
           });
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing.value = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
         });
       }
     } catch (exception) {
@@ -153,8 +197,7 @@ class ReunionController extends GetxController {
           });
         }, onError: (error) {
           isDataProcessing.value = false;
-          ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
-          debugPrint('Error : ${error.toString()}');
+          HttpResponse.StatusCode(error.toString());
         });
       }
     } catch (exception) {
@@ -172,7 +215,7 @@ class ReunionController extends GetxController {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data",
+        Get.snackbar("No Connection", 'cannot_synchronize_data'.tr,
             colorText: Colors.blue, snackPosition: SnackPosition.TOP);
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
@@ -183,6 +226,8 @@ class ReunionController extends GetxController {
         await SyncDataController().syncActionOfReunionToSQLServer();
         //save data in db local
         await ReunionService().getReunion(matricule).then((resp) async {
+          //delete table
+          await localReunionService.deleteTableReunion();
           resp.forEach((data) async {
             var model = ReunionModel();
             model.online = 1;
@@ -196,18 +241,16 @@ class ReunionController extends GetxController {
             model.site = data['site'];
             model.ordreJour = data['ordreJour'];
 
-            //delete table
-            await localReunionService.deleteTableReunion();
             //save data
             await localReunionService.saveReunion(model);
-            print(
+            debugPrint(
                 'Inserting data in table Reunion : ${model.nReunion} - ${model.ordreJour}');
           });
           listReunion.clear();
           getReunion();
-        }, onError: (err) {
+        }, onError: (error) {
           //isDataProcessing(false);
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
         });
         await ApiControllersCall().getParticipantsReunion();
         await ApiControllersCall().getActionReunionRattacher();

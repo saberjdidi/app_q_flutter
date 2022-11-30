@@ -273,9 +273,7 @@ class NewIncidentSecuriteController extends GetxController {
   //champ cache
   int? isps_visible = 1;
   int? type_incident_visible = 1;
-  bool isVisibileTypeIncident = true;
   int? poste_visible = 1;
-  bool isVisibilePoste = true;
   int? category_visible = 1;
   int? cout_esteme_visible = 1;
   int? date_entre_visible = 1;
@@ -502,7 +500,7 @@ class NewIncidentSecuriteController extends GetxController {
         secteur_obligatoire.value = model.incidentSecteur!;
         evenement_declencheur_obligatoire.value =
             model.incidentEventDeclencheur!;
-        print('champ obligatoire incident : ${data}');
+        debugPrint('champ obligatoire incident : ${data}');
       });
     } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
@@ -553,7 +551,7 @@ class NewIncidentSecuriteController extends GetxController {
         secteur_obligatoire.value = model.incidentSecteur!;
         evenement_declencheur_obligatoire.value =
             model.incidentEventDeclencheur!;
-        print('champ obligatoire incident : ${data}');
+        debugPrint('champ obligatoire incident : ${data}');
       }, onError: (err) {
         ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
       });
@@ -610,6 +608,9 @@ class NewIncidentSecuriteController extends GetxController {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'evenement_declencheur'.tr} ${'is_required'.tr}");
       return false;
+    } else if (detectedEmployeModel == null) {
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'detected'.tr} ${'by'.tr} ${'is_required'.tr}");
     } else if (site_visible.value == 1 &&
         site_obligatoire.value == 1 &&
         siteModel == null) {

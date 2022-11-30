@@ -14,7 +14,9 @@ import '../../Models/action/action_model.dart';
 import '../../Models/action/action_sync.dart';
 import '../../Models/activity_model.dart';
 import '../../Models/audit_action_model.dart';
+import '../../Models/begin_licence_model.dart';
 import '../../Models/direction_model.dart';
+import '../../Models/licence_end_model.dart';
 import '../../Models/processus_model.dart';
 import '../../Models/product_model.dart';
 import '../../Models/service_model.dart';
@@ -28,9 +30,13 @@ import '../../Services/action/local_action_service.dart';
 import '../../Services/api_services_call.dart';
 import '../../Services/licence_service.dart';
 import '../../Services/login_service.dart';
+import '../../Utils/http_response.dart';
 import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Views/action/sous_action/add_sous_action_page.dart';
+import '../../Views/action/sous_action/sous_action_page.dart';
+import '../../Views/licence/licence_page.dart';
 import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
@@ -231,7 +237,8 @@ class ActionController extends GetxController {
           }
         });
       }, onError: (err) {
-        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        HttpResponse.StatusCode(err.toString());
+        //ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
       });
     }
   }
@@ -339,7 +346,8 @@ class ActionController extends GetxController {
           });
         }, onError: (err) {
           isDataProcessing(false);
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          HttpResponse.StatusCode(err.toString());
+          //ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
         });
       }
     } catch (exception) {
@@ -407,10 +415,54 @@ class ActionController extends GetxController {
     }
   }
 
+  //check if licence end
+  BeginLicenceModel? licenceDevice;
+  LicenceEndModel? licenceEndModel;
+  var isLicenceEnd = 0.obs;
+  final deviceId = SharedPreference.getDeviceIdKey();
+  checkLicence() async {
+    var connection = await Connectivity().checkConnectivity();
+    if (connection == ConnectivityResult.none) {
+      licenceDevice = await LicenceService().getBeginLicence();
+      String? device_id = licenceDevice?.DeviceId;
+      licenceEndModel = await LicenceService().getIsLicenceEnd(device_id);
+      if (licenceEndModel?.retour == 0) {
+        debugPrint('licence of device : $device_id');
+      } else {
+        Get.snackbar("Licence ${SharedPreference.getLicenceKey().toString()}",
+            'licence_expired'.tr,
+            colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
+        SharedPreference.clearSharedPreference();
+        Get.off(LicencePage());
+      }
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      await LoginService().isLicenceEndService({
+        "deviceid": deviceId.toString(),
+      }).then((responseLicenceEnd) async {
+        debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+        if (responseLicenceEnd['retour'] == 0) {
+          debugPrint('licence of device : ${deviceId.toString()}');
+        } else {
+          ShowSnackBar.snackBar(
+              "Licence ${SharedPreference.getLicenceKey().toString()}",
+              'licence_expired'.tr,
+              Colors.lightBlueAccent);
+          SharedPreference.clearSharedPreference();
+          Get.off(LicencePage());
+        }
+      }, onError: (errorLicenceEnd) {
+        HttpResponse.StatusCode(errorLicenceEnd.toString());
+        //ShowSnackBar.snackBar("Error Licence End", errorLicenceEnd.toString(), Colors.red);
+      });
+    }
+  }
+
   @override
   void onInit() async {
     super.onInit();
     getActions();
+    checkLicence();
 
     //search
     searchNumAction.text = '';
@@ -480,29 +532,7 @@ class ActionController extends GetxController {
           print('search actions');
         }
         response.forEach((data) {
-          //print('id action : ${data['nAct']}');
-          //print('id action int : ${int.parse(data['nAct'].toString())}');
           var model = ActionModel();
-          /*num nact_data = data['nAct'];
-          num online_data = data['online'];
-          print('nact data : ${nact_data}');
-          print('online data : ${online_data}');
-
-
-          if(nact_data * online_data == 0){
-            num maxAction = localActionService.readNActionMax();
-            print("maxAction ${maxAction}");
-            //int? model_nact = maxAction.toInt() + int.parse(data['nAct'].toString());// + data['nAct'];
-
-            num result_data = maxAction+nact_data;
-            print('result data : ${result_data}');
-            model.nAct = result_data.toInt();
-            print('nact offline : ${model.nAct}');
-          }
-          else{
-            model.nAct=data['nAct'];
-            print('nact online: ${model.nAct}');
-          } */
           model.nAct = data['nAct'];
           model.site = data['site'];
           model.sourceAct = data['sourceAct'];
@@ -539,7 +569,6 @@ class ActionController extends GetxController {
         }).then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
-            print('get actions : ${data} ');
             var model = ActionModel();
             model.nAct = data['nAct'];
             model.site = data['site'];
@@ -556,20 +585,16 @@ class ActionController extends GetxController {
             model.actionPlus1 = data['action_plus1'];
             //model.datsuivPrv = data['datsuiv_prv'];
             model.online = 1;
-
             listAction.add(model);
-            listAction.forEach((element) {
-              print('element act ${element.act}');
-            });
 
             searchNumAction.clear();
             searchAction.clear();
             searchType = '';
           });
-          print('get data');
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing.value = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
         });
 
         /* listAction = await ActionService().getAction(searchNumAction.text, searchAction.text, matricule.toString(), searchType) as List<ActionModel>;
@@ -602,8 +627,8 @@ class ActionController extends GetxController {
           "cloture": 0,
           "codesite": selectedSiteCode,
           "matdeclencheur": matricule.toString(),
-          "commentaire": commentaireController.text.trim(),
-          "respsuivi": selectedResSuiviCode,
+          "commentaire": '', //commentaireController.text.trim(),
+          "respsuivi": '', //selectedResSuiviCode,
           "nfiche": 0,
           "imodule": 0,
           "datesaisie": dateSaisieController.text,
@@ -715,17 +740,19 @@ class ActionController extends GetxController {
         await localActionService.saveAction(model);
 
         //save type cause in db local
-        listTypeCauseOffline.forEach((element) async {
-          int max_type_cause =
-              await LocalActionService().getMaxNumTypeCauseAction();
-          var model = TypeCauseModel();
-          model.online = 3;
-          model.nAct = max_num_action + 1;
-          model.idTypeCause = max_type_cause + 1;
-          model.codetypecause = element.codetypecause;
-          model.typecause = element.typecause;
-          await LocalActionService().saveTypeCauseAction(model);
-        });
+        if (listTypeCauseOffline.isNotEmpty || listTypeCauseOffline != []) {
+          listTypeCauseOffline.forEach((element) async {
+            int max_type_cause =
+                await LocalActionService().getMaxNumTypeCauseAction();
+            var model = TypeCauseModel();
+            model.online = 3;
+            model.nAct = max_num_action + 1;
+            model.idTypeCause = max_type_cause + 1;
+            model.codetypecause = element.codetypecause;
+            model.typecause = element.typecause;
+            await LocalActionService().saveTypeCauseAction(model);
+          });
+        }
 
         Get.back();
         listAction.clear();
@@ -737,23 +764,50 @@ class ActionController extends GetxController {
         clearData();
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
-        await ActionService().saveAction(data).then((resp) {
-          Get.back();
-          listAction.clear();
-          getActions();
-          ShowSnackBar.snackBar("Add Action", "Action Added", Colors.green);
-          //Get.toNamed(AppRoute.action);
-          clearData();
-        }, onError: (err) {
+        await ActionService().saveAction(data).then((response) {
+          final num_action = response['nact'];
+          debugPrint('num action : ${num_action}');
+
+          ShowSnackBar.snackBar("Successfully", "Action Added", Colors.green);
+
+          Get.defaultDialog(
+              title: '${'new'.tr} Sous Action',
+              backgroundColor: Colors.white,
+              titleStyle: TextStyle(color: Colors.black),
+              middleTextStyle: TextStyle(color: Colors.white),
+              textConfirm: "Yes",
+              textCancel: "No",
+              onConfirm: () {
+                Get.to(AddSousActionPage(numAction: num_action));
+                //Get.to(SousActionPage(), arguments: {"id_action": num_action});
+              },
+              onCancel: () {
+                //Get.toNamed(AppRoute.action);
+                Get.back();
+                listAction.clear();
+                getActions();
+                clearData();
+              },
+              confirmTextColor: Colors.white,
+              buttonColor: Colors.blue,
+              barrierDismissible: false,
+              radius: 20,
+              content: Text(
+                '${'do_you_want_add'.tr} Sous Action',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'Brand-Bold'),
+              ));
+        }, onError: (error) {
           isDataProcessing(false);
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          print('Error : ${err.toString()}');
+          HttpResponse.StatusCode(error.toString());
         });
       }
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-      print('Exception : ${exception.toString()}');
+      debugPrint('Exception : ${exception.toString()}');
     } finally {
       isDataProcessing(false);
       //Get.back();
@@ -794,6 +848,7 @@ class ActionController extends GetxController {
     serviceModel = null;
     //productList = [];
     typeCauseList = [];
+    listTypeCauseOffline = [];
   }
 
   //synchronization
@@ -802,12 +857,12 @@ class ActionController extends GetxController {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data",
+        Get.snackbar("No Connection", 'cannot_synchronize_data'.tr,
             colorText: Colors.blue, snackPosition: SnackPosition.TOP);
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
         //verify licence
-        final licenceDevice = await LicenceService().getBeginLicence();
+        /* final licenceDevice = await LicenceService().getBeginLicence();
         String? device_id = licenceDevice?.DeviceId;
         await LoginService().isLicenceEndService({
           "deviceid": device_id.toString(),
@@ -821,7 +876,7 @@ class ActionController extends GetxController {
         }, onError: (errorLicenceEnd) {
           ShowSnackBar.snackBar(
               "Error Licence End", errorLicenceEnd.toString(), Colors.red);
-        });
+        }); */
         //sync from db local to sql server
         await SyncDataController().syncActionToSQLServer();
         await SyncDataController().syncSousActionToSQLServer();
@@ -839,6 +894,8 @@ class ActionController extends GetxController {
           "action_plus1": "",
           "typeAction": ""
         }).then((resp) async {
+          //delete db local
+          await localActionService.deleteAllAction();
           //isDataProcessing(false);
           resp.forEach((data) async {
             var model = ActionModel();
@@ -860,8 +917,7 @@ class ActionController extends GetxController {
             //model.isd = data['isd'];
             //model.datsuivPrv = data['datsuiv_prv'];
             model.online = 1;
-            //delete db local
-            await localActionService.deleteAllAction();
+
             //save data in local db
             await localActionService.saveAction(model);
             print(
@@ -869,9 +925,10 @@ class ActionController extends GetxController {
           });
           listAction.clear();
           getActions();
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing.value = false;
-          ShowSnackBar.snackBar("Error Action", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
+          //ShowSnackBar.snackBar("Error Action", error.toString(), Colors.red);
         });
 
         await ApiControllersCall().getAllSousAction();
@@ -1018,8 +1075,8 @@ class ActionController extends GetxController {
             ),
       child: ListTile(
         selected: isSelected,
-        title: Text(auditActionModel?.refAudit ?? ''),
-        subtitle: Text(auditActionModel?.idaudit.toString() ?? ''),
+        title: Text(auditActionModel?.idaudit.toString() ?? ''),
+        //subtitle: Text(auditActionModel?.refAudit?? ''),
       ),
     );
   }
@@ -1095,7 +1152,7 @@ class ActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(siteModel?.site ?? ''),
-        subtitle: Text(siteModel?.codesite.toString() ?? ''),
+        // subtitle: Text(siteModel?.codesite.toString() ?? ''),
       ),
     );
   }
@@ -1131,7 +1188,7 @@ class ActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
-        subtitle: Text(processusModel?.codeProcessus.toString() ?? ''),
+        // subtitle: Text(processusModel?.codeProcessus.toString() ?? ''),
       ),
     );
   }
@@ -1179,7 +1236,7 @@ class ActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(employeModel?.nompre ?? ''),
-        subtitle: Text(employeModel?.mat.toString() ?? ''),
+        //subtitle: Text(employeModel?.mat.toString() ?? ''),
       ),
     );
   }
@@ -1215,7 +1272,7 @@ class ActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(directionModel?.direction ?? ''),
-        subtitle: Text(directionModel?.codeDirection.toString() ?? ''),
+        // subtitle: Text(directionModel?.codeDirection.toString() ?? ''),
       ),
     );
   }
@@ -1306,7 +1363,7 @@ class ActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(item?.produit ?? ''),
-        subtitle: Text(item?.codePdt?.toString() ?? ''),
+        // subtitle: Text(item?.codePdt?.toString() ?? ''),
         leading: CircleAvatar(
             // this does not work - throws 404 error
             // backgroundImage: NetworkImage(item.avatar ?? ''),
@@ -1355,7 +1412,7 @@ class ActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(item?.typecause ?? ''),
-        subtitle: Text(item?.codetypecause?.toString() ?? ''),
+        //subtitle: Text(item?.codetypecause?.toString() ?? ''),
         leading: CircleAvatar(
             // this does not work - throws 404 error
             // backgroundImage: NetworkImage(item.avatar ?? ''),

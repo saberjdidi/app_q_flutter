@@ -1,20 +1,14 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Models/incident_securite/cause_typique_model.dart';
-import 'package:qualipro_flutter/Services/incident_securite/incident_securite_service.dart';
 import 'package:qualipro_flutter/Services/visite_securite/local_visite_securite_service.dart';
 import 'package:qualipro_flutter/Services/visite_securite/visite_securite_service.dart';
-import '../../../Controllers/incident_securite/incident_securite_controller.dart';
 import '../../../Controllers/visite_securite/visite_securite_controller.dart';
 import '../../../Models/pnc/isps_pnc_model.dart';
 import '../../../Models/visite_securite/checklist_critere_model.dart';
 import '../../../Route/app_route.dart';
-import '../../../Utils/custom_colors.dart';
 import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
@@ -231,7 +225,7 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
                                   listCheckList[index].eval =
                                       int.parse(critere.toString());
                                   ispspncModel = data;
-                                  print('critere value :${critere}');
+                                  debugPrint('critere value :${critere}');
                                 },
                                 dropdownBuilder: _customDropDownRespect,
                                 popupItemBuilder:
@@ -258,8 +252,8 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
                                   textInputAction: TextInputAction.next,
                                   //initialValue: listCheckList[index].commentaire,
                                   decoration: InputDecoration(
-                                      labelText: 'Commentaire',
-                                      hintText: 'Commentaire',
+                                      labelText: 'comment'.tr,
+                                      hintText: 'comment'.tr,
                                       labelStyle: TextStyle(
                                         fontSize: 14.0,
                                       ),
@@ -436,16 +430,16 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
           onPressed: () async {
             //saveBtn();
             for (var i = 0; i < listCheckList.length; i++) {
-              print(
+              debugPrint(
                   'checklist : ${listCheckList[i].id}-${listCheckList[i].lib} -eval:${listCheckList[i].eval} - comment:${_controllers[i].text}');
               if (_controllers[i].text.trim() == '' &&
                   listCheckList[i].eval == 2) {
                 Message.taskErrorOrWarning(
-                    "Warning", "Commentaire est obligatoire");
+                    'warning'.tr, "${'comment'.tr} ${'is_required'.tr}");
                 return;
               } else if (listCheckList[i].eval == 0) {
-                Message.taskErrorOrWarning("Warning",
-                    "Le champs d'évaluation est obligatoire pour toute la liste");
+                Message.taskErrorOrWarning('warning'.tr,
+                    'champs_evaluation_obligatoire_toute_liste'.tr);
                 return;
               }
             }
@@ -515,7 +509,7 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
                         padding: const EdgeInsets.only(right: 4.0),
                         child: Icon(Icons.add),
                       ),
-                      Text("Save")
+                      Text('save'.tr)
                     ],
                   ),
           ),
@@ -604,9 +598,9 @@ class _CheckListCriterePageState extends State<CheckListCriterePage> {
     try {
       List<ISPSPNCModel> ispsList = [
         ISPSPNCModel(value: "0", name: ""),
-        ISPSPNCModel(value: "1", name: "Respecté"),
-        ISPSPNCModel(value: "2", name: "Non Respecté"),
-        ISPSPNCModel(value: "3", name: "Non Observé"),
+        ISPSPNCModel(value: "1", name: 'respecte'.tr),
+        ISPSPNCModel(value: "2", name: 'non_respecte'.tr),
+        ISPSPNCModel(value: "3", name: 'non_observe'.tr),
       ];
 
       return ispsList;

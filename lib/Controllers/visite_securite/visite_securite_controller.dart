@@ -1,17 +1,18 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Services/visite_securite/local_visite_securite_service.dart';
-import '../../Models/visite_securite/equipe_model.dart';
-import '../../Models/visite_securite/equipe_visite_securite_model.dart';
+import '../../Models/begin_licence_model.dart';
+import '../../Models/licence_end_model.dart';
 import '../../Models/visite_securite/visite_securite_model.dart';
-import '../../Services/incident_securite/incident_securite_service.dart';
 import '../../Services/incident_securite/local_incident_securite_service.dart';
+import '../../Services/licence_service.dart';
+import '../../Services/login_service.dart';
 import '../../Services/visite_securite/visite_securite_service.dart';
+import '../../Utils/http_response.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Views/licence/licence_page.dart';
 import '../api_controllers_call.dart';
 import '../sync_data_controller.dart';
 
@@ -36,11 +37,55 @@ class VisiteSecuriteController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     getData();
+    checkLicence();
     //checkConnectivity();
     //search
     searchNumero.text = '';
     searchUnite.text = '';
     searchZone.text = '';
+  }
+
+  //check if licence end
+  BeginLicenceModel? licenceDevice;
+  LicenceEndModel? licenceEndModel;
+  var isLicenceEnd = 0.obs;
+  final deviceId = SharedPreference.getDeviceIdKey();
+  checkLicence() async {
+    var connection = await Connectivity().checkConnectivity();
+    if (connection == ConnectivityResult.none) {
+      licenceDevice = await LicenceService().getBeginLicence();
+      String? device_id = licenceDevice?.DeviceId;
+      licenceEndModel = await LicenceService().getIsLicenceEnd(device_id);
+      if (licenceEndModel?.retour == 0) {
+        debugPrint('licence of device : $device_id');
+      } else {
+        Get.snackbar("Licence ${SharedPreference.getLicenceKey().toString()}",
+            'licence_expired'.tr,
+            colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
+        SharedPreference.clearSharedPreference();
+        Get.off(LicencePage());
+      }
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      await LoginService().isLicenceEndService({
+        "deviceid": deviceId.toString(),
+      }).then((responseLicenceEnd) async {
+        debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+        if (responseLicenceEnd['retour'] == 0) {
+          debugPrint('licence of device : ${deviceId.toString()}');
+        } else {
+          ShowSnackBar.snackBar(
+              "Licence ${SharedPreference.getLicenceKey().toString()}",
+              'licence_expired'.tr,
+              Colors.lightBlueAccent);
+          SharedPreference.clearSharedPreference();
+          Get.off(LicencePage());
+        }
+      }, onError: (errorLicenceEnd) {
+        HttpResponse.StatusCode(errorLicenceEnd.toString());
+        //ShowSnackBar.snackBar("Error Licence End", errorLicenceEnd.toString(), Colors.red);
+      });
+    }
   }
 
   Future<void> checkConnectivity() async {
@@ -76,9 +121,6 @@ class VisiteSecuriteController extends GetxController {
           model.unite = data['unite'];
           model.zone = data['zone'];
           listVisiteSecurite.add(model);
-          listVisiteSecurite.forEach((element) {
-            print('element visite ${element.id} - ${element.unite}');
-          });
         });
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
@@ -96,9 +138,6 @@ class VisiteSecuriteController extends GetxController {
             model.unite = data['unite'];
             model.zone = data['zone'];
             listVisiteSecurite.add(model);
-            listVisiteSecurite.forEach((element) {
-              print('element visite ${element.id} - ${element.unite}');
-            });
             /*
            //model.listEquipe = data['listEquipe'];
             if (data['listEquipe'] != null) {
@@ -118,16 +157,15 @@ class VisiteSecuriteController extends GetxController {
             }
             */
           });
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing.value = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          print('Error visite Securite : ${err.toString()}');
+          HttpResponse.StatusCode(error.toString());
         });
       }
     } catch (exception) {
       isDataProcessing.value = false;
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-      print('Exception : ${exception.toString()}');
+      debugPrint('Exception : ${exception.toString()}');
     } finally {
       isDataProcessing.value = false;
     }
@@ -151,9 +189,6 @@ class VisiteSecuriteController extends GetxController {
           model.unite = data['unite'];
           model.zone = data['zone'];
           listVisiteSecurite.add(model);
-          listVisiteSecurite.forEach((element) {
-            print('element visite ${element.id} - ${element.unite}');
-          });
           searchNumero.clear();
           searchUnite.clear();
           searchZone.clear();
@@ -176,16 +211,15 @@ class VisiteSecuriteController extends GetxController {
             model.unite = data['unite'];
             model.zone = data['zone'];
             listVisiteSecurite.add(model);
-            listVisiteSecurite.forEach((element) {
-              print('element visite ${element.id} - ${element.unite}');
-            });
+
             searchNumero.clear();
             searchUnite.clear();
             searchZone.clear();
           });
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing.value = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
+          //ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
         });
       }
     } catch (exception) {
@@ -204,7 +238,7 @@ class VisiteSecuriteController extends GetxController {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data",
+        Get.snackbar("No Connection", 'cannot_synchronize_data'.tr,
             colorText: Colors.blue, snackPosition: SnackPosition.TOP);
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
@@ -288,15 +322,15 @@ class VisiteSecuriteController extends GetxController {
             //await localVisiteSecuriteService.deleteTableEquipeVisiteSecuriteOffline();
             //save data
             await localVisiteSecuriteService.saveVisiteSecurite(model);
-            print(
+            debugPrint(
                 'Inserting data in table VisiteSecurite : ${model.id} - ${model.unite} - ${model.zone}');
           });
           listVisiteSecurite.clear();
           getData();
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing(false);
-          ShowSnackBar.snackBar(
-              "Error Visite Securite", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
+          // ShowSnackBar.snackBar("Error Visite Securite", error.toString(), Colors.red);
         });
 
         await ApiControllersCall().getEquipeVisiteSecuriteFromAPI();

@@ -125,6 +125,8 @@ class DBHelper {
     batch.execute(
         "CREATE TABLE ${DBTable.type_reunion}(id INTEGER PRIMARY KEY AUTOINCREMENT, codeTypeR INTEGER, typeReunion TEXT)");
     batch.execute(
+        "CREATE TABLE ${DBTable.type_reunion_matricule}(id INTEGER PRIMARY KEY AUTOINCREMENT, codeTypeR INTEGER, typeReunion TEXT, mat TEXT)");
+    batch.execute(
         "CREATE TABLE ${DBTable.reunion}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, nReunion INTEGER, typeReunion TEXT, codeTypeReunion INTEGER, datePrev TEXT, dateReal TEXT, etat TEXT, lieu TEXT, site TEXT, ordreJour TEXT, dureePrev TEXT, heureDeb TEXT, heureFin TEXT, dureeReal TEXT, commentaire TEXT, codeSite INTEGER, codeProcessus INTEGER, codeDirection INTEGER, codeService INTEGER, codeActivity INTEGER)");
     batch.execute(
         "CREATE TABLE ${DBTable.participant_reunion}(id INTEGER PRIMARY KEY AUTOINCREMENT, online INTEGER, nReunion INTEGER, mat TEXT, nompre TEXT, comment TEXT, aparticipe INTEGER, confirm INTEGER)");
@@ -1564,6 +1566,27 @@ class DBHelper {
   Future<int> deleteTableTypeReunion() async {
     Database? mydb = await db;
     final res = await mydb!.rawDelete('DELETE FROM ${DBTable.type_reunion}');
+    return res;
+  }
+
+  //---------------type reunion matricule---------------------
+  readTypeReunionByMatricule(mat) async {
+    Database? mydb = await db;
+    List<Map> response = await mydb!.rawQuery(
+        "SELECT * FROM ${DBTable.type_reunion_matricule} WHERE mat = '$mat'");
+    return response;
+  }
+
+  insertTypeReunionMatricule(String table, data) async {
+    Database? mydb = await db;
+    int response = await mydb!.insert(table, data);
+    return response;
+  }
+
+  Future<int> deleteTableTypeReunionMatricule() async {
+    Database? mydb = await db;
+    final res =
+        await mydb!.rawDelete('DELETE FROM ${DBTable.type_reunion_matricule}');
     return res;
   }
 

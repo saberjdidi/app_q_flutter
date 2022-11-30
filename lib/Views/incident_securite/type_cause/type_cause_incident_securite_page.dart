@@ -206,12 +206,12 @@ class _TypeCauseIncidentSecuritePageState
             await IncidentSecuriteService()
                 .deleteTypeCauseIncidentById(widget.numIncident, id)
                 .then((resp) async {
-              ShowSnackBar.snackBar(
-                  "Successfully", "Type Cause Deleted", Colors.green);
               listType.removeWhere((element) => element.idTypeCause == id);
               setState(() {});
               await ApiControllersCall().getTypeCauseIncidentSecRattacher();
               Navigator.of(context).pop();
+              ShowSnackBar.snackBar(
+                  "Successfully", "Type Cause Deleted", Colors.green);
             }, onError: (err) {
               ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
               print('Error : ${err.toString()}');

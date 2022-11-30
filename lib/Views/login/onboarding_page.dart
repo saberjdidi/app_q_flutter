@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Utils/custom_colors.dart';
 import '../../Controllers/onboarding_controller.dart';
-import '../../Widgets/loading_widget.dart';
-import '../dashboard_screen.dart';
 import '../home_page.dart';
 
 class OnBoardingPage extends GetView<OnBoardingController> {
@@ -14,17 +11,19 @@ class OnBoardingPage extends GetView<OnBoardingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedSplashScreen(
-        splash: Obx((){
+        splash: Obx(() {
           if (controller.isDataProcessing.value == true) {
             return Center(
               child: Column(
                 children: <Widget>[
-                  Lottie.asset('assets/images/loading_image.json', width: 150, height: 150),
+                  Lottie.asset('assets/images/loading_image.json',
+                      width: 150, height: 150),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text('synchronize_data'.tr,
-                          style: TextStyle(color: Colors.blueGrey, fontSize: 20)),
+                          style:
+                              TextStyle(color: Colors.blueGrey, fontSize: 20)),
                     ),
                   ),
                 ],
@@ -42,9 +41,12 @@ class OnBoardingPage extends GetView<OnBoardingController> {
                     // fit: BoxFit.fill,
                   ),
                   const SizedBox(height: 10),*/
-                  CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),),
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
                   Center(
-                    child: Text('synchronize_data'.tr, textAlign: TextAlign.center,
+                    child: Text('synchronize_data'.tr,
+                        textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.blueGrey, fontSize: 20)),
                   ),
                   /* const SizedBox(height: 20),
@@ -68,7 +70,6 @@ class OnBoardingPage extends GetView<OnBoardingController> {
         backgroundColor: Colors.white54,
         splashIconSize: 250,
         splashTransition: SplashTransition.sizeTransition,
-
       ),
       /*Obx(() {
 
@@ -106,5 +107,4 @@ class OnBoardingPage extends GetView<OnBoardingController> {
       ) */
     );
   }
-
 }

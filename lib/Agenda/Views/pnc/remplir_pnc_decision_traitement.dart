@@ -1,18 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as mypath;
-
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Models/employe_model.dart';
 import '../../../Models/pnc/responsable_traitement_model.dart';
@@ -27,7 +20,6 @@ import '../../../Utils/snack_bar.dart';
 import '../../../Validators/validator.dart';
 import 'pnc_decision_traitement_page.dart';
 import 'remplir_pnc_investigation_a_effectuer.dart';
-import 'responsable_traitement/new_responsable_traitement.dart';
 
 class RemplirPNCTraitementDecision extends StatefulWidget {
   TraitementDecisionModel traitementDecisionModel;
@@ -99,11 +91,6 @@ class _RemplirPNCTraitementDecisionState
               model.rapport_trait = data['rapport_trait'];
               model.premier_resp_int = data['premier_resp_int'];
               respTraitementList.add(model);
-
-              respTraitementList.forEach((element) {
-                print(
-                    'element resp traitement ${element.nompre}, resptrait : ${element.resptrait}');
-              });
             });
           });
         }, onError: (err) {
@@ -120,10 +107,11 @@ class _RemplirPNCTraitementDecisionState
   bool _dataValidation() {
     if (respTraitementList.isEmpty || respTraitementList == []) {
       Message.taskErrorOrWarning(
-          "Alert", "Veuillez Ajouter au moins responsable de traitement");
+          'warning'.tr, 'ajouter_au_moins_responsable_traitement'.tr);
       return false;
     } else if (responsableSuiviModel == null) {
-      Message.taskErrorOrWarning("Alert", "Responsable Suivi is required");
+      Message.taskErrorOrWarning('warning'.tr,
+          "${'responsable'.tr} ${'suivi'.tr} ${'is_required'.tr}");
       return false;
     }
     return true;
@@ -135,7 +123,6 @@ class _RemplirPNCTraitementDecisionState
         DateFormat('yyyy-MM-dd').format(dateTime);
     super.initState();
     getResponsableTraitement();
-    print('list resp : $respTraitementList');
     //add reponsable traitement
     dateTraitementController.text = DateFormat('yyyy-MM-dd').format(dateTime);
     if (SharedPreference.getLangue() == null) {
@@ -162,7 +149,7 @@ class _RemplirPNCTraitementDecisionState
           //color: Colors.blue,
         ),
         title: Center(
-          child: Text("PNC N° ${widget.traitementDecisionModel.nnc}"),
+          child: Text("P.N.C N° ${widget.traitementDecisionModel.nnc}"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -183,7 +170,7 @@ class _RemplirPNCTraitementDecisionState
                         Visibility(
                           visible: true,
                           child: CheckboxListTile(
-                            title: const Text('Nécessite Investigation'),
+                            title: Text('necessite_investigation'.tr),
                             value: checkWithInvestigation,
                             onChanged: (bool? value) {
                               setState(() {
@@ -221,7 +208,7 @@ class _RemplirPNCTraitementDecisionState
                             validator: (value) =>
                                 Validator.validateField(value: value!),
                             decoration: InputDecoration(
-                                labelText: 'Date Saisie Decision',
+                                labelText: '${'date_saisie'.tr} Decision',
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -252,8 +239,8 @@ class _RemplirPNCTraitementDecisionState
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Cause NC',
-                                hintText: 'Cause NC',
+                                labelText: 'Cause N.C',
+                                hintText: 'Cause N.C',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -281,14 +268,14 @@ class _RemplirPNCTraitementDecisionState
                           isFilteredOnline: true,
                           compareFn: (i, s) => i?.isEqual(s) ?? false,
                           dropdownSearchDecoration: InputDecoration(
-                            labelText: "Type Traitement",
+                            labelText: "Type ${'processing'.tr}",
                             contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                             border: OutlineInputBorder(),
                           ),
                           onFind: (String? filter) => getTypeTraitement(filter),
                           onChanged: (data) {
                             selectCodeTypeTraitement = data?.codeTypeT;
-                            print(
+                            debugPrint(
                                 'type traitement: ${data?.typeT}, mat: ${selectCodeTypeTraitement}');
                           },
                           dropdownBuilder: customDropDownTypeTraitement,
@@ -305,7 +292,7 @@ class _RemplirPNCTraitementDecisionState
                           isFilteredOnline: true,
                           compareFn: (i, s) => i?.isEqual(s) ?? false,
                           dropdownSearchDecoration: InputDecoration(
-                            labelText: "Responsable Suivi *",
+                            labelText: "${'responsable'.tr} ${'suivi'.tr} *",
                             contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                             border: OutlineInputBorder(),
                           ),
@@ -314,14 +301,14 @@ class _RemplirPNCTraitementDecisionState
                           onChanged: (data) {
                             responsableSuiviModel = data;
                             responsableSuiviMatricule = data?.mat;
-                            print(
+                            debugPrint(
                                 'responsable suivi: ${data?.nompre}, mat: ${responsableSuiviMatricule}');
                           },
                           dropdownBuilder: customDropDownResponsableSuivi,
                           popupItemBuilder:
                               customPopupItemBuilderResponsableSuivi,
                           validator: (u) => u == null
-                              ? "Responsable suivi is required "
+                              ? "${'responsable'.tr} ${'suivi'.tr} ${'is_required'.tr}"
                               : null,
                         ),
                         SizedBox(
@@ -329,7 +316,7 @@ class _RemplirPNCTraitementDecisionState
                         ),
                         Center(
                           child: Text(
-                            'responsable Traitement',
+                            '${'responsable'.tr} ${'processing'.tr}',
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w600),
                           ),
@@ -349,7 +336,7 @@ class _RemplirPNCTraitementDecisionState
                                           style: _contentStyleHeader),
                                       numeric: true),
                                   DataColumn(
-                                      label: Text('Nom Prenom',
+                                      label: Text('nom_prenom'.tr,
                                           style: _contentStyleHeader)),
                                   DataColumn(
                                     label: InkWell(
@@ -758,7 +745,7 @@ class _RemplirPNCTraitementDecisionState
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -1044,9 +1031,9 @@ class _RemplirPNCTraitementDecisionState
           scrollable: true,
           actionsAlignment: MainAxisAlignment.center,
           insetPadding: EdgeInsets.all(10),
-          title: const Center(
+          title: Center(
             child: Text(
-              'New Responsable Traitement',
+              '${'new'.tr} ${'responsable'.tr} ${'processing'.tr}',
               style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontFamily: "Brand-Bold",
@@ -1063,35 +1050,41 @@ class _RemplirPNCTraitementDecisionState
                   children: <Widget>[
                     Visibility(
                       visible: true,
-                      child: TextFormField(
-                        controller: dateTraitementController,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (value) {
+                      child: InkWell(
+                        onTap: () {
                           selectedDate(context);
                         },
-                        decoration: InputDecoration(
-                            labelText: 'Delai Traitement *',
-                            hintText: 'date',
-                            labelStyle: TextStyle(
-                              fontSize: 14.0,
-                            ),
-                            hintStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 10.0,
-                            ),
-                            suffixIcon: InkWell(
-                              onTap: () {
-                                selectedDate(context);
-                              },
-                              child: Icon(Icons.calendar_today),
-                            ),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.lightBlue, width: 1),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)))),
-                        style: TextStyle(fontSize: 14.0),
+                        child: TextFormField(
+                          enabled: false,
+                          controller: dateTraitementController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          onChanged: (value) {
+                            selectedDate(context);
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'Delai ${'processing'.tr} *',
+                              hintText: 'date',
+                              labelStyle: TextStyle(
+                                fontSize: 14.0,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 10.0,
+                              ),
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  selectedDate(context);
+                                },
+                                child: Icon(Icons.calendar_today),
+                              ),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.lightBlue, width: 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)))),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -1104,8 +1097,8 @@ class _RemplirPNCTraitementDecisionState
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Traitement N.C *',
-                            hintText: 'Traitement NC',
+                            labelText: '${'processing'.tr} N.C *',
+                            hintText: '${'processing'.tr} N.C',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -1135,20 +1128,20 @@ class _RemplirPNCTraitementDecisionState
                       isFilteredOnline: true,
                       compareFn: (i, s) => i?.isEqual(s) ?? false,
                       dropdownSearchDecoration: InputDecoration(
-                        labelText: "Responsable Traitement *",
+                        labelText: "${'responsable'.tr} ${'processing'.tr} *",
                         contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                         border: OutlineInputBorder(),
                       ),
                       onFind: (String? filter) => getEmploye(filter),
                       onChanged: (data) {
                         employeMatricule = data?.mat;
-                        print(
+                        debugPrint(
                             'Responsable Traitement: ${data?.nompre}, mat: ${employeMatricule}');
                       },
                       dropdownBuilder: customDropDownEmploye,
                       popupItemBuilder: customPopupItemBuilderEmploye,
                       validator: (u) => u == null
-                          ? "Responsable Traitementl is required "
+                          ? "${'responsable'.tr} ${'processing'.tr} ${'is_required'.tr}"
                           : null,
                     ),
                     SizedBox(
@@ -1157,7 +1150,7 @@ class _RemplirPNCTraitementDecisionState
                     Visibility(
                       visible: true,
                       child: CheckboxListTile(
-                        title: const Text('Premier Responsable'),
+                        title: Text('${'first'.tr} ${'responsable'.tr}'),
                         value: checkFirstResponsable,
                         onChanged: (bool? value) {
                           setState(() {
@@ -1167,7 +1160,8 @@ class _RemplirPNCTraitementDecisionState
                             } else {
                               firstResponsable = "0";
                             }
-                            print('Premier Responsable ${firstResponsable}');
+                            debugPrint(
+                                'Premier Responsable ${firstResponsable}');
                           });
                         },
                         activeColor: Colors.blue,
@@ -1183,8 +1177,8 @@ class _RemplirPNCTraitementDecisionState
           actionsPadding: EdgeInsets.all(1.0),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                'Cancel',
+              child: Text(
+                'cancel'.tr,
                 style: TextStyle(color: Colors.red),
               ),
               onPressed: () {
@@ -1255,7 +1249,7 @@ class _RemplirPNCTraitementDecisionState
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Text(
-                  'Save',
+                  'save'.tr,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

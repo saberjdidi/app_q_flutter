@@ -121,6 +121,31 @@ class _NewTypeConsequenceIncidentSecuriteState
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Types Consequences',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               onFind: (String? filter) =>
                                   getTypeConsequence(filter),
                               onChanged: (data) {

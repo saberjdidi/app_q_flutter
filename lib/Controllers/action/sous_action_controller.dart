@@ -6,11 +6,13 @@ import 'package:qualipro_flutter/Models/champ_obligatoire_action_model.dart';
 import 'package:qualipro_flutter/Models/gravite_model.dart';
 import 'package:qualipro_flutter/Models/priorite_model.dart';
 import 'package:qualipro_flutter/Models/action/sous_action_model.dart';
+import '../../Models/champ_cache_model.dart';
 import '../../Models/employe_model.dart';
 import '../../Models/processus_employe_model.dart';
 import '../../Services/action/action_service.dart';
 import '../../Services/action/local_action_service.dart';
 import '../../Services/api_services_call.dart';
+import '../../Utils/http_response.dart';
 import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
@@ -39,42 +41,158 @@ class SousActionController extends GetxController {
   //priorite
   int? selectedCodePriorite = 0;
   PrioriteModel? prioriteModel = null;
-  late int? priorite_obligatoire;
+  var priorite_obligatoire = 0.obs;
   //gravite
   int? selectedCodeGravite = 0;
   GraviteModel? graviteModel = null;
-  late int? gravite_obligatoire;
+  var gravite_obligatoire = 0.obs;
   //processus
   int? selectedProcessusCode = 0;
   ProcessusEmployeModel? processusModel = null;
   //resp suivi
   String? selectedResSuiviCode = "";
   EmployeModel? resSuiviModel = null;
-  late int? delai_suivi_obligatoire;
+  var delai_suivi_obligatoire = 0.obs;
   //resp real
   String? selectedResRealCode = "";
   EmployeModel? respRealModel = null;
 
   //Champ obligatoire
   getChampObligatoire() async {
-    List<ChampObligatoireActionModel> champObligatoireList =
-        await List<ChampObligatoireActionModel>.empty(growable: true);
-    var response = await localActionService.readChampObligatoireAction();
-    response.forEach((data) {
-      var model = ChampObligatoireActionModel();
-      model.commentaire_Realisation_Action =
-          data['commentaire_Realisation_Action'];
-      model.rapport_Suivi_Action = data['rapport_Suivi_Action'];
-      model.delai_Suivi_Action = data['delai_Suivi_Action'];
-      model.priorite = data['priorite'];
-      model.gravite = data['gravite'];
-      model.commentaire = data['commentaire'];
-      champObligatoireList.add(model);
+    var connection = await Connectivity().checkConnectivity();
+    if (connection == ConnectivityResult.none) {
+      List<ChampObligatoireActionModel> champObligatoireList =
+          await List<ChampObligatoireActionModel>.empty(growable: true);
+      var response = await localActionService.readChampObligatoireAction();
+      response.forEach((data) {
+        debugPrint('champ obligatoire : $data');
+        var model = ChampObligatoireActionModel();
+        model.commentaire_Realisation_Action =
+            data['commentaire_Realisation_Action'];
+        model.rapport_Suivi_Action = data['rapport_Suivi_Action'];
+        model.delai_Suivi_Action = data['delai_Suivi_Action'];
+        model.priorite = data['priorite'];
+        model.gravite = data['gravite'];
+        model.commentaire = data['commentaire'];
+        champObligatoireList.add(model);
 
-      priorite_obligatoire = model.priorite;
-      gravite_obligatoire = model.gravite;
-      delai_suivi_obligatoire = model.delai_Suivi_Action;
-    });
+        priorite_obligatoire.value = model.priorite!;
+        gravite_obligatoire.value = model.gravite!;
+        delai_suivi_obligatoire.value = model.delai_Suivi_Action!;
+      });
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      await ApiServicesCall().getChampObligatoireAction().then((resp) async {
+        resp.forEach((data) async {
+          //print('get champ obligatoire : ${data} ');
+          var model = ChampObligatoireActionModel();
+          model.commentaire_Realisation_Action =
+              data['commentaire_Realisation_Action'];
+          model.rapport_Suivi_Action = data['rapport_Suivi_Action'];
+          model.delai_Suivi_Action = data['delai_Suivi_Action'];
+          model.priorite = data['priorite'];
+          model.gravite = data['gravite'];
+          model.commentaire = data['commentaire'];
+
+          priorite_obligatoire.value = model.priorite!;
+          gravite_obligatoire.value = model.gravite!;
+          delai_suivi_obligatoire.value = model.delai_Suivi_Action!;
+        });
+      }, onError: (err) {
+        isDataProcessing(false);
+        // ShowSnackBar.snackBar("Error ChampObligatoireAction", err.toString(), Colors.red);
+        debugPrint('Error ChampObligatoireAction : ${err.toString()}');
+      });
+    }
+  }
+
+  //champ visible
+  int? priorite_visible = 1;
+  int? gravite_visible = 1;
+  int? risque = 1;
+  int? cout_prev_visible = 1;
+  getChampCache() async {
+    try {
+      List<ChampCacheModel> listChampCache =
+          await List<ChampCacheModel>.empty(growable: true);
+      var connection = await Connectivity().checkConnectivity();
+      if (connection == ConnectivityResult.none) {
+        var response = await localActionService.readChampCacheByModule(
+            "Action", "Fiche Action"); //Demande action
+        response.forEach((data) {
+          print(
+              'module : ${data['module']}, nom_param:${data['nomParam']}, visible:${data['visible']}');
+          var model = ChampCacheModel();
+          model.id = data['id'];
+          model.module = data['module'];
+          model.fiche = data['fiche'];
+          model.listOrder = data['listOrder'];
+          model.nomParam = data['nomParam'];
+          model.visible = data['visible'];
+          listChampCache.add(model);
+
+          if (model.nomParam == "Priorité" &&
+              model.module == "Action" &&
+              model.fiche == "Fiche Action") {
+            priorite_visible = model.visible;
+          } else if (model.nomParam == "Gravité Action" &&
+              model.module == "Action" &&
+              model.fiche == "Fiche Action") {
+            gravite_visible = model.visible;
+          } else if (model.nomParam == "Risque" &&
+              model.module == "Action" &&
+              model.fiche == "Fiche Action") {
+            risque = model.visible;
+          } else if (model.nomParam == "Coût prév." &&
+              model.module == "Action" &&
+              model.fiche == "Fiche Action") {
+            cout_prev_visible = model.visible;
+          }
+        });
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        await ApiServicesCall()
+            .getChampCache({"module": "Action", "fiche": "Fiche Action"}).then(
+                (resp) async {
+          resp.forEach((data) async {
+            //print('get champ obligatoire : ${data} ');
+            var model = ChampCacheModel();
+            model.id = data['id'];
+            model.module = data['module'];
+            model.fiche = data['fiche'];
+            model.listOrder = data['list_order'];
+            model.nomParam = data['nom_param'];
+            model.visible = data['visible'];
+            listChampCache.add(model);
+
+            if (model.nomParam == "Priorité" &&
+                model.module == "Action" &&
+                model.fiche == "Fiche Action") {
+              priorite_visible = model.visible;
+            } else if (model.nomParam == "Gravité Action" &&
+                model.module == "Action" &&
+                model.fiche == "Fiche Action") {
+              gravite_visible = model.visible;
+            } else if (model.nomParam == "Risque" &&
+                model.module == "Action" &&
+                model.fiche == "Fiche Action") {
+              risque = model.visible;
+            } else if (model.nomParam == "Coût prév." &&
+                model.module == "Action" &&
+                model.fiche == "Fiche Action") {
+              cout_prev_visible = model.visible;
+            }
+          });
+        }, onError: (err) {
+          isDataProcessing(false);
+          HttpResponse.StatusCode(err.toString());
+          //ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+    }
   }
 
   bool _dataValidation() {
@@ -82,20 +200,24 @@ class SousActionController extends GetxController {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'designation'.tr} ${'is_required'.tr}");
       return false;
-    } else if (delai_suivi_obligatoire == 1 &&
-        delaiRealisationController.text.trim() == '') {
+    } else if (delaiRealisationController.text.trim() == '') {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'delai_real'.tr} ${'is_required'.tr}");
       return false;
-    } else if (delaiSuiviController.text.trim() == '') {
+    } else if (delai_suivi_obligatoire.value == 1 &&
+        delaiSuiviController.text.trim() == '') {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'delai_suivi'.tr} ${'is_required'.tr}");
       return false;
-    } else if (priorite_obligatoire == 1 && prioriteModel == null) {
+    } else if (priorite_visible == 1 &&
+        priorite_obligatoire.value == 1 &&
+        prioriteModel == null) {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'priority'.tr} ${'is_required'.tr}");
       return false;
-    } else if (gravite_obligatoire == 1 && graviteModel == null) {
+    } else if (gravite_visible == 1 &&
+        gravite_obligatoire.value == 1 &&
+        graviteModel == null) {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'gravity'.tr} ${'is_required'.tr}");
       return false;
@@ -116,6 +238,7 @@ class SousActionController extends GetxController {
     super.onInit();
     getSousActions();
     getChampObligatoire();
+    getChampCache();
 
     designationController = TextEditingController();
     risqueController = TextEditingController();
@@ -130,14 +253,17 @@ class SousActionController extends GetxController {
     checkConnectivity();
   }
 
+  var isVisibleIntervenat = true.obs;
   Future<void> checkConnectivity() async {
     var connection = await Connectivity().checkConnectivity();
     var countSousActionLocal = LocalActionService().getCountSousActionOffline();
     print('count Table SousAction : ${countSousActionLocal}');
     if (connection == ConnectivityResult.none) {
+      isVisibleIntervenat.value = false;
       // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
     } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
+      isVisibleIntervenat.value == true;
       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
       /* if(countSousActionLocal > 0){
         ShowSnackBar.snackBar("Synchronization", " data synchronized", Colors.cyan.shade400);
@@ -182,7 +308,7 @@ class SousActionController extends GetxController {
       isDataProcessing(true);
 
       id_action = Get.arguments['id_action'];
-      print('id action $id_action');
+      debugPrint('id action $id_action');
       //rest api
       await Future.delayed(Duration(seconds: 1), () async {
         var connection = await Connectivity().checkConnectivity();
@@ -219,9 +345,6 @@ class SousActionController extends GetxController {
             model.online = data['online'];
 
             listSousAction.add(model);
-            listSousAction.forEach((element) {
-              print('sous act ${element.sousAct}, online: ${element.online}');
-            });
           });
         } else if (connection == ConnectivityResult.wifi ||
             connection == ConnectivityResult.mobile) {
@@ -257,20 +380,16 @@ class SousActionController extends GetxController {
               model.online = 1;
 
               listSousAction.add(model);
-              listSousAction.forEach((element) {
-                print(
-                    'element act ${element.sousAct}, online: ${element.online}');
-              });
               //delete db local
               ///await localActionService.deleteAllSousAction();
               //save data in local db
               ///await localActionService.saveSousAction(model);
               //print('Inserting sous action : ${model.sousAct} ');
             });
-            print('get data');
-          }, onError: (err) {
+          }, onError: (error) {
             isDataProcessing(false);
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+            HttpResponse.StatusCode(error.toString());
+            //ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
           });
         }
       });
@@ -294,7 +413,7 @@ class SousActionController extends GetxController {
               backgroundColor: Colors.lightBlue,
               titleStyle: TextStyle(color: Colors.white),
               middleTextStyle: TextStyle(color: Colors.white),
-              textConfirm: "Confirm",
+              textConfirm: "OK",
               onConfirm: () {
                 Get.back();
               },
@@ -305,7 +424,7 @@ class SousActionController extends GetxController {
               barrierDismissible: false,
               radius: 20,
               content: Text(
-                'Le delai de suivi doit être supérieur au délai de réalisation',
+                'delai_suivi_superieur_delai_real'.tr,
                 style: TextStyle(color: Colors.white),
               ));
           return;
@@ -320,7 +439,7 @@ class SousActionController extends GetxController {
         if (connection == ConnectivityResult.none) {
           int max_num_sous_action =
               await localActionService.getMaxNumSousAction(id_action);
-          print('max num sous action: $max_num_sous_action');
+          debugPrint('max num sous action: $max_num_sous_action');
           //save data in local db
           var model = SousActionModel();
           model.nSousAct = max_num_sous_action + 1; //data['nSousAct'];
@@ -350,7 +469,7 @@ class SousActionController extends GetxController {
           model.online = 0;
 
           await localActionService.saveSousAction(model);
-          print(
+          debugPrint(
               'Inserting sous action offline  : num sousAct: ${model.nSousAct}, numAct: ${model.nAct}, sousAct: ${model.sousAct}, '
               'cout prev: ${model.coutPrev}, respreal: ${model.respRealNom}, respsuivi ${model.respSuivieNom}, '
               'respreasmat: ${model.respReal}, ressuivimat:  ${model.respSuivi}, priorite: ${model.priorite}, code priorite: ${model.codePriorite}, gravite: ${model.gravite}, '
@@ -401,10 +520,10 @@ class SousActionController extends GetxController {
 
             //Get.offAll(ActionPage());
             clearData();
-          }, onError: (err) {
+          }, onError: (error) {
             isDataProcessing(false);
-            print('Error : ${err.toString()}');
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+            HttpResponse.StatusCode(error.toString());
+            // ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
           });
         }
       } catch (ex) {
@@ -555,7 +674,7 @@ class SousActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(prioriteModel?.priorite ?? ''),
-        subtitle: Text(prioriteModel?.codepriorite.toString() ?? ''),
+        //subtitle: Text(prioriteModel?.codepriorite.toString() ?? ''),
       ),
     );
   }
@@ -588,7 +707,7 @@ class SousActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(graviteModel?.gravite ?? ''),
-        subtitle: Text(graviteModel?.codegravite.toString() ?? ''),
+        //subtitle: Text(graviteModel?.codegravite.toString() ?? ''),
       ),
     );
   }
@@ -625,7 +744,7 @@ class SousActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(processusModel?.processus ?? ''),
-        subtitle: Text(processusModel?.codeProcessus.toString() ?? ''),
+        //subtitle: Text(processusModel?.codeProcessus.toString() ?? ''),
       ),
     );
   }
@@ -673,7 +792,7 @@ class SousActionController extends GetxController {
       child: ListTile(
         selected: isSelected,
         title: Text(respRealModel?.nompre ?? ''),
-        subtitle: Text(respRealModel?.mat.toString() ?? ''),
+        //subtitle: Text(respRealModel?.mat.toString() ?? ''),
       ),
     );
   }

@@ -1,27 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
 import 'package:qualipro_flutter/Services/pnc/pnc_service.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Models/employe_model.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Utils/custom_colors.dart';
-import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
-import '../../../Utils/utility_file.dart';
 import '../../../Validators/validator.dart';
 import 'pnc_valider_page.dart';
 
@@ -42,110 +30,151 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
   final validor = SharedPreference.getNomPrenom();
 
   DateTime dateTime = DateTime.now();
-  TextEditingController  motifController = TextEditingController();
-  TextEditingController  dateValidationController = TextEditingController();
-  TextEditingController  validatorController = TextEditingController();
+  TextEditingController motifController = TextEditingController();
+  TextEditingController dateValidationController = TextEditingController();
+  TextEditingController validatorController = TextEditingController();
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   String valide = "1";
   String? decideurMatricule = "";
 
   @override
-  void initState(){
+  void initState() {
     dateValidationController.text = DateFormat('yyyy-MM-dd').format(dateTime);
     validatorController.text = validor.toString();
     super.initState();
   }
-
 
   selectedDate(BuildContext context) async {
     var datePicker = await showDatePicker(
         context: context,
         initialDate: dateTime,
         firstDate: DateTime(2000),
-        lastDate: dateTime
-    );
-    if(datePicker != null){
+        lastDate: dateTime);
+    if (datePicker != null) {
       setState(() {
         dateTime = datePicker;
-        dateValidationController.text = DateFormat('yyyy-MM-dd').format(datePicker);
+        dateValidationController.text =
+            DateFormat('yyyy-MM-dd').format(datePicker);
       });
     }
   }
-  bool _dataValidation(){
 
+  bool _dataValidation() {
     return true;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _globalKey,
       appBar: AppBar(
         leading: TextButton(
-          onPressed: (){
+          onPressed: () {
             Get.back();
           },
-          child: Icon(Icons.arrow_back, color: Colors.white,),
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
         title: Center(
-          child: Text("PNC N° ${widget.nnc}"),
+          child: Text("P.N.C N° ${widget.nnc}"),
         ),
         backgroundColor: Colors.blue,
       ),
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: SingleChildScrollView(
-                child: Form(
-                    key: _addItemFormKey,
-                    child: Padding(
-                        padding: EdgeInsets.all(25.0),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 8.0,),
-                            ToggleSwitch(
-                              minWidth: 90.0,
-                              minHeight: 60.0,
-                              fontSize: 16.0,
-                              cornerRadius: 30,
-                              initialLabelIndex: 0,
-                              activeBgColors: [[Colors.green], [Colors.red], [Colors.blue]],
-                              activeFgColor: Colors.white,
-                              inactiveFgColor: Colors.white,
-                              totalSwitches: 3,
-                              labels: ['Valider', 'Refuser', 'Corriger'],
-                               /* icons: [
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: SingleChildScrollView(
+            child: Form(
+                key: _addItemFormKey,
+                child: Padding(
+                    padding: EdgeInsets.all(25.0),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 8.0,
+                        ),
+                        ToggleSwitch(
+                          minWidth: 90.0,
+                          minHeight: 60.0,
+                          fontSize: 16.0,
+                          cornerRadius: 30,
+                          initialLabelIndex: 0,
+                          activeBgColors: [
+                            [Colors.green],
+                            [Colors.red],
+                            [Colors.blue]
+                          ],
+                          activeFgColor: Colors.white,
+                          inactiveFgColor: Colors.white,
+                          totalSwitches: 3,
+                          labels: ['valider'.tr, 'refuser'.tr, 'corriger'.tr],
+                          /* icons: [
                                   FontAwesomeIcons.mars,
                                   FontAwesomeIcons.venus,
                                   FontAwesomeIcons.transgender
                                 ],
                               iconSize: 25, */
-                              onToggle: (index) {
-                                if(index == 0){
-                                  valide = "1";
-                                  print('valide : $valide');
-                                }
-                                else if(index == 1){
-                                  valide = "2";
-                                  print('valide : $valide');
-                                }
-                                else if(index == 2){
-                                  valide = "3";
-                                  print('valide : $valide');
-                                }
-
-                              },
+                          onToggle: (index) {
+                            if (index == 0) {
+                              valide = "1";
+                              print('valide : $valide');
+                            } else if (index == 1) {
+                              valide = "2";
+                              print('valide : $valide');
+                            } else if (index == 2) {
+                              valide = "3";
+                              print('valide : $valide');
+                            }
+                          },
+                        ),
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        TextFormField(
+                          enabled: false,
+                          controller: validatorController,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: 'Validateur'.tr,
+                            hintText: 'Validateur'.tr,
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
                             ),
-                            SizedBox(height: 15.0,),
-                            TextFormField(
-                              enabled: false,
-                              controller: validatorController,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: 'Validateur',
-                                hintText: 'Validateur',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: TextFormField(
+                            enabled: false,
+                            controller: dateValidationController,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) =>
+                                Validator.validateField(value: value!),
+                            onChanged: (value) {
+                              selectedDate(context);
+                            },
+                            decoration: InputDecoration(
+                                labelText: 'Date Validation *',
+                                hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -153,152 +182,126 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
                                   color: Colors.grey,
                                   fontSize: 10.0,
                                 ),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    selectedDate(context);
+                                  },
+                                  child: Icon(Icons.calendar_today),
+                                ),
                                 border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                              ),
-                              style: TextStyle(fontSize: 14.0),
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          controller: motifController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) =>
+                              Validator.validateField(value: value!),
+                          decoration: InputDecoration(
+                            labelText: '${'comment'.tr} *',
+                            hintText: 'comment'.tr,
+                            labelStyle: TextStyle(
+                              fontSize: 14.0,
                             ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: TextFormField(
-                                enabled: false,
-                                controller: dateValidationController,
-                                keyboardType: TextInputType.text,
-                                textInputAction: TextInputAction.next,
-                                validator: (value) => Validator.validateField(
-                                    value: value!
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0,
+                            ),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.lightBlue, width: 1),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          style: TextStyle(fontSize: 14.0),
+                          minLines: 2,
+                          maxLines: 5,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        DropdownSearch<EmployeModel>(
+                          showSelectedItems: true,
+                          showClearButton: true,
+                          showSearchBox: true,
+                          isFilteredOnline: true,
+                          compareFn: (i, s) => i?.isEqual(s) ?? false,
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "${'decideur'.tr} *",
+                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                            border: OutlineInputBorder(),
+                          ),
+                          onFind: (String? filter) => getDecideur(filter),
+                          onChanged: (data) {
+                            decideurMatricule = data?.mat;
+                            debugPrint(
+                                'decideur: ${data?.nompre}, code: ${decideurMatricule}');
+                          },
+                          dropdownBuilder: customDropDownEmploye,
+                          popupItemBuilder: customPopupItemBuilderEmploye,
+                          validator: (u) => u == null
+                              ? "${'decideur'.tr} ${'is_required'}"
+                              : null,
+                        ),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _isProcessing
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    CustomColors.firebaseOrange,
+                                  ),
                                 ),
-                                onChanged: (value){
-                                  selectedDate(context);
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  saveBtn();
                                 },
-                                decoration: InputDecoration(
-                                    labelText: 'Date Validation *',
-                                    hintText: 'date',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    CustomColors.googleBackground,
+                                  ),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    suffixIcon: InkWell(
-                                      onTap: (){
-                                        selectedDate(context);
-                                      },
-                                      child: Icon(Icons.calendar_today),
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    )
-                                ),
-                                style: TextStyle(fontSize: 14.0),
-                              ),
-                            ),
-                            SizedBox(height: 10.0,),
-                            TextFormField(
-                              controller: motifController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              validator: (value) => Validator.validateField(
-                                  value: value!
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Commentaire *',
-                                hintText: 'motif',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                              ),
-                              style: TextStyle(fontSize: 14.0),
-                              minLines: 2,
-                              maxLines: 5,
-                            ),
-                            SizedBox(height: 10.0,),
-                            DropdownSearch<EmployeModel>(
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: true,
-                              isFilteredOnline: true,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Decideur *",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
-                              ),
-                              onFind: (String? filter) => getDecideur(filter),
-                              onChanged: (data) {
-                                decideurMatricule = data?.mat;
-                                print('decideur: ${data?.nompre}, code: ${decideurMatricule}');
-                              },
-                              dropdownBuilder: customDropDownEmploye,
-                              popupItemBuilder: customPopupItemBuilderEmploye,
-                              validator: (u) =>
-                              u == null ? "Decideur is required " : null,
-                            ),
-                            SizedBox(height: 20.0,),
-                            _isProcessing
-                                ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  CustomColors.firebaseOrange,
-                                ),
-                              ),
-                            )
-                                :
-                            ElevatedButton(
-                              onPressed: () async {
-                                saveBtn();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  CustomColors.googleBackground,
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text('Save',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: CustomColors.firebaseWhite,
-                                    letterSpacing: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'save'.tr,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: CustomColors.firebaseWhite,
+                                      letterSpacing: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                ),
-              ),
-            ),
-          )
-      ),
+                              )
+                      ],
+                    ))),
+          ),
+        ),
+      )),
     );
   }
 
   Future saveBtn() async {
-    if(_dataValidation() && _addItemFormKey.currentState!.validate()){
+    if (_dataValidation() && _addItemFormKey.currentState!.validate()) {
       try {
-        setState(()  {
+        setState(() {
           _isProcessing = true;
         });
         await pncService.updatePNCValidation({
@@ -317,17 +320,18 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
           _isProcessing = false;
           ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
         });
-      }
-      catch (ex){
+      } catch (ex) {
         _isProcessing = false;
         AwesomeDialog(
           context: context,
           animType: AnimType.SCALE,
           dialogType: DialogType.ERROR,
-          body: Center(child: Text(
-            ex.toString(),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),),
+          body: Center(
+            child: Text(
+              ex.toString(),
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
           title: 'Error',
           btnCancel: Text('Cancel'),
           btnOkOnPress: () {
@@ -336,8 +340,7 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
         )..show();
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
-      }
-      finally{
+      } finally {
         _isProcessing = false;
       }
     }
@@ -346,8 +349,10 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
   //decideur
   Future<List<EmployeModel>> getDecideur(filter) async {
     try {
-      List<EmployeModel> employeList = await List<EmployeModel>.empty(growable: true);
-      List<EmployeModel>employeFilter = await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeList =
+          await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeFilter =
+          await List<EmployeModel>.empty(growable: true);
 
       await PNCService().getDecideurByNNC(widget.nnc).then((resp) async {
         resp.forEach((data) async {
@@ -356,16 +361,14 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
           model.mat = data['mat'];
           employeList.add(model);
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
 
       employeFilter = employeList.where((u) {
         var name = u.mat.toString().toLowerCase();
         var description = u.nompre!.toLowerCase();
-        return name.contains(filter) ||
-            description.contains(filter);
+        return name.contains(filter) || description.contains(filter);
       }).toList();
       return employeFilter;
     } catch (exception) {
@@ -373,12 +376,11 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
       return Future.error('service : ${exception.toString()}');
     }
   }
-  
+
   Widget customDropDownEmploye(BuildContext context, EmployeModel? item) {
     if (item == null) {
       return Container();
-    }
-    else{
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -387,7 +389,7 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
       );
     }
   }
-  
+
   Widget customPopupItemBuilderEmploye(
       BuildContext context, EmployeModel item, bool isSelected) {
     return Container(
@@ -395,10 +397,10 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item.nompre ?? ''),
@@ -406,5 +408,4 @@ class _RemplirPNCValidationState extends State<RemplirPNCValidation> {
       ),
     );
   }
-
 }

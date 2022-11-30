@@ -3,18 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
-
-import '../../../Models/action/action_realisation_model.dart';
 import '../../../Models/action/action_suivi_model.dart';
-import '../../../Models/action/action_model.dart';
 import '../../../Services/action/action_service.dart';
 import '../../../Services/action/local_action_service.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
-import '../../../Widgets/loading_widget.dart';
-import 'remplir_action_realisation.dart';
 import 'remplir_action_suivi.dart';
 
 class ActionSuiviPage extends StatefulWidget {
@@ -81,9 +76,6 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
             model.gravite = data['gravite'];
             listActionSuivi.add(model);
             listFiltered = listActionSuivi;
-            listActionSuivi.forEach((element) {
-              print('element act ${element.act}, id act: ${element.nAct}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -124,9 +116,6 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
               model.gravite = data['gravite'];
               listActionSuivi.add(model);
               listFiltered = listActionSuivi;
-              listActionSuivi.forEach((element) {
-                print('element act ${element.act}, id act: ${element.nAct}');
-              });
             });
           });
         }, onError: (err) {
@@ -166,8 +155,8 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
             ),
           ),
           title: Text(
-            'Actions à suivre ${listActionSuivi.length}',
-            style: TextStyle(color: Colors.black),
+            '${'action_a_suivi'.tr} : ${listActionSuivi.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -232,7 +221,7 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -263,9 +252,10 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                                 color: Color(0xF2F2F2F2),
                                 child: ListTile(
                                   title: Text(
-                                    ' Action: ${num_action}   \n Sous Action: ${num_sous_action}',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                    ' Action: ${num_action} \n Sous Action: ${num_sous_action}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
                                   ),
                                   subtitle: Padding(
                                     padding: const EdgeInsets.only(
@@ -277,6 +267,17 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 2),
+                                          child: Text(
+                                            'Designation : ${listFiltered[index].act}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                                fontSize: 14),
+                                          ),
+                                        ),
                                         RichText(
                                           text: TextSpan(
                                             style: Theme.of(context)
@@ -294,7 +295,7 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                                               ),
                                               TextSpan(
                                                   text:
-                                                      '${listFiltered[index].dateSuivi}'),
+                                                      '${listFiltered[index].delaiSuivi}'),
 
                                               //TextSpan(text: '${action.declencheur}'),
                                             ],
@@ -323,7 +324,13 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                                           ),
                                         ),
                                         Text(
-                                          'Taux real : ${listFiltered[index].pourcentReal} %',
+                                          '${'taux_realisation'.tr} : ${listFiltered[index].pourcentReal} %',
+                                          style: TextStyle(
+                                              color: Color(0xff111558),
+                                              fontSize: 15),
+                                        ),
+                                        Text(
+                                          '${'taux_efficacite'.tr} : ${listFiltered[index].pourcentSuivie} %',
                                           style: TextStyle(
                                               color: Color(0xff111558),
                                               fontSize: 15),
@@ -331,7 +338,7 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                                         listFiltered[index].rapportEff == ''
                                             ? Text('')
                                             : ReadMoreText(
-                                                "Rapport : ${listFiltered[index].rapportEff}",
+                                                "${'rapport'.tr} : ${listFiltered[index].rapportEff}",
                                                 style: TextStyle(
                                                     color: Color(0xFF3B465E),
                                                     fontWeight:
@@ -380,8 +387,8 @@ class _ActionSuiviPageState extends State<ActionSuiviPage> {
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
+                : Center(
+                    child: Text('empty_list'.tr,
                         style: TextStyle(
                             fontSize: 20.0, fontFamily: 'Brand-Bold')),
                   )),

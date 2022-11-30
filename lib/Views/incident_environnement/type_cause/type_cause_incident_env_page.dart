@@ -251,7 +251,7 @@ class _TypeCauseIncidentEnvPageState extends State<TypeCauseIncidentEnvPage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'cancel'.tr,
+              'cancel',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

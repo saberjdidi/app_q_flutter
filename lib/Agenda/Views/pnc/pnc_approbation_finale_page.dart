@@ -2,10 +2,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
-import '../../../Models/pnc/pnc_a_corriger_model.dart';
 import '../../../Models/pnc/pnc_suivre_model.dart';
 import '../../../Services/pnc/local_pnc_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
@@ -13,8 +11,8 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_approbation_finale.dart';
-import 'remplir_pnc_suivre.dart';
 
 class PNCApprobationFinalePage extends StatefulWidget {
   PNCApprobationFinalePage({Key? key}) : super(key: key);
@@ -60,9 +58,6 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
             model.nomClt = data['nomClt'];
             listApprobationFinale.add(model);
             listFiltered = listApprobationFinale;
-            listApprobationFinale.forEach((element) {
-              print('element pnc ${element.produit}, id : ${element.nnc}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -85,9 +80,6 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
               model.nomClt = data['nomClt'];
               listApprobationFinale.add(model);
               listFiltered = listApprobationFinale;
-              listApprobationFinale.forEach((element) {
-                print('element pnc ${element.produit}, id : ${element.nnc}');
-              });
             });
           });
         }, onError: (err) {
@@ -128,8 +120,8 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
             ),
           ),
           title: Text(
-            'Approbation Finale : ${listApprobationFinale.length}',
-            style: TextStyle(color: Colors.black),
+            '${'non_conformite_pour_approbation_finale'.tr} : ${listApprobationFinale.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -164,7 +156,7 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -197,7 +189,7 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
                                 color: Color(0xFFFCF9F9),
                                 child: ListTile(
                                   title: Text(
-                                    'PNC N°${num_pnc}',
+                                    'P.N.C N°${num_pnc}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -234,7 +226,7 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
                                           padding: const EdgeInsets.only(
                                               top: 5, bottom: 5),
                                           child: Text(
-                                              'Produit : ${listFiltered[index].produit}',
+                                              '${'product'.tr} : ${listFiltered[index].produit}',
                                               style: TextStyle(
                                                   color: Colors.blueAccent)),
                                         ),
@@ -284,11 +276,7 @@ class _PNCApprobationFinalePageState extends State<PNCApprobationFinalePage> {
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
-                        style: TextStyle(
-                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
-                  )),
+                : EmptyListWidget()),
       ),
     );
   }

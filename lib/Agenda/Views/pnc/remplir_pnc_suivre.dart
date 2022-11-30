@@ -1,30 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Agenda/Views/pnc/pnc_suivre_page.dart';
-import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
-
 import '../../../Controllers/api_controllers_call.dart';
-import '../../../Models/employe_model.dart';
-import '../../../Models/pnc/pnc_a_traiter_model.dart';
 import '../../../Models/pnc/pnc_suivre_model.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
 import '../../../Utils/custom_colors.dart';
-import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Utils/utility_file.dart';
 import '../../../Validators/validator.dart';
-import 'pnc_traiter_page.dart';
 
 class RemplirPNCSuivre extends StatefulWidget {
   PNCSuivreModel pncSuivreModel;
@@ -54,7 +44,7 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
   onChangeCloture(var value) {
     setState(() {
       cloture = value;
-      print('nc cloture : ${cloture}');
+      debugPrint('nc cloture : ${cloture}');
     });
   }
 
@@ -102,7 +92,7 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
           ),
         ),
         title: Center(
-          child: Text("PNC N° ${widget.pncSuivreModel.nnc}"),
+          child: Text("P.N.C N° ${widget.pncSuivreModel.nnc}"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -134,8 +124,8 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                                   fillColor:
                                       MaterialStateProperty.all(Colors.blue),
                                 ),
-                                const Text(
-                                  "N.C. non cloture",
+                                Text(
+                                  "N.C. ${'non_cloture'.tr}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -155,8 +145,8 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                                   fillColor:
                                       MaterialStateProperty.all(Colors.blue),
                                 ),
-                                const Text(
-                                  "N.C. cloture",
+                                Text(
+                                  "N.C. ${'cloture'.tr}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -177,8 +167,8 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                           validator: (value) =>
                               Validator.validateField(value: value!),
                           decoration: InputDecoration(
-                            labelText: 'Responsable de cloture',
-                            hintText: 'responsable de cloture',
+                            labelText: 'resp_cloture'.tr,
+                            hintText: 'resp_cloture'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -210,7 +200,8 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                               selectedDate(context);
                             },
                             decoration: InputDecoration(
-                                labelText: 'Date Saisie de Cloture',
+                                labelText:
+                                    '${'date_saisie'.tr} ${'of'.tr} ${'closing'.tr}',
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -238,37 +229,43 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                         ),
                         Visibility(
                           visible: true,
-                          child: TextFormField(
-                            controller: dateClotureController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            validator: (value) =>
-                                Validator.validateField(value: value!),
-                            onChanged: (value) {
+                          child: InkWell(
+                            onTap: (){
                               selectedDate(context);
                             },
-                            decoration: InputDecoration(
-                                labelText: 'Date Cloture',
-                                hintText: 'date',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    selectedDate(context);
-                                  },
-                                  child: Icon(Icons.calendar_today),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.lightBlue, width: 1),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)))),
-                            style: TextStyle(fontSize: 14.0),
+                            child: TextFormField(
+                              enabled: false,
+                              controller: dateClotureController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) =>
+                                  Validator.validateField(value: value!),
+                              onChanged: (value) {
+                                selectedDate(context);
+                              },
+                              decoration: InputDecoration(
+                                  labelText: 'Date ${'closing'.tr}',
+                                  hintText: 'date',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      selectedDate(context);
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -281,8 +278,8 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Rapport Cloture',
-                                hintText: 'Rapport',
+                                labelText: '${'rapport'.tr} ${'closing'.tr}',
+                                hintText: 'rapport'.tr,
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -331,7 +328,7 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -448,7 +445,7 @@ class _RemplirPNCSuivreState extends State<RemplirPNCSuivre> {
       child: Column(
         children: <Widget>[
           Text(
-            "Choose Photo",
+            "${'choose'.tr} Photo",
             style: TextStyle(
               fontSize: 20.0,
             ),

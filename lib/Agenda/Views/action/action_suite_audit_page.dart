@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
-
-import '../../../Models/action/action_realisation_model.dart';
 import '../../../Models/action/action_suite_audit.dart';
-import '../../../Models/action/action_model.dart';
 import '../../../Services/action/action_service.dart';
 import '../../../Services/action/local_action_service.dart';
 import '../../../Utils/custom_colors.dart';
@@ -14,8 +11,6 @@ import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/action/sous_action/sous_action_page.dart';
 import '../../../Views/home_page.dart';
-import '../../../Widgets/loading_widget.dart';
-import 'remplir_action_realisation.dart';
 
 class ActionSuiteAuditPage extends StatefulWidget {
   ActionSuiteAuditPage({Key? key}) : super(key: key);
@@ -56,9 +51,6 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
             model.isd = data['isd'];
             listAction.add(model);
             listFiltered = listAction;
-            listAction.forEach((element) {
-              print('element act ${element.act}, id act: ${element.act}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -76,9 +68,6 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
               model.isd = data['isd'];
               listAction.add(model);
               listFiltered = listAction;
-              listAction.forEach((element) {
-                print('element act ${element.act}, id act: ${element.act}');
-              });
             });
           });
         }, onError: (err) {
@@ -118,8 +107,8 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
             ),
           ),
           title: Text(
-            'Actions suite à audit ${listAction.length}',
-            style: TextStyle(color: Colors.black),
+            '${'action_suite_a_audit'.tr} : ${listAction.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -154,7 +143,7 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -221,7 +210,7 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
                                           ),
                                         ),
                                         ReadMoreText(
-                                          "${listFiltered[index].act}",
+                                          "Designation : ${listFiltered[index].act}",
                                           style: TextStyle(
                                               color: Color(0xFF2F6AA8),
                                               fontWeight: FontWeight.bold),
@@ -262,8 +251,8 @@ class _ActionSuiteAuditPageState extends State<ActionSuiteAuditPage> {
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
+                : Center(
+                    child: Text('empty_list'.tr,
                         style: TextStyle(
                             fontSize: 20.0, fontFamily: 'Brand-Bold')),
                   )),

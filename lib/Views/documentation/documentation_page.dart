@@ -11,6 +11,7 @@ import 'package:readmore/readmore.dart';
 import '../../Services/document/documentation_service.dart';
 import '../../Utils/custom_colors.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
@@ -48,9 +49,9 @@ class DocumentationPage extends GetView<DocumentationController> {
                 Get.find<DocumentationController>().listDocument.clear();
                 Get.find<DocumentationController>().getDocument();
               },
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(height: 1.0),
                 shrinkWrap: true,
-                primary: false,
                 itemCount: controller.listDocument.length,
                 itemBuilder: (BuildContext context, int index) {
                   final status =
@@ -217,12 +218,7 @@ class DocumentationPage extends GetView<DocumentationController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

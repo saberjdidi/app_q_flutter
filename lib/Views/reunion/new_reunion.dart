@@ -49,6 +49,30 @@ class NewReunionPage extends GetView<NewReunionController> {
                           contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                           border: OutlineInputBorder(),
                         ),
+                        popupTitle: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  '${'list'.tr} Type ${'reunion'.tr}s',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                  ))
+                            ],
+                          ),
+                        ),
                         onFind: (String? filter) => getTypeReunion(filter),
                         onChanged: (data) {
                           controller.typeReunionModel = data;
@@ -290,6 +314,30 @@ class NewReunionPage extends GetView<NewReunionController> {
                           contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                           border: OutlineInputBorder(),
                         ),
+                        popupTitle: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  '${'list'.tr} Sites',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                  ))
+                            ],
+                          ),
+                        ),
                         onFind: (String? filter) => getSite(filter),
                         onChanged: (data) {
                           controller.siteModel = data;
@@ -329,6 +377,30 @@ class NewReunionPage extends GetView<NewReunionController> {
                               "Processus ${controller.processus_obligatoire.value == 1 ? '*' : ''}",
                           contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                           border: OutlineInputBorder(),
+                        ),
+                        popupTitle: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  '${'list'.tr} Processus',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                  ))
+                            ],
+                          ),
                         ),
                         onFind: (String? filter) => getProcessus(filter),
                         onChanged: (data) {
@@ -371,6 +443,30 @@ class NewReunionPage extends GetView<NewReunionController> {
                                 "Direction ${controller.direction_obligatoire.value == 1 ? '*' : ''}",
                             contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                             border: OutlineInputBorder(),
+                          ),
+                          popupTitle: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    '${'list'.tr} Directions',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.red,
+                                    ))
+                              ],
+                            ),
                           ),
                           onFind: (String? filter) => getDirection(filter),
                           onChanged: (data) {
@@ -442,6 +538,30 @@ class NewReunionPage extends GetView<NewReunionController> {
                             contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                             border: OutlineInputBorder(),
                           ),
+                          popupTitle: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    '${'list'.tr} Services',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.red,
+                                    ))
+                              ],
+                            ),
+                          ),
                           onFind: (String? filter) => getService(filter),
                           onChanged: (data) {
                             controller.selectedCodeService = data?.codeService;
@@ -508,9 +628,33 @@ class NewReunionPage extends GetView<NewReunionController> {
                           compareFn: (i, s) => i?.isEqual(s) ?? false,
                           dropdownSearchDecoration: InputDecoration(
                             labelText:
-                                "Activity ${controller.activity_obligatoire.value == 1 ? '*' : ''}",
+                                "${'activity'.tr} ${controller.activity_obligatoire.value == 1 ? '*' : ''}",
                             contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                             border: OutlineInputBorder(),
+                          ),
+                          popupTitle: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    '${'list'.tr} ${'activity'.tr}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.red,
+                                    ))
+                              ],
+                            ),
                           ),
                           onFind: (String? filter) => getActivity(filter),
                           onChanged: (data) {
@@ -1741,7 +1885,9 @@ class NewReunionPage extends GetView<NewReunionController> {
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-        var response = await controller.localReunionService.readTypeReunion();
+        //var response = await controller.localReunionService.readTypeReunion();
+        var response = await controller.localReunionService
+            .readTypeReunionByMatricule(controller.matricule);
         response.forEach((data) {
           var model = TypeReunionModel();
           model.codeTypeR = data['codeTypeR'];
@@ -1752,11 +1898,14 @@ class NewReunionPage extends GetView<NewReunionController> {
           connection == ConnectivityResult.mobile) {
         //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
-        await ReunionService().getTypeReunion().then((resp) async {
+        await ReunionService()
+            .getTypeReunionByMatricule(controller.matricule, 1)
+            .then((resp) async {
           resp.forEach((data) async {
             var model = TypeReunionModel();
             model.codeTypeR = data['codeTypeR'];
-            model.typeReunion = data['type_Reunion'];
+            model.typeReunion = data['typeR'];
+            model.mat = data['mat'];
             _typeList.add(model);
           });
         }, onError: (err) {

@@ -3,17 +3,10 @@ import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:qualipro_flutter/Services/visite_securite/visite_securite_service.dart';
 import '../../../Controllers/visite_securite/visite_securite_controller.dart';
-import '../../../Models/action/action_model.dart';
-import '../../../Models/type_cause_model.dart';
 import '../../../Models/visite_securite/action_visite_securite.dart';
 import '../../../Route/app_route.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
-import '../../../Services/incident_securite/incident_securite_service.dart';
-import '../../../Services/incident_securite/local_incident_securite_service.dart';
 import '../../../Services/visite_securite/local_visite_securite_service.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
@@ -117,8 +110,8 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
             ),
           ),
           title: Text(
-            'Actions of Visite Securite N°${widget.numFiche}',
-            style: TextStyle(color: Colors.black, fontSize: 17),
+            'Actions ${'of'.tr} ${'visite_securite'.tr} N°${widget.numFiche}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -274,12 +267,12 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
                             ),
                             Center(
                               child: Text(
-                                'Ajouter Action',
+                                '${'new'.tr} Action',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "Brand-Bold",
                                     color: Color(0xFF0769D2),
-                                    fontSize: 30.0),
+                                    fontSize: 20.0),
                               ),
                             ),
                             SizedBox(
@@ -305,20 +298,47 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
                                             EdgeInsets.fromLTRB(12, 12, 0, 0),
                                         border: OutlineInputBorder(),
                                       ),
+                                      popupTitle: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10),
+                                              child: Text(
+                                                '${'list'.tr} Actions',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                            IconButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                icon: Icon(
+                                                  Icons.close,
+                                                  color: Colors.red,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
                                       onFind: (String? filter) =>
                                           getAction(filter),
                                       onChanged: (data) {
                                         actionModel = data;
                                         selectedNAction = data?.nAct;
                                         selectedAction = data?.act;
-                                        print(
+                                        debugPrint(
                                             'Action: ${selectedAction}, num: ${selectedNAction}');
                                       },
                                       dropdownBuilder: _customDropDownAction,
                                       popupItemBuilder:
                                           _customPopupItemBuilderAction,
                                       validator: (u) => u == null
-                                          ? "Action est obligatoire "
+                                          ? "Action ${'is_required'.tr}"
                                           : null,
                                     ),
                                   ),
@@ -347,7 +367,7 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
                                       ),
                                       icon: Icon(Icons.save),
                                       label: Text(
-                                        'Save',
+                                        'save'.tr,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
                                       ),
@@ -397,14 +417,15 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
                                                   getData();
                                                 });
                                               }, onError: (err) {
-                                                print(
+                                                debugPrint(
                                                     'err : ${err.toString()}');
                                                 ShowSnackBar.snackBar("Error",
                                                     err.toString(), Colors.red);
                                               });
                                             }
                                           } catch (ex) {
-                                            print("Exception" + ex.toString());
+                                            debugPrint(
+                                                "Exception" + ex.toString());
                                             ShowSnackBar.snackBar("Exception",
                                                 ex.toString(), Colors.red);
                                             throw Exception(
@@ -439,7 +460,7 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
                                       ),
                                       icon: Icon(Icons.cancel),
                                       label: Text(
-                                        'Cancel',
+                                        'cancel'.tr,
                                         style: TextStyle(
                                             fontSize: 16, color: Colors.white),
                                       ),
@@ -478,11 +499,11 @@ class _ActionVisiteSecuritePageState extends State<ActionVisiteSecuritePage> {
         dialogType: DialogType.ERROR,
         body: Center(
           child: Text(
-            'Are you sure to delete this item ${id}',
+            '${'delete_item'.tr} ${id}',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
-        title: 'Delete',
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(

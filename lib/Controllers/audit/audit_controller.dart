@@ -2,16 +2,18 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:qualipro_flutter/Controllers/api_controllers_call.dart';
 import 'package:qualipro_flutter/Services/audit/audit_service.dart';
 import 'package:qualipro_flutter/Services/audit/local_audit_service.dart';
 import '../../Models/audit/audit_model.dart';
-import '../../Models/incident_securite/incident_securite_model.dart';
-import '../../Services/incident_securite/incident_securite_service.dart';
-import '../../Services/incident_securite/local_incident_securite_service.dart';
+import '../../Models/begin_licence_model.dart';
+import '../../Models/licence_end_model.dart';
+import '../../Services/licence_service.dart';
+import '../../Services/login_service.dart';
+import '../../Utils/http_response.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Views/licence/licence_page.dart';
 import '../sync_data_controller.dart';
 
 class AuditController extends GetxController {
@@ -33,10 +35,54 @@ class AuditController extends GetxController {
   void onInit() {
     super.onInit();
     getData();
+    checkLicence();
     //checkConnectivity();
     //search
     searchNumero.text = '';
     searchType.text = '';
+  }
+
+  //check if licence end
+  BeginLicenceModel? licenceDevice;
+  LicenceEndModel? licenceEndModel;
+  var isLicenceEnd = 0.obs;
+  final deviceId = SharedPreference.getDeviceIdKey();
+  checkLicence() async {
+    var connection = await Connectivity().checkConnectivity();
+    if (connection == ConnectivityResult.none) {
+      licenceDevice = await LicenceService().getBeginLicence();
+      String? device_id = licenceDevice?.DeviceId;
+      licenceEndModel = await LicenceService().getIsLicenceEnd(device_id);
+      if (licenceEndModel?.retour == 0) {
+        debugPrint('licence of device : $device_id');
+      } else {
+        Get.snackbar("Licence ${SharedPreference.getLicenceKey().toString()}",
+            'licence_expired'.tr,
+            colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
+        SharedPreference.clearSharedPreference();
+        Get.off(LicencePage());
+      }
+    } else if (connection == ConnectivityResult.wifi ||
+        connection == ConnectivityResult.mobile) {
+      await LoginService().isLicenceEndService({
+        "deviceid": deviceId.toString(),
+      }).then((responseLicenceEnd) async {
+        debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
+        if (responseLicenceEnd['retour'] == 0) {
+          debugPrint('licence of device : ${deviceId.toString()}');
+        } else {
+          ShowSnackBar.snackBar(
+              "Licence ${SharedPreference.getLicenceKey().toString()}",
+              'licence_expired'.tr,
+              Colors.lightBlueAccent);
+          SharedPreference.clearSharedPreference();
+          Get.off(LicencePage());
+        }
+      }, onError: (error) {
+        HttpResponse.StatusCode(error.toString());
+        //ShowSnackBar.snackBar("Error Licence End", error.toString(), Colors.red);
+      });
+    }
   }
 
   Future<void> checkConnectivity() async {
@@ -176,7 +222,7 @@ class AuditController extends GetxController {
       isDataProcessing(true);
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Cannot synchronize Data",
+        Get.snackbar("No Connection", 'cannot_synchronize_data'.tr,
             colorText: Colors.blue, snackPosition: SnackPosition.TOP);
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
@@ -217,9 +263,10 @@ class AuditController extends GetxController {
           });
           listAudit.clear();
           getData();
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing(false);
-          ShowSnackBar.snackBar("Error Audits", err.toString(), Colors.red);
+          HttpResponse.StatusCode(error.toString());
+          //ShowSnackBar.snackBar("Error Audits", error.toString(), Colors.red);
         });
         //await ApiControllersCall().getAudits();
         await ApiControllersCall().getConstatsActionProv();

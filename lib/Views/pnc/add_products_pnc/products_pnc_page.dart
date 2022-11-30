@@ -9,6 +9,7 @@ import '../../../../Services/action/local_action_service.dart';
 import '../../../../Utils/shared_preference.dart';
 import '../../../../Utils/snack_bar.dart';
 import '../../../Controllers/pnc/pnc_controller.dart';
+import '../../../Models/champ_cache_model.dart';
 import '../../../Models/pnc/champ_obligatoire_pnc_model.dart';
 import '../../../Models/pnc/product_pnc_model.dart';
 import '../../../Models/product_model.dart';
@@ -43,6 +44,7 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
     checkConnectivity();
     getProducts();
     parametrageProduct();
+    getChampCache();
     getChampObligatoire();
   }
 
@@ -145,6 +147,86 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
       }, onError: (err) {
         ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
       });
+    }
+  }
+
+  //champ cache
+  int? unite_visible = 1;
+  int? numero_lot_visible = 1;
+  int? numero_of_visible = 1;
+  int? quantity_visible = 1;
+  getChampCache() async {
+    try {
+      List<ChampCacheModel> listChampCache =
+          await List<ChampCacheModel>.empty(growable: true);
+      var connection = await Connectivity().checkConnectivity();
+      if (connection == ConnectivityResult.none) {
+        var response = await LocalActionService()
+            .readChampCacheByModule("P.N.C.", "PNC"); //Demande action
+        response.forEach((data) {
+          var model = ChampCacheModel();
+          model.id = data['id'];
+          model.module = data['module'];
+          model.fiche = data['fiche'];
+          model.listOrder = data['listOrder'];
+          model.nomParam = data['nomParam'];
+          model.visible = data['visible'];
+          debugPrint(
+              'champ cache : module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+          listChampCache.add(model);
+
+          setState(() {
+            if (model.nomParam == "Unité" && model.module == "P.N.C.") {
+              unite_visible = model.visible;
+            } else if (model.nomParam == "N° Lot" && model.module == "P.N.C.") {
+              numero_lot_visible = model.visible;
+            } else if (model.nomParam == "N° OF" && model.module == "P.N.C.") {
+              numero_of_visible = model.visible;
+            } else if (model.nomParam == "Quantité + Valeur" &&
+                model.module == "P.N.C.") {
+              quantity_visible = model.visible;
+            }
+          });
+        });
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        await ApiServicesCall()
+            .getChampCache({"module": "P.N.C.", "fiche": ""}).then(
+                (resp) async {
+          resp.forEach((data) async {
+            //print('get champ obligatoire : ${data} ');
+            var model = ChampCacheModel();
+            model.id = data['id'];
+            model.module = data['module'];
+            model.fiche = data['fiche'];
+            model.listOrder = data['list_order'];
+            model.nomParam = data['nom_param'];
+            model.visible = data['visible'];
+            debugPrint(
+                'champ cache : module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+            listChampCache.add(model);
+
+            setState(() {
+              if (model.nomParam == "Unité" && model.module == "P.N.C.") {
+                unite_visible = model.visible;
+              } else if (model.nomParam == "N° Lot" &&
+                  model.module == "P.N.C.") {
+                numero_lot_visible = model.visible;
+              } else if (model.nomParam == "N° OF" &&
+                  model.module == "P.N.C.") {
+                numero_of_visible = model.visible;
+              } else if (model.nomParam == "Quantité + Valeur" &&
+                  model.module == "P.N.C.") {
+                quantity_visible = model.visible;
+              }
+            });
+          });
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
+    } catch (exception) {
+      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
     }
   }
 
@@ -405,26 +487,31 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                         'warning'.tr, "${'product'.tr} ${'is_required'.tr}");
                     return false;
                   } else if (num_of_obligatoire == 1 &&
+                      numero_of_visible == 1 &&
                       numeroOfController.text.trim() == '') {
                     Message.taskErrorOrWarning(
                         'warning'.tr, "Numero Of ${'is_required'.tr}");
                     return false;
                   } else if (num_lot_obligatoire == 1 &&
+                      numero_lot_visible == 1 &&
                       numeroLotController.text.trim() == '') {
                     Message.taskErrorOrWarning(
                         'warning'.tr, "Numero Lot ${'is_required'.tr}");
                     return false;
                   } else if (unite_obligatoire == 1 &&
+                      unite_visible == 1 &&
                       uniteController.text.trim() == '') {
                     Message.taskErrorOrWarning(
                         'warning'.tr, "${'unite'.tr} ${'is_required'.tr}");
                     return false;
                   } else if (qte_detect_obligatoire == 1 &&
+                      quantity_visible == 1 &&
                       quantityProductController.text.trim() == '') {
                     Message.taskErrorOrWarning('warning'.tr,
                         "${'quantity'.tr} ${'detect'.tr} ${'is_required'.tr}");
                     return false;
                   } else if (qte_produit_obligatoire == 1 &&
+                      quantity_visible == 1 &&
                       quantityProductController.text.trim() == '') {
                     Message.taskErrorOrWarning('warning'.tr,
                         "${'quantity'.tr} ${'product'.tr} ${'is_required'.tr}");
@@ -569,7 +656,7 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                         left: 10, right: 10),
                                     child: Center(
                                       child: Text(
-                                        '${'new'.tr} ${'product'.tr} of P.N.C N°${widget.nnc}',
+                                        '${'new'.tr} ${'product'.tr} ${'of'.tr} P.N.C N°${widget.nnc}',
                                         style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             fontFamily: "Brand-Bold",
@@ -609,6 +696,38 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                                           12, 12, 0, 0),
                                                   border: OutlineInputBorder(),
                                                 ),
+                                                popupTitle: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 10),
+                                                        child: Text(
+                                                          '${'list'.tr} ${'product'.tr}s',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
                                                 onFind: (String? filter) =>
                                                     getProduct(filter),
                                                 onChanged: (data) {
@@ -617,7 +736,7 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                                       data?.codePdt;
                                                   selectedProduct =
                                                       data?.produit;
-                                                  print(
+                                                  debugPrint(
                                                       'product: ${selectedProduct}, code: ${selectedCodeProduct}');
                                                 },
                                                 dropdownBuilder:
@@ -628,11 +747,18 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                                     ? "${'product'.tr} ${'is_required'.tr} "
                                                     : null,
                                               )),
-                                          SizedBox(
-                                            height: 10,
+                                          Visibility(
+                                            visible: numero_of_visible == 1
+                                                ? true
+                                                : false,
+                                            child: SizedBox(
+                                              height: 10,
+                                            ),
                                           ),
                                           Visibility(
-                                            visible: true,
+                                            visible: numero_of_visible == 1
+                                                ? true
+                                                : false,
                                             child: TextFormField(
                                               controller: numeroOfController,
                                               keyboardType: TextInputType.text,
@@ -661,11 +787,18 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                               style: TextStyle(fontSize: 14.0),
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 10.0,
+                                          Visibility(
+                                            visible: numero_lot_visible == 1
+                                                ? true
+                                                : false,
+                                            child: SizedBox(
+                                              height: 10.0,
+                                            ),
                                           ),
                                           Visibility(
-                                            visible: true,
+                                            visible: numero_lot_visible == 1
+                                                ? true
+                                                : false,
                                             child: TextFormField(
                                               controller: numeroLotController,
                                               keyboardType: TextInputType.text,
@@ -694,11 +827,18 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                               style: TextStyle(fontSize: 14.0),
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 10.0,
+                                          Visibility(
+                                            visible: unite_visible == 1
+                                                ? true
+                                                : false,
+                                            child: SizedBox(
+                                              height: 10.0,
+                                            ),
                                           ),
                                           Visibility(
-                                            visible: true,
+                                            visible: unite_visible == 1
+                                                ? true
+                                                : false,
                                             child: TextFormField(
                                               controller: uniteController,
                                               keyboardType: TextInputType.text,
@@ -727,11 +867,18 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                               style: TextStyle(fontSize: 14.0),
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 10.0,
+                                          Visibility(
+                                            visible: quantity_visible == 1
+                                                ? true
+                                                : false,
+                                            child: SizedBox(
+                                              height: 10.0,
+                                            ),
                                           ),
                                           Visibility(
-                                            visible: true,
+                                            visible: quantity_visible == 1
+                                                ? true
+                                                : false,
                                             child: TextFormField(
                                               controller:
                                                   quantityDetectController,
@@ -763,11 +910,18 @@ class _ProductsPNCPageState extends State<ProductsPNCPage> {
                                               style: TextStyle(fontSize: 14.0),
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 10.0,
+                                          Visibility(
+                                            visible: quantity_visible == 1
+                                                ? true
+                                                : false,
+                                            child: SizedBox(
+                                              height: 10.0,
+                                            ),
                                           ),
                                           Visibility(
-                                            visible: true,
+                                            visible: quantity_visible == 1
+                                                ? true
+                                                : false,
                                             child: TextFormField(
                                               controller:
                                                   quantityProductController,

@@ -45,6 +45,7 @@ class DBTable {
   static const String reunion = "Reunion";
   static const String participant_reunion = "ParticipantReunion";
   static const String type_reunion = "TypeReunion";
+  static const String type_reunion_matricule = "TypeReunionMatricule";
   static const String action_reunion_rattacher = "ActionReunionRattacher";
   static const String documentation = "Documentation";
   static const String type_document = "TypeDocument";

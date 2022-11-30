@@ -4,12 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualipro_flutter/Agenda/Views/incident_environnement/valider_incident_env_decision_traitement.dart';
 import 'package:qualipro_flutter/Services/incident_environnement/incident_environnement_service.dart';
-import 'package:qualipro_flutter/Services/reunion/local_reunion_service.dart';
-import 'package:qualipro_flutter/Services/reunion/reunion_service.dart';
 import '../../../Models/incident_environnement/incident_env_agenda_model.dart';
-import '../../../Models/reunion/reunion_model.dart';
 import '../../../Services/incident_environnement/local_incident_environnement_service.dart';
-import '../../../Services/pnc/pnc_service.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
@@ -52,10 +48,6 @@ class _DecisionTraitementIncidentEnvPageState
             model.dateDetect = data['dateDetect'];
             listIncident.add(model);
             listFiltered = listIncident;
-            listIncident.forEach((element) {
-              print(
-                  'element incident ${element.nIncident} - ${element.incident}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -76,10 +68,6 @@ class _DecisionTraitementIncidentEnvPageState
               model.idProcessus = data['idProcessus'];
               listIncident.add(model);
               listFiltered = listIncident;
-              listIncident.forEach((element) {
-                print(
-                    'element incident ${element.nIncident} - ${element.incident}');
-              });
             });
           });
         }, onError: (err) {
@@ -93,7 +81,7 @@ class _DecisionTraitementIncidentEnvPageState
     }
   }
 
-  final columns = ['Numéro', 'Incident', 'Date', ''];
+  final columns = ['number'.tr, 'Incident', 'Date', ''];
   int? sortColumnIndex;
   bool isAscending = false;
   final _contentStyleHeader = const TextStyle(
@@ -134,8 +122,8 @@ class _DecisionTraitementIncidentEnvPageState
             ),
           ),
           title: Text(
-            'Decision de Traitement : ${listIncident.length}',
-            style: TextStyle(color: Colors.black),
+            '${'decision_de_traitement'.tr} : ${listIncident.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -155,7 +143,7 @@ class _DecisionTraitementIncidentEnvPageState
                             title: new TextField(
                                 controller: controller,
                                 decoration: new InputDecoration(
-                                    hintText: 'Search',
+                                    hintText: 'search'.tr,
                                     border: InputBorder.none),
                                 onChanged: (value) {
                                   setState(() {
@@ -199,7 +187,7 @@ class _DecisionTraitementIncidentEnvPageState
                     ),
                   )
                 : const Center(
-                    child: Text('Empty List',
+                    child: Text('empty_list',
                         style: TextStyle(
                             fontSize: 20.0, fontFamily: 'Brand-Bold')),
                   )),

@@ -14,6 +14,7 @@ import '../../Models/pnc/isps_pnc_model.dart';
 import '../../Utils/custom_colors.dart';
 import '../../Utils/snack_bar.dart';
 import '../../Widgets/build_shimmer.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
 import 'audit_widget.dart';
@@ -184,7 +185,7 @@ class AuditPage extends GetView<AuditController> {
                                                           FontWeight.w500,
                                                       fontFamily: "Brand-Bold",
                                                       color: Color(0xFF0769D2),
-                                                      fontSize: 30.0),
+                                                      fontSize: 20.0),
                                                 ),
                                               ),
                                               SizedBox(
@@ -579,12 +580,7 @@ class AuditPage extends GetView<AuditController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

@@ -115,6 +115,31 @@ class _NewTypeCauseIncidentEnvState extends State<NewTypeCauseIncidentEnv> {
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Types Causes',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               onFind: (String? filter) => getTypesCause(filter),
                               onChanged: (data) {
                                 typeCauseModel = data;

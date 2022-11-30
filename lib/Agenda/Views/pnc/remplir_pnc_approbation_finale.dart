@@ -1,31 +1,14 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:qualipro_flutter/Agenda/Views/pnc/pnc_suivre_page.dart';
-import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
-
 import '../../../Controllers/api_controllers_call.dart';
-import '../../../Models/employe_model.dart';
-import '../../../Models/pnc/pnc_a_traiter_model.dart';
-import '../../../Models/pnc/pnc_suivre_model.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
 import '../../../Utils/custom_colors.dart';
-import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
-import '../../../Utils/utility_file.dart';
 import '../../../Validators/validator.dart';
 import 'pnc_approbation_finale_page.dart';
-import 'pnc_traiter_page.dart';
 
 class RemplirPNCApprobationFinale extends StatefulWidget {
   final nnc;
@@ -56,7 +39,6 @@ class _RemplirPNCApprobationFinaleState
   onChangeApprouve(var value) {
     setState(() {
       approuve = value;
-      print('nc approuve : ${approuve}');
     });
   }
 
@@ -97,8 +79,8 @@ class _RemplirPNCApprobationFinaleState
         ),
         title: Center(
           child: Text(
-            "Approbation Finale of N.C N° ${widget.nnc}",
-            style: TextStyle(fontSize: 16),
+            "${'non_conformite_pour_approbation_finale'.tr} N° ${widget.nnc}",
+            style: TextStyle(fontSize: 15),
           ),
         ),
         backgroundColor: Colors.blue,
@@ -133,8 +115,8 @@ class _RemplirPNCApprobationFinaleState
                                   fillColor:
                                       MaterialStateProperty.all(Colors.blue),
                                 ),
-                                const Text(
-                                  "N.C. non approuvée",
+                                Text(
+                                  'N.C ${'non_approuve'.tr}',
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -157,8 +139,8 @@ class _RemplirPNCApprobationFinaleState
                                   fillColor:
                                       MaterialStateProperty.all(Colors.blue),
                                 ),
-                                const Text(
-                                  "N.C. approuvée",
+                                Text(
+                                  'N.C ${'approuve'.tr}',
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -179,8 +161,9 @@ class _RemplirPNCApprobationFinaleState
                           validator: (value) =>
                               Validator.validateField(value: value!),
                           decoration: InputDecoration(
-                            labelText: 'Responsable approbation',
-                            hintText: 'responsable approbation',
+                            labelText:
+                                '${'responsable'.tr} ${'approbation'.tr}',
+                            hintText: '${'responsable'.tr} ${'approbation'.tr}',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -210,7 +193,7 @@ class _RemplirPNCApprobationFinaleState
                               selectedDate(context);
                             },
                             decoration: InputDecoration(
-                                labelText: 'Date Approbation',
+                                labelText: 'Date ${'approbation'.tr}',
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -244,8 +227,9 @@ class _RemplirPNCApprobationFinaleState
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Rapport Approbation',
-                                hintText: 'Rapport',
+                                labelText:
+                                    '${'rapport'.tr} ${'approbation'.tr}',
+                                hintText: 'rapport'.tr,
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -292,7 +276,7 @@ class _RemplirPNCApprobationFinaleState
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

@@ -340,6 +340,41 @@ class _AuditeurExternePageState extends State<AuditeurExternePage>
                                                         border:
                                                             OutlineInputBorder(),
                                                       ),
+                                                      popupTitle: Center(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 10),
+                                                              child: Text(
+                                                                '${'list'.tr} ${'auditeur'.tr}s',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                            IconButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons.close,
+                                                                  color: Colors
+                                                                      .red,
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      ),
                                                       onFind: (String?
                                                               filter) =>
                                                           getAuditeur(filter),
@@ -823,10 +858,35 @@ class _AuditeurExternePageState extends State<AuditeurExternePage>
                                                 popupItemBuilder:
                                                     _customPopupItemBuilderEmployeHabilite,
                                                 popupTitle: Center(
-                                                  child: Text(
-                                                    'List Employes',
-                                                    style:
-                                                        TextStyle(fontSize: 16),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 10),
+                                                        child: Text(
+                                                          'List Employes',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ))
+                                                    ],
                                                   ),
                                                 ),
                                                 validator: (data) => data ==
@@ -1031,6 +1091,19 @@ class _AuditeurExternePageState extends State<AuditeurExternePage>
                         child: ListView.builder(
                             itemCount: listAuditeurExterne.length,
                             itemBuilder: (context, index) {
+                              String? affectation =
+                                  listAuditeurExterne[index].affectation;
+                              var message_affectation;
+                              if (affectation == 'RA') {
+                                message_affectation = 'Responsable Audit';
+                              } else if (affectation == 'A') {
+                                message_affectation = 'Auditeur';
+                              } else if (affectation == 'O') {
+                                message_affectation = 'Observateur';
+                              } else {
+                                message_affectation = affectation;
+                              }
+
                               return Card(
                                 color: Color(0xFFE9EAEE),
                                 child: ListTile(
@@ -1056,7 +1129,7 @@ class _AuditeurExternePageState extends State<AuditeurExternePage>
                                       Padding(
                                         padding: const EdgeInsets.all(2.0),
                                         child: Text(
-                                          'Affectation : ${listAuditeurExterne[index].affectation}',
+                                          'Affectation : $message_affectation',
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.w600),

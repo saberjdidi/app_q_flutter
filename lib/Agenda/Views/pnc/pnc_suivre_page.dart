@@ -2,20 +2,16 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:readmore/readmore.dart';
-import '../../../Models/pnc/pnc_a_corriger_model.dart';
 import '../../../Models/pnc/pnc_suivre_model.dart';
 import '../../../Services/pnc/local_pnc_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
-import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_suivre.dart';
 
 class PNCSuivrePage extends StatefulWidget {
-
   PNCSuivrePage({Key? key}) : super(key: key);
 
   @override
@@ -23,10 +19,10 @@ class PNCSuivrePage extends StatefulWidget {
 }
 
 class _PNCSuivrePageState extends State<PNCSuivrePage> {
-
   PNCService localService = PNCService();
   final matricule = SharedPreference.getMatricule();
-  List<PNCSuivreModel> listPNCSuivre = List<PNCSuivreModel>.empty(growable: true);
+  List<PNCSuivreModel> listPNCSuivre =
+      List<PNCSuivreModel>.empty(growable: true);
   List<PNCSuivreModel> listFiltered = [];
   TextEditingController controller = TextEditingController();
   String _searchResult = '';
@@ -40,10 +36,10 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
   void getPNCASuivre() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-       // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+      if (connection == ConnectivityResult.none) {
+        // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
         var response = await LocalPNCService().readPNCASuivre();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = PNCSuivreModel();
             model.nnc = data['nnc'];
@@ -60,15 +56,12 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
             model.nomClt = data['nomClt'];
             listPNCSuivre.add(model);
             listFiltered = listPNCSuivre;
-            listPNCSuivre.forEach((element) {
-              print('element pnc ${element.nc}, id : ${element.nnc}');
-            });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-       //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-       //rest api
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+        //rest api
         await PNCService().getPNCASuivre(matricule).then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
@@ -88,33 +81,31 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
               model.nomClt = data['nomClt'];
               listPNCSuivre.add(model);
               listFiltered = listPNCSuivre;
-              listPNCSuivre.forEach((element) {
-                print('element pnc ${element.nc}, id : ${element.nnc}');
-              });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-    }
-
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
 
-  final columns = ['Numéro','n.c','date', 'produit',''];
+  final columns = ['Numéro', 'n.c', 'date', 'produit', ''];
   int? sortColumnIndex;
   bool isAscending = false;
   final _contentStyleHeader = const TextStyle(
-      color: Color(0xff060f7d), fontSize: 15, fontWeight: FontWeight.w700,
-  fontFamily: "Brand-Bold");
+      color: Color(0xff060f7d),
+      fontSize: 15,
+      fontWeight: FontWeight.w700,
+      fontFamily: "Brand-Bold");
   final _contentStyle = const TextStyle(
-      color: Color(0xff0c2d5e), fontSize: 14, fontWeight: FontWeight.normal,
+      color: Color(0xff0c2d5e),
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
       fontFamily: "Brand-Regular");
 
   @override
@@ -127,21 +118,24 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
-            'Non Confirmité a Suivre ${listPNCSuivre.length}',
+            '${'non_conformite_a_suivre'.tr} ${listPNCSuivre.length}',
             style: TextStyle(color: Colors.black),
           ),
           backgroundColor: (lightPrimary),
@@ -149,8 +143,9 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listPNCSuivre.isNotEmpty ?
-          /*  Container(
+            child: listPNCSuivre.isNotEmpty
+                ?
+                /*  Container(
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   final num_pnc = listPNCSuivre[index].nnc;
@@ -274,82 +269,97 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
               ),
             )
             */
-       //datatable
-            SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                children: [
-                  Card(
-                    child: new ListTile(
-                      leading: new Icon(Icons.search),
-                      title: new TextField(
-                        controller: controller,
-                          decoration: new InputDecoration(
-                              hintText: 'Search', border: InputBorder.none),
-                          onChanged: (value) {
-                            setState(() {
-                               _searchResult = value;
-                               listFiltered = listPNCSuivre.where((user) =>
-                                      user.nnc.toString().contains(_searchResult)
-                                   || user.nc.toString().contains(_searchResult)
-                                   || user.produit.toString().contains(_searchResult)
-                               ).toList();
-                            });
-                          }),
-                      trailing: new IconButton(
-                        icon: controller.text.trim()=='' ?Text('') :Icon(Icons.cancel),
-                        onPressed: () {
-                          setState(() {
-                             controller.clear();
-                                _searchResult = '';
-                                listFiltered = listPNCSuivre;
-                          });
-                        },
-                      ),
+                //datatable
+                SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        Card(
+                          child: new ListTile(
+                            leading: new Icon(Icons.search),
+                            title: new TextField(
+                                controller: controller,
+                                decoration: new InputDecoration(
+                                    hintText: 'search'.tr,
+                                    border: InputBorder.none),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _searchResult = value;
+                                    listFiltered = listPNCSuivre
+                                        .where((user) =>
+                                            user.nnc
+                                                .toString()
+                                                .contains(_searchResult) ||
+                                            user.nc
+                                                .toString()
+                                                .contains(_searchResult) ||
+                                            user.produit
+                                                .toString()
+                                                .contains(_searchResult))
+                                        .toList();
+                                  });
+                                }),
+                            trailing: new IconButton(
+                              icon: controller.text.trim() == ''
+                                  ? Text('')
+                                  : Icon(Icons.cancel),
+                              onPressed: () {
+                                setState(() {
+                                  controller.clear();
+                                  _searchResult = '';
+                                  listFiltered = listPNCSuivre;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            sortAscending: isAscending,
+                            sortColumnIndex: sortColumnIndex,
+                            columns: getColumns(columns),
+                            rows: getRows(listFiltered),
+                            columnSpacing: 10,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        sortAscending: isAscending,
-                        sortColumnIndex: sortColumnIndex,
-                        columns: getColumns(columns),
-                        rows: getRows(listFiltered),
-                        columnSpacing: 10,
-                      ),
-                    ),
-                ],
-              ),
-            )
-
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : EmptyListWidget()),
       ),
     );
   }
 
-  List<DataColumn> getColumns(List<String> columns) => columns.
-      map((String column) => DataColumn(
-      label: Text(column, style: _contentStyleHeader,),
-    onSort: onSort
-  ))
+  List<DataColumn> getColumns(List<String> columns) => columns
+      .map((String column) => DataColumn(
+          label: Text(
+            column,
+            style: _contentStyleHeader,
+          ),
+          onSort: onSort))
       .toList();
 
-  List<DataRow> getRows(List<PNCSuivreModel> listPNC) => listPNC.map((PNCSuivreModel pncSuivreModel) {
-    final cells = [pncSuivreModel.nnc, pncSuivreModel.dateDetect, pncSuivreModel.produit];
-    return DataRow(cells: [
-      DataCell(InkWell(
-          onTap: (){
-            Get.to(RemplirPNCSuivre(pncSuivreModel: pncSuivreModel,));
-          },
-          child: Text('${pncSuivreModel.nnc}', style: _contentStyle, textAlign: TextAlign.right)
-          )),
-      DataCell(Text('${pncSuivreModel.nc}', style: _contentStyle, textAlign: TextAlign.right)),
-     /* DataCell(ReadMoreText(
+  List<DataRow> getRows(List<PNCSuivreModel> listPNC) =>
+      listPNC.map((PNCSuivreModel pncSuivreModel) {
+        final cells = [
+          pncSuivreModel.nnc,
+          pncSuivreModel.dateDetect,
+          pncSuivreModel.produit
+        ];
+        return DataRow(
+            cells: [
+              DataCell(InkWell(
+                  onTap: () {
+                    Get.to(RemplirPNCSuivre(
+                      pncSuivreModel: pncSuivreModel,
+                    ));
+                  },
+                  child: Text('${pncSuivreModel.nnc}',
+                      style: _contentStyle, textAlign: TextAlign.right))),
+              DataCell(Text('${pncSuivreModel.nc}',
+                  style: _contentStyle, textAlign: TextAlign.right)),
+              /* DataCell(ReadMoreText(
         '${pncSuivreModel.nnc}',
         style: _contentStyle,
         trimLines: 3,
@@ -362,42 +372,49 @@ class _PNCSuivrePageState extends State<PNCSuivrePage> {
             fontWeight: FontWeight.bold,
             color: CustomColors.bleuCiel),
       )), */
-      DataCell(Text('${pncSuivreModel.dateDetect}', style: _contentStyle, textAlign: TextAlign.right)),
-      DataCell(Text('${pncSuivreModel.produit}', style: _contentStyle, textAlign: TextAlign.right)),
-      DataCell(
-          InkWell(
-              onTap: (){
-                Get.to(RemplirPNCSuivre(pncSuivreModel: pncSuivreModel,));
-              },
-              child: Icon(Icons.edit, color: Color(0xFF0C8273),)
-          )
-      ),
-    ],
-    onLongPress: (){
-      Get.to(RemplirPNCSuivre(pncSuivreModel: pncSuivreModel,));
-    });
-    //return DataRow(cells: getCells(cells));
-  }).toList();
+              DataCell(Text('${pncSuivreModel.dateDetect}',
+                  style: _contentStyle, textAlign: TextAlign.right)),
+              DataCell(Text('${pncSuivreModel.produit}',
+                  style: _contentStyle, textAlign: TextAlign.right)),
+              DataCell(InkWell(
+                  onTap: () {
+                    Get.to(RemplirPNCSuivre(
+                      pncSuivreModel: pncSuivreModel,
+                    ));
+                  },
+                  child: Icon(
+                    Icons.edit,
+                    color: Color(0xFF0C8273),
+                  ))),
+            ],
+            onLongPress: () {
+              Get.to(RemplirPNCSuivre(
+                pncSuivreModel: pncSuivreModel,
+              ));
+            });
+        //return DataRow(cells: getCells(cells));
+      }).toList();
 
   List<DataCell> getCells(List<dynamic> cells) =>
       cells.map((data) => DataCell(Text('${data}'))).toList();
 
   void onSort(int columnIndex, bool ascending) {
-    if(columnIndex == 0){
-      listPNCSuivre.sort((pnc1, pnc2)=>
-      compareString(ascending, pnc1.nnc.toString(), pnc2.nnc.toString()));
-    } else  if(columnIndex == 1){
-      listPNCSuivre.sort((pnc1, pnc2)=>
-          compareString(ascending, pnc1.dateDetect.toString(), pnc2.dateDetect.toString()));
-    } else  if(columnIndex == 2){
-      listPNCSuivre.sort((pnc1, pnc2)=>
-          compareString(ascending, pnc1.produit.toString(), pnc2.produit.toString()));
+    if (columnIndex == 0) {
+      listPNCSuivre.sort((pnc1, pnc2) =>
+          compareString(ascending, pnc1.nnc.toString(), pnc2.nnc.toString()));
+    } else if (columnIndex == 1) {
+      listPNCSuivre.sort((pnc1, pnc2) => compareString(
+          ascending, pnc1.dateDetect.toString(), pnc2.dateDetect.toString()));
+    } else if (columnIndex == 2) {
+      listPNCSuivre.sort((pnc1, pnc2) => compareString(
+          ascending, pnc1.produit.toString(), pnc2.produit.toString()));
     }
     setState(() {
       this.sortColumnIndex = columnIndex;
       this.isAscending = ascending;
     });
   }
+
   compareString(bool ascending, String value1, String value2) =>
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 }

@@ -9,17 +9,12 @@ import '../../Models/action/type_action_model.dart';
 import '../../Services/api_services_call.dart';
 import '../../Utils/custom_colors.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
-import '../dashboard_screen.dart';
-import '../task/add_task.dart';
-import 'action_list.dart';
 import 'action_widget.dart';
-import 'add_action.dart';
 import 'new_action.dart';
-import 'products_action_page.dart';
-import 'search_action.dart';
 import 'sous_action/sous_action_page.dart';
 import 'types_causes_action_page.dart';
 
@@ -150,12 +145,7 @@ class ActionPage extends GetView<ActionController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),
@@ -305,11 +295,11 @@ class ActionPage extends GetView<ActionController> {
                             children: <Widget>[
                               TextFormField(
                                 controller: controller.searchNumAction,
-                                keyboardType: TextInputType.text,
+                                keyboardType: TextInputType.number,
                                 textInputAction: TextInputAction.next,
                                 decoration: InputDecoration(
                                   labelText: 'N° Action',
-                                  hintText: 'numero',
+                                  hintText: 'number'.tr,
                                   labelStyle: TextStyle(
                                     fontSize: 14.0,
                                   ),

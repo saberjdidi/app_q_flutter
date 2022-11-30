@@ -113,8 +113,7 @@ class SyncDataController extends GetxController {
         }).then((resp) async {
           //isDataProcessing(false);
           await localActionService.deleteTableActionSync();
-          ShowSnackBar.snackBar(
-              "Add Action Sync", "Synchronization successfully", Colors.green);
+          //ShowSnackBar.snackBar("Add Action Sync", "Synchronization successfully", Colors.green);
           debugPrint(
               'action sync : ${listActionSync[i].action}-${listActionSync[i].descpb}-${listActionSync[i].listTypeCause}');
         }, onError: (err) {
@@ -1276,7 +1275,7 @@ class SyncDataController extends GetxController {
           "idFiche": listImages[i].idFiche,
           "fileName": listImages[i].fileName.toString()
         }).then((resp) async {
-          await localIncidentSecuriteService.deleteTableImageIncidentSecurite();
+          await localVisiteSecuriteService.deleteTableImageVisiteSecurite();
         }, onError: (err) {
           isDataProcessing(false);
           // ShowSnackBar.snackBar("Error upload images", err.toString(), Colors.red);

@@ -7,6 +7,7 @@ import 'package:qualipro_flutter/Utils/shared_preference.dart';
 import '../Services/licence_service.dart';
 import '../Services/login_service.dart';
 import '../Services/pnc/pnc_service.dart';
+import '../Utils/http_response.dart';
 import '../Utils/snack_bar.dart';
 import 'api_controllers_call.dart';
 
@@ -38,7 +39,7 @@ class OnBoardingController extends GetxController {
         }).then((responseLicenceEnd) async {
           debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
           if (responseLicenceEnd['retour'] == 0) {
-            Get.snackbar("Internet Connection", "Add Data in DataBase Local",
+            Get.snackbar("Internet Connection", 'add_data_db_local'.tr,
                 colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
             //----------------------------sync from db local to web service------------------------------
@@ -123,14 +124,15 @@ class OnBoardingController extends GetxController {
             ///pnc
             if (SharedPreference.getIsVisiblePNC() == 1) {
               //agenda
+              /* await apiControllersCall.getPNCDecision();
+              await apiControllersCall.getPNCATraiter();
               await apiControllersCall.getPNCAValider();
               await apiControllersCall.getPNCACorriger();
-              //await apiControllersCall.getPNCDecision();
               await apiControllersCall.getPNCInvestigationEffectuer();
               await apiControllersCall.getPNCInvestigationApprouver();
               await apiControllersCall.getPNCASuivre();
               await apiControllersCall.getPNCApprobationFinale();
-              await apiControllersCall.getPNCDecisionTraitementAValidater();
+              await apiControllersCall.getPNCDecisionTraitementAValidater(); */
               //module pnc
               await apiControllersCall.getPNC();
               await apiControllersCall.getAllProductsPNC();
@@ -158,6 +160,13 @@ class OnBoardingController extends GetxController {
             //agenda pnc
             await apiControllersCall.getPNCDecision();
             await apiControllersCall.getPNCATraiter();
+            await apiControllersCall.getPNCAValider();
+            await apiControllersCall.getPNCACorriger();
+            await apiControllersCall.getPNCInvestigationEffectuer();
+            await apiControllersCall.getPNCInvestigationApprouver();
+            await apiControllersCall.getPNCASuivre();
+            await apiControllersCall.getPNCApprobationFinale();
+            await apiControllersCall.getPNCDecisionTraitementAValidater();
 
             ///reunion
             if (SharedPreference.getIsVisibleReunion() == 1) {
@@ -170,6 +179,7 @@ class OnBoardingController extends GetxController {
               await apiControllersCall.getParticipantsReunion();
               await apiControllersCall.getActionReunionRattacher();
               await apiControllersCall.getTypeReunion();
+              await apiControllersCall.getTypeReunionByMatricule();
             }
             // incident environnement
             if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
@@ -278,8 +288,8 @@ class OnBoardingController extends GetxController {
                 Colors.lightBlueAccent);
           }
         }, onError: (errorLicenceEnd) {
-          ShowSnackBar.snackBar(
-              "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+          HttpResponse.StatusCode(errorLicenceEnd.toString());
+          //ShowSnackBar.snackBar("Error Licence End", errorLicenceEnd.toString(), Colors.red);
         });
       }
     } catch (exception) {

@@ -428,8 +428,8 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
       //Get.offAllNamed(AppRoute.documentation);
       Get.toNamed(AppRoute.documentation);
     } else if (index == 4) {
-      Get.find<ReunionController>().listReunion.clear();
-      Get.find<ReunionController>().getReunion();
+      //Get.find<ReunionController>().listReunion.clear();
+      //Get.find<ReunionController>().getReunion();
       //Get.offAllNamed(AppRoute.reunion);
       Get.toNamed(AppRoute.reunion);
     } else if (index == 5) {

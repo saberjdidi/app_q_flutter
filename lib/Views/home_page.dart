@@ -1,5 +1,3 @@
-import 'package:accordion/accordion.dart';
-import 'package:accordion/controllers.dart';
 import 'package:badges/badges.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:expandable/expandable.dart';
@@ -16,7 +14,6 @@ import 'package:qualipro_flutter/Services/incident_environnement/local_incident_
 import 'package:qualipro_flutter/Services/incident_securite/local_incident_securite_service.dart';
 import 'package:qualipro_flutter/Services/pnc/pnc_service.dart';
 import 'package:qualipro_flutter/Services/reunion/local_reunion_service.dart';
-
 import '../Agenda/Views/action/action_realisation_page.dart';
 import '../Agenda/Views/action/action_suite_audit_page.dart';
 import '../Agenda/Views/action/action_suivi_page.dart';
@@ -39,7 +36,6 @@ import '../Agenda/Views/pnc/pnc_traiter_page.dart';
 import '../Agenda/Views/pnc/pnc_valider_decision_traitement_page.dart';
 import '../Agenda/Views/reunion/reunion_informer_page.dart';
 import '../Controllers/api_controllers_call.dart';
-import '../Controllers/home_controller.dart';
 import '../Controllers/network_controller.dart';
 import '../Controllers/sync_data_controller.dart';
 import '../Models/action/action_realisation_model.dart';
@@ -63,6 +59,7 @@ import '../Services/login_service.dart';
 import '../Services/pnc/local_pnc_service.dart';
 import '../Services/reunion/reunion_service.dart';
 import '../Utils/custom_colors.dart';
+import '../Utils/http_response.dart';
 import '../Utils/shared_preference.dart';
 import '../Utils/snack_bar.dart';
 import '../Widgets/app_bar_title.dart';
@@ -252,7 +249,8 @@ class _HomePageState extends State<HomePage> {
         if (licenceEndModel?.retour == 0) {
           debugPrint('licence of device : $device_id');
         } else {
-          Get.snackbar("Licence expired", "Your licence has expired",
+          Get.snackbar("Licence ${SharedPreference.getLicenceKey().toString()}",
+              'licence_expired'.tr,
               colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
           SharedPreference.clearSharedPreference();
           Get.off(LicencePage());
@@ -267,14 +265,16 @@ class _HomePageState extends State<HomePage> {
         if (responseLicenceEnd['retour'] == 0) {
           debugPrint('licence of device : ${deviceId.toString()}');
         } else {
-          ShowSnackBar.snackBar(SharedPreference.getDeviceNameKey().toString(),
-              'Your licence has expired', Colors.lightBlueAccent);
+          ShowSnackBar.snackBar(
+              "Licence ${SharedPreference.getLicenceKey().toString()}",
+              'licence_expired'.tr,
+              Colors.lightBlueAccent);
           SharedPreference.clearSharedPreference();
           Get.off(LicencePage());
         }
       }, onError: (errorLicenceEnd) {
-        ShowSnackBar.snackBar(
-            "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+        HttpResponse.StatusCode(errorLicenceEnd.toString());
+        //ShowSnackBar.snackBar("Error Licence End", errorLicenceEnd.toString(), Colors.red);
       });
     }
   }
@@ -319,38 +319,6 @@ class _HomePageState extends State<HomePage> {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
-        /* var response = await localActionService.readActionRealisation();
-        response.forEach((data){
-          var model = ActionRealisationModel();
-          model.nomPrenom = data['nomPrenom'];
-          model.nAct = data['nAct'];
-          model.act = data['act'];
-          model.nSousAct = data['nSousAct'];
-          model.sousAct = data['sousAct'];
-          model.respReal = data['respReal'];
-          model.delaiReal = data['delaiReal'];
-          model.delaiSuivi = data['delaiSuivi'];
-          model.dateReal = data['dateReal'];
-          model.dateSuivi = data['dateSuivi'];
-          model.pourcentReal = data['pourcentReal'];
-          model.depense = data['depense'];
-          model.commentaire = data['commentaire'];
-          model.cloture = data['cloture'];
-          model.priorite = data['priorite'];
-          model.gravite = data['gravite'];
-
-          listActionReal.add(model);
-          if(listActionReal.length == null){
-            setState(() {
-              countListActionRealisation = 0;
-            });
-          } else {
-            setState(() {
-              countListActionRealisation = listActionReal.length;
-            });
-          }
-
-        }); */
         var count_action_realisation =
             await localActionService.getCountActionRealisation();
         if (count_action_realisation == 0) {
@@ -413,20 +381,27 @@ class _HomePageState extends State<HomePage> {
                 countListActionRealisation = listActionReal.length;
               });
             }
-
-            /* listActionReal.forEach((element) {
-              print('element act ${element.act}, id act: ${element.nAct}');
-            });
-            print('length list action realiser: ${countListActionRealisation}'); */
           });
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          if (error.toString() == 500.toString() ||
+              error.toString().contains(500.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'internal_server_error'.tr, Colors.red);
+          } else if (error.toString() == 503.toString() ||
+              error.toString().contains(503.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'service_unavailable'.tr, Colors.red);
+          } else {
+            ShowSnackBar.snackBar(
+                "Error Action realisation", error.toString(), Colors.red);
+          }
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Action realisation", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -495,21 +470,17 @@ class _HomePageState extends State<HomePage> {
                 countListActionSuivi = listActionSuivi.length;
               });
             }
-
-            listActionSuivi.forEach((element) {
-              print(
-                  'element act suivi ${element.act}, id act: ${element.nAct}');
-            });
-            print('length list action suivi: ${countListActionSuivi}');
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Action Suivi", err.toString(), Colors.red);
+          debugPrint('Error Action Suivi: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Action Suivi", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -559,12 +530,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Action suite Audit", err.toString(), Colors.red);
+          debugPrint('Error Action suite Audit: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Action suite Audit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -625,14 +598,26 @@ class _HomePageState extends State<HomePage> {
               });
             }
           });
-        }, onError: (err) {
+        }, onError: (error) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          if (error.toString() == 500.toString() ||
+              error.toString().contains(500.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'internal_server_error'.tr, Colors.red);
+          } else if (error.toString() == 503.toString() ||
+              error.toString().contains(503.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'service_unavailable'.tr, Colors.red);
+          } else {
+            ShowSnackBar.snackBar(
+                "Error PNC Traiter", error.toString(), Colors.red);
+          }
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNC Traiter", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -689,12 +674,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Corriger", err.toString(), Colors.red);
+          debugPrint('Error PNC Corriger : ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNC Corriger", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -751,12 +738,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Valider", err.toString(), Colors.red);
+          debugPrint('Error PNC Valider : ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNC Valider", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -812,12 +801,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC a suivre", err.toString(), Colors.red);
+          debugPrint('Error PNC a suivre : ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNC a suivre", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -874,12 +865,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Investigation Effectuer", err.toString(), Colors.red);
+          debugPrint('Error PNC Investigation Effectuer: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNC Investigation Effectuer",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -936,12 +929,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Investigation Approuver", err.toString(), Colors.red);
+          debugPrint('Error PNC Investigation Approuver: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNC Investigation Approuver",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -997,12 +992,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Traitement Decision", err.toString(), Colors.red);
+          debugPrint('Error PNC Traitement Decision: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNC Traitement Decision",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1056,12 +1053,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Approbation Finale", err.toString(), Colors.red);
+          debugPrint('Error PNC Approbation Finale: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNC Approbation Finale", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1115,12 +1114,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error PNC Validation Traitement", err.toString(), Colors.red);
+          debugPrint('Error PNC Validation Traitement: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNC Validation Traitement",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1170,12 +1171,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Reunion Info", err.toString(), Colors.red);
+          debugPrint('Error Reunion Info: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Reunion Info", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1228,12 +1231,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Reunion Planifier", err.toString(), Colors.red);
+          debugPrint('Error Reunion Planifier: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Reunion Planifier", exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1285,12 +1290,17 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Decision Traitement Incident Environnement", err.toString(), Colors.red);
+          debugPrint(
+              'Error Decision Traitement Incident Environnement: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Decision Traitement Incident Environnement",
+          exception.toString(),
+          Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1340,12 +1350,15 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Incident Environnement A Traiter", err.toString(), Colors.red);
+          debugPrint(
+              'Error Incident Environnement A Traiter: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Incident Environnement A Traiter",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1395,12 +1408,15 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Incident Environnement A Cloturer", err.toString(), Colors.red);
+          debugPrint(
+              'Error Incident Environnement A Cloturer: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Incident Environnement A Cloturer",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1452,12 +1468,15 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Decision Traitement Incident Securite", err.toString(), Colors.red);
+          debugPrint(
+              'Error Decision Traitement Incident Securite: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Decision Traitement Incident Securite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1508,12 +1527,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Incident Securite A Traiter", err.toString(), Colors.red);
+          debugPrint('Error Incident Securite A Traiter: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Incident Securite A Traiter",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1564,12 +1585,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Incident Securite A Cloturer", err.toString(), Colors.red);
+          debugPrint('Error Incident Securite A Cloturer: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Incident Securite A Cloturer",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1619,12 +1642,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Audits EnTantQue Audite", err.toString(), Colors.red);
+          debugPrint('Error Audits EnTantQue Audite: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Audits EnTantQue Audite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1674,12 +1699,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Audits EnTantQue Auditeur", err.toString(), Colors.red);
+          debugPrint('Error Audits EnTantQue Auditeur: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Audits EnTantQue Auditeur",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1729,12 +1756,14 @@ class _HomePageState extends State<HomePage> {
           });
         }, onError: (err) {
           isDataProcessing = false;
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+          //ShowSnackBar.snackBar("Error Rapport Audits A Valider", err.toString(), Colors.red);
+          debugPrint('Error Rapport Audits A Valider: ${err.toString()}');
         });
       }
     } catch (exception) {
       isDataProcessing = false;
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception Rapport Audits A Valider",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing = false;
     }
@@ -1770,7 +1799,7 @@ class _HomePageState extends State<HomePage> {
     //await Get.find<OnBoardingController>().syncApiCallToLocalDB();
     var connection = await Connectivity().checkConnectivity();
     if (connection == ConnectivityResult.none) {
-      Get.snackbar("No Connection", "Mode Offline",
+      Get.snackbar("No Connection", 'cannot_synchronize_data'.tr,
           colorText: Colors.blue, snackPosition: SnackPosition.TOP);
     } else if (connection == ConnectivityResult.wifi ||
         connection == ConnectivityResult.mobile) {
@@ -1782,12 +1811,27 @@ class _HomePageState extends State<HomePage> {
       }).then((responseLicenceEnd) async {
         debugPrint('responseLicenceEnd : ${responseLicenceEnd['retour']}');
         if (responseLicenceEnd['retour'] == 0) {
-          Get.snackbar(
-              "Internet Connection", "Please wait to Synchronization Data",
+          Get.snackbar("Internet Connection", '',
               colorText: Colors.blue,
               snackPosition: SnackPosition.TOP,
               duration: Duration(seconds: 10),
-              titleText: CircularProgressIndicator());
+              titleText: Container(
+                width: Get.width * 0.6,
+                height: Get.height * 0.4,
+                child: CircularProgressIndicator(
+                  color: Colors.blueAccent,
+                ),
+              ),
+              messageText: Center(
+                child: Text(
+                  'wait_to_synchronize_data'.tr,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueAccent),
+                ),
+              ),
+              snackStyle: SnackStyle.FLOATING);
           //----------------------------sync from db local to web service------------------------------
           //sync action
           if (SharedPreference.getIsVisibleAction() == 1) {
@@ -1869,13 +1913,15 @@ class _HomePageState extends State<HomePage> {
           ///pnc
           if (SharedPreference.getIsVisiblePNC() == 1) {
             //agenda
+            /* await apiControllersCall.getPNCDecision();
+            await apiControllersCall.getPNCATraiter();
             await apiControllersCall.getPNCAValider();
             await apiControllersCall.getPNCACorriger();
             await apiControllersCall.getPNCInvestigationEffectuer();
             await apiControllersCall.getPNCInvestigationApprouver();
             await apiControllersCall.getPNCASuivre();
             await apiControllersCall.getPNCApprobationFinale();
-            await apiControllersCall.getPNCDecisionTraitementAValidater();
+            await apiControllersCall.getPNCDecisionTraitementAValidater(); */
             //module pnc
             await apiControllersCall.getPNC();
             await apiControllersCall.getAllProductsPNC();
@@ -1900,6 +1946,16 @@ class _HomePageState extends State<HomePage> {
                   'Error one product', error.toString(), Colors.red);
             });
           }
+          //agenda pnc
+          await apiControllersCall.getPNCDecision();
+          await apiControllersCall.getPNCATraiter();
+          await apiControllersCall.getPNCAValider();
+          await apiControllersCall.getPNCACorriger();
+          await apiControllersCall.getPNCInvestigationEffectuer();
+          await apiControllersCall.getPNCInvestigationApprouver();
+          await apiControllersCall.getPNCASuivre();
+          await apiControllersCall.getPNCApprobationFinale();
+          await apiControllersCall.getPNCDecisionTraitementAValidater();
 
           ///reunion
           if (SharedPreference.getIsVisibleReunion() == 1) {
@@ -1912,6 +1968,7 @@ class _HomePageState extends State<HomePage> {
             await apiControllersCall.getParticipantsReunion();
             await apiControllersCall.getActionReunionRattacher();
             await apiControllersCall.getTypeReunion();
+            await apiControllersCall.getTypeReunionByMatricule();
           }
           //incident env
           if (SharedPreference.getIsVisibleIncidentEnvironnement() == 1) {
@@ -2005,9 +2062,6 @@ class _HomePageState extends State<HomePage> {
             await apiControllersCall.getDocument();
             await apiControllersCall.getTypeDocument();
           }
-          //agenda pnc
-          await apiControllersCall.getPNCDecision();
-          await apiControllersCall.getPNCATraiter();
           //domaine affectation
           await apiControllersCall.getEmploye();
           await apiControllersCall.getProduct();
@@ -2139,7 +2193,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                          'Action à realiser',
+                                          'action_a_realiser'.tr,
                                           style: _contentStyleHeader,
                                         ),
                                         trailing: Badge(
@@ -2174,7 +2228,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Action à suivre',
+                                        title: Text('action_a_suivi'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFF0B9205),
@@ -2209,7 +2263,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Action suite à audit',
+                                        title: Text('action_suite_a_audit'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFF0B9205),
@@ -2266,7 +2320,7 @@ class _HomePageState extends State<HomePage> {
                                   const Icon(Icons.compare_rounded,
                                       color: Colors.white),
                                   const Text(
-                                    'PNC',
+                                    'P.N.C',
                                     style: TextStyle(
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
@@ -2312,7 +2366,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                          'Non Confirmité à Valider',
+                                          'non_conformite_a_valider'.tr,
                                           style: _contentStyleHeader,
                                         ),
                                         trailing: Badge(
@@ -2347,7 +2401,8 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Non Confirmité à Corriger',
+                                        title: Text(
+                                            'non_conformite_a_corriger'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2384,7 +2439,8 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Investigation à effectuer',
+                                        title: Text(
+                                            'investigation_a_effectuer'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2418,7 +2474,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Decision de Traitement',
+                                        title: Text('decision_de_traitement'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2455,7 +2511,8 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Investigation à approuver',
+                                        title: Text(
+                                            'investigation_a_approuver'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2491,7 +2548,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Traitement à Valider',
+                                        title: Text('traitement_a_valider'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2525,7 +2582,8 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Non Confirmité à Traiter',
+                                        title: Text(
+                                            'non_conformite_a_traiter'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2559,7 +2617,8 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Non Confirmité à Suivre',
+                                        title: Text(
+                                            'non_conformite_a_suivre'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2594,7 +2653,9 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Approbation Finale',
+                                        title: Text(
+                                            'non_conformite_pour_approbation_finale'
+                                                .tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: Colors.blue,
@@ -2652,7 +2713,7 @@ class _HomePageState extends State<HomePage> {
                                   const Icon(Icons.reduce_capacity,
                                       color: Colors.white),
                                   Text(
-                                    'Reunion',
+                                    'reunion'.tr,
                                     style: _headerStyle,
                                   ),
                                   Badge(
@@ -2694,7 +2755,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                          'Reunion pour Info',
+                                          '${'reunion'.tr} ${'pour'.tr} Info',
                                           style: _contentStyleHeader,
                                         ),
                                         trailing: Badge(
@@ -2729,7 +2790,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Reunion Planifiée',
+                                        title: Text('reunion_planifie'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFFEF9A08),
@@ -2788,7 +2849,7 @@ class _HomePageState extends State<HomePage> {
                                   const Icon(Icons.whatshot,
                                       color: Colors.white),
                                   Text(
-                                    'Environnement',
+                                    'environment'.tr,
                                     style: _headerStyle,
                                   ),
                                   Badge(
@@ -2831,7 +2892,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                          'Decision de Traitement',
+                                          'decision_de_traitement'.tr,
                                           style: _contentStyleHeader,
                                         ),
                                         trailing: Badge(
@@ -2867,7 +2928,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Incident A Traiter',
+                                        title: Text('incident_a_traiter'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFF17DB47),
@@ -2902,7 +2963,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Incident a Cloturer',
+                                        title: Text('incident_a_cloturer'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFF17DB47),
@@ -2960,7 +3021,7 @@ class _HomePageState extends State<HomePage> {
                                   const Icon(Icons.security,
                                       color: Colors.white),
                                   Text(
-                                    'Securite',
+                                    'securite'.tr,
                                     style: _headerStyle,
                                   ),
                                   Badge(
@@ -3005,7 +3066,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                          'Decision de Traitement',
+                                          'decision_de_traitement'.tr,
                                           style: _contentStyleHeader,
                                         ),
                                         trailing: Badge(
@@ -3042,7 +3103,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Incident A Traiter',
+                                        title: Text('incident_a_traiter'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFFE20B24),
@@ -3078,7 +3139,7 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Incident a Cloturer',
+                                        title: Text('incident_a_cloturer'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFFE20B24),
@@ -3176,7 +3237,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                          'Audits en tant que audité',
+                                          'Audits_en_tant_que_audite'.tr,
                                           style: _contentStyleHeader,
                                         ),
                                         trailing: Badge(
@@ -3213,7 +3274,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 45,
                                         ),
                                         title: Text(
-                                            'Audits en tant que auditeur',
+                                            'Audits_en_tant_que_auditeur'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFFC20BE2),
@@ -3248,7 +3309,8 @@ class _HomePageState extends State<HomePage> {
                                           color: Colors.black87,
                                           size: 45,
                                         ),
-                                        title: Text('Rapport audits à valider',
+                                        title: Text(
+                                            'rapport_audit_a_valider'.tr,
                                             style: _contentStyleHeader),
                                         trailing: Badge(
                                           badgeColor: const Color(0xFFC20BE2),

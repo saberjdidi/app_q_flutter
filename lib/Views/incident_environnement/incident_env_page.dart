@@ -10,6 +10,7 @@ import '../../Models/type_incident_model.dart';
 import '../../Services/incident_environnement/incident_environnement_service.dart';
 import '../../Utils/custom_colors.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
@@ -60,9 +61,9 @@ class IncidentEnvironnementPage
                     .clear();
                 Get.find<IncidentEnvironnementController>().getIncident();
               },
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(height: 1.0),
                 shrinkWrap: true,
-                primary: false,
                 itemCount: controller.listIncident.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
@@ -304,12 +305,7 @@ class IncidentEnvironnementPage
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

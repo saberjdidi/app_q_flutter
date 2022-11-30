@@ -2,7 +2,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
 import '../../../Models/pnc/pnc_validation_decision_model.dart';
@@ -12,6 +11,7 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_decision_validation.dart';
 
 class PNCValiderDecisionTraitementPage extends StatefulWidget {
@@ -58,9 +58,6 @@ class _PNCValiderDecisionTraitementPageState
             model.nomClt = data['nomClt'];
             listPNC.add(model);
             listFiltered = listPNC;
-            listPNC.forEach((element) {
-              print('element pnc ${element.nc}, id : ${element.nnc}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -83,9 +80,6 @@ class _PNCValiderDecisionTraitementPageState
               model.nomClt = data['nomClt'];
               listPNC.add(model);
               listFiltered = listPNC;
-              listPNC.forEach((element) {
-                print('element pnc ${element.nc}, id : ${element.nnc}');
-              });
             });
           });
         }, onError: (err) {
@@ -126,7 +120,7 @@ class _PNCValiderDecisionTraitementPageState
             ),
           ),
           title: Text(
-            'Validation de Decision ${listPNC.length}',
+            'Validation Decision ${listPNC.length}',
             style: TextStyle(color: Colors.black),
           ),
           backgroundColor: (lightPrimary),
@@ -162,7 +156,7 @@ class _PNCValiderDecisionTraitementPageState
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -194,7 +188,7 @@ class _PNCValiderDecisionTraitementPageState
                                 color: Color(0xFFFCF9F9),
                                 child: ListTile(
                                   title: Text(
-                                    'PNC N°${num_pnc}',
+                                    'P.N.C N°${num_pnc}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -244,7 +238,7 @@ class _PNCValiderDecisionTraitementPageState
                                           padding: const EdgeInsets.only(
                                               top: 5, bottom: 5),
                                           child: Text(
-                                              'Produit : ${listFiltered[index].produit}',
+                                              '${'product'.tr} : ${listFiltered[index].produit}',
                                               style: TextStyle(
                                                   color: Colors.blueAccent)),
                                         ),
@@ -289,11 +283,7 @@ class _PNCValiderDecisionTraitementPageState
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
-                        style: TextStyle(
-                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
-                  )),
+                : EmptyListWidget()),
       ),
     );
   }

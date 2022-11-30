@@ -1,16 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../Models/employe_model.dart';
 import '../../../../Models/pnc/traitement_decision_model.dart';
 import '../../../../Services/action/local_action_service.dart';
@@ -90,7 +82,7 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
           ),
         ),
         title: Center(
-          child: Text("New Responsable Traitement"),
+          child: Text("${'new'.tr} ${'responsable'.tr} ${'processing'.tr}"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -110,35 +102,41 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
                         ),
                         Visibility(
                           visible: true,
-                          child: TextFormField(
-                            controller: dateTraitementController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (value) {
+                          child: InkWell(
+                            onTap: () {
                               selectedDate(context);
                             },
-                            decoration: InputDecoration(
-                                labelText: 'Delai Traitement',
-                                hintText: 'date',
-                                labelStyle: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 10.0,
-                                ),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    selectedDate(context);
-                                  },
-                                  child: Icon(Icons.calendar_today),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.lightBlue, width: 1),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)))),
-                            style: TextStyle(fontSize: 14.0),
+                            child: TextFormField(
+                              enabled: false,
+                              controller: dateTraitementController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (value) {
+                                selectedDate(context);
+                              },
+                              decoration: InputDecoration(
+                                  labelText: 'Date ${'processing'.tr}',
+                                  hintText: 'date',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      selectedDate(context);
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -151,8 +149,8 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Traitement NC',
-                                hintText: 'Traitement NC',
+                                labelText: '${'processing'.tr} N.C',
+                                hintText: '${'processing'.tr} N.C',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -187,13 +185,13 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
                           onFind: (String? filter) => getEmploye(filter),
                           onChanged: (data) {
                             employeMatricule = data?.mat;
-                            print(
+                            debugPrint(
                                 'employe: ${data?.nompre}, mat: ${employeMatricule}');
                           },
                           dropdownBuilder: customDropDownEmploye,
                           popupItemBuilder: customPopupItemBuilderEmploye,
                           validator: (u) =>
-                              u == null ? "Employe is required " : null,
+                              u == null ? "Employe ${'is_required'.tr}" : null,
                         ),
                         SizedBox(
                           height: 10.0,
@@ -201,7 +199,7 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
                         Visibility(
                           visible: true,
                           child: CheckboxListTile(
-                            title: const Text('Premier Responsable'),
+                            title: Text('${'first'.tr} ${'responsable'.tr}'),
                             value: checkFirstResponsable,
                             onChanged: (bool? value) {
                               setState(() {
@@ -211,7 +209,7 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
                                 } else {
                                   firstResponsable = "0";
                                 }
-                                print(
+                                debugPrint(
                                     'Premier Responsable ${firstResponsable}');
                               });
                             },
@@ -248,7 +246,7 @@ class _NewResponsableTraitementState extends State<NewResponsableTraitement> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(15.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

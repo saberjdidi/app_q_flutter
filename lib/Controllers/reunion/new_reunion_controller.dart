@@ -3,38 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Controllers/reunion/reunion_controller.dart';
-import 'package:qualipro_flutter/Models/client_model.dart';
-import 'package:qualipro_flutter/Models/fournisseur_model.dart';
-import 'package:qualipro_flutter/Models/pnc/atelier_pnc_model.dart';
-import 'package:qualipro_flutter/Models/pnc/isps_pnc_model.dart';
-import 'package:qualipro_flutter/Models/pnc/source_pnc_model.dart';
-import 'package:qualipro_flutter/Models/pnc/type_pnc_model.dart';
-import 'package:qualipro_flutter/Models/product_model.dart';
 import 'package:qualipro_flutter/Models/reunion/reunion_model.dart';
 import 'package:qualipro_flutter/Models/reunion/type_reunion_model.dart';
 import 'package:qualipro_flutter/Services/action/local_action_service.dart';
 import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
 import 'package:qualipro_flutter/Services/reunion/local_reunion_service.dart';
 import 'package:qualipro_flutter/Services/reunion/reunion_service.dart';
-
 import '../../Models/Domaine_affectation_model.dart';
 import '../../Models/activity_model.dart';
-import '../../Models/champ_cache_model.dart';
 import '../../Models/direction_model.dart';
-import '../../Models/employe_model.dart';
-import '../../Models/pnc/champ_obligatoire_pnc_model.dart';
-import '../../Models/pnc/gravite_pnc_model.dart';
-import '../../Models/pnc/pnc_model.dart';
 import '../../Models/processus_model.dart';
 import '../../Models/service_model.dart';
 import '../../Models/site_model.dart';
-import '../../Route/app_route.dart';
 import '../../Services/api_services_call.dart';
-import '../../Services/pnc/pnc_service.dart';
+import '../../Utils/http_response.dart';
 import '../../Utils/message.dart';
 import '../../Utils/shared_preference.dart';
 import '../../Utils/snack_bar.dart';
-import '../../Views/pnc/add_products_pnc/products_pnc_page.dart';
 import '../../Views/reunion/participant/participant_page.dart';
 
 class NewReunionController extends GetxController {
@@ -437,10 +422,10 @@ class NewReunionController extends GetxController {
             ShowSnackBar.snackBar(
                 "Successfully", "Reunion Added ", Colors.green);
             final num_reunion = resp['nReunion'];
-            print('num reunion : ${num_reunion}');
+            debugPrint('num reunion : ${num_reunion}');
 
             Get.defaultDialog(
-                title: 'Add Participants',
+                title: '${'new'.tr} Participants',
                 backgroundColor: Colors.white,
                 titleStyle: TextStyle(color: Colors.black),
                 middleTextStyle: TextStyle(color: Colors.white),
@@ -464,16 +449,17 @@ class NewReunionController extends GetxController {
                 barrierDismissible: false,
                 radius: 20,
                 content: Text(
-                  'Do you want to add participants',
+                  '${'do_you_want_add'.tr} participants',
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,
                       fontFamily: 'Brand-Bold'),
                 ));
-          }, onError: (err) {
+          }, onError: (error) {
             isDataProcessing(false);
-            print('Error : ${err.toString()}');
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+            print('Error : ${error.toString()}');
+            HttpResponse.StatusCode(error.toString());
+            //ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
           });
         }
       } catch (ex) {

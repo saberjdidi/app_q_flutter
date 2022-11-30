@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Models/documentation/documentation_model.dart';
-import 'package:qualipro_flutter/Models/pnc/pnc_model.dart';
-import 'package:qualipro_flutter/Models/reunion/reunion_model.dart';
-import 'package:readmore/readmore.dart';
 import 'dart:ui' as ui;
-import '../../Models/action/action_model.dart';
-import '../../Utils/custom_colors.dart';
+
+import 'package:qualipro_flutter/Utils/shared_preference.dart';
 
 class DetailsDocumentation extends StatelessWidget {
   final DocumentationModel model;
@@ -25,6 +22,33 @@ class DetailsDocumentation extends StatelessWidget {
         fontSize: 14,
         fontWeight: FontWeight.normal,
         fontFamily: "Brand-Regular");
+
+    final langue = SharedPreference.getLangue();
+    DateTime dateCreation = DateTime.parse(model.dateCreat.toString());
+    DateTime dateRevis = DateTime.parse(model.dateRevis.toString());
+    DateTime dateRevue = DateTime.parse(model.dateRevue.toString());
+    DateTime dateProchRevue = DateTime.parse(model.dateprochRevue.toString());
+
+    var creation_date;
+    var date_revis;
+    var date_revue;
+    var date_proche_revue;
+    if (langue == 'en') {
+      creation_date = DateFormat('dd/MM/yyyy').format(dateCreation);
+      date_revis = DateFormat('dd/MM/yyyy').format(dateRevis);
+      date_revue = DateFormat('dd/MM/yyyy').format(dateRevue);
+      date_proche_revue = DateFormat('dd/MM/yyyy').format(dateProchRevue);
+    } else if (langue == 'en') {
+      creation_date = DateFormat('MM/dd/yyyy').format(dateCreation);
+      date_revis = DateFormat('MM/dd/yyyy').format(dateRevis);
+      date_revue = DateFormat('MM/dd/yyyy').format(dateRevue);
+      date_proche_revue = DateFormat('MM/dd/yyyy').format(dateProchRevue);
+    } else {
+      creation_date = DateFormat('dd/MM/yyyy').format(dateCreation);
+      date_revis = DateFormat('dd/MM/yyyy').format(dateRevis);
+      date_revue = DateFormat('dd/MM/yyyy').format(dateRevue);
+      date_proche_revue = DateFormat('dd/MM/yyyy').format(dateProchRevue);
+    }
 
     return SingleChildScrollView(
       child: Padding(
@@ -97,7 +121,7 @@ class DetailsDocumentation extends StatelessWidget {
                   '${'creation_date'.tr} : ',
                   style: _contentStyleHeader,
                 ),
-                Text('${model.dateCreat}', style: _contentStyle),
+                Text('$creation_date', style: _contentStyle),
               ],
             ),
             SizedBox(
@@ -109,7 +133,7 @@ class DetailsDocumentation extends StatelessWidget {
                   'Date Revis : ',
                   style: _contentStyleHeader,
                 ),
-                Text('${model.dateRevis}', style: _contentStyle),
+                Text('$date_revis', style: _contentStyle),
               ],
             ),
             SizedBox(
@@ -121,7 +145,7 @@ class DetailsDocumentation extends StatelessWidget {
                   'Date Revue : ',
                   style: _contentStyleHeader,
                 ),
-                Text('${model.dateRevue}', style: _contentStyle),
+                Text('$date_revue', style: _contentStyle),
               ],
             ),
             SizedBox(
@@ -133,7 +157,7 @@ class DetailsDocumentation extends StatelessWidget {
                   'Date Proche Revue : ',
                   style: _contentStyleHeader,
                 ),
-                Text('${model.dateprochRevue}', style: _contentStyle),
+                Text('$date_proche_revue', style: _contentStyle),
               ],
             ),
             SizedBox(

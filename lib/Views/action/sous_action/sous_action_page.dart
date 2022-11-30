@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
+import 'package:qualipro_flutter/Controllers/action/action_controller.dart';
 import '../../../Controllers/action/sous_action_controller.dart';
+import '../../../Route/app_route.dart';
 import '../../../Utils/custom_colors.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import '../../../Widgets/loading_widget.dart';
 import '../../../Widgets/refresh_widget.dart';
+import '../action_page.dart';
 import 'intervenant_page.dart';
 import 'new_sous_action.dart';
 import 'sous_action_widget.dart';
@@ -23,9 +27,11 @@ class SousActionPage extends GetView<SousActionController> {
         leading: TextButton(
           onPressed: () {
             Get.back();
-            //Get.offAll(ActionPage());
+            Get.find<ActionController>().listAction.clear();
+            Get.find<ActionController>().getActions();
+            //Get.offAllNamed(AppRoute.pnc);
             //Get.toNamed(AppRoute.action);
-            //Get.offAllNamed(AppRoute.action);
+            //Get.offAll(ActionPage());
           },
           child: Icon(
             Icons.arrow_back,
@@ -96,23 +102,26 @@ class SousActionPage extends GetView<SousActionController> {
                         endActionPane: ActionPane(
                           motion: ScrollMotion(),
                           children: [
-                            SlidableAction(
-                              // An action can be bigger than the others.
-                              flex: 2,
-                              onPressed: (context) {
-                                //print('id action:${controller.listSousAction[index].nAct}');
-                                // print('id sous action:${controller.listSousAction[index].nSousAct}');
-                                Get.to(IntervenantsPage(
-                                  idAction:
-                                      controller.listSousAction[index].nAct,
-                                  idSousAction:
-                                      controller.listSousAction[index].nSousAct,
-                                ));
-                              },
-                              backgroundColor: Color(0xFF0DBD90),
-                              foregroundColor: Colors.white,
-                              icon: Icons.edit,
-                              label: 'Intervenants',
+                            Visibility(
+                              visible: controller.isVisibleIntervenat.value,
+                              child: SlidableAction(
+                                // An action can be bigger than the others.
+                                flex: 2,
+                                onPressed: (context) {
+                                  //print('id action:${controller.listSousAction[index].nAct}');
+                                  // print('id sous action:${controller.listSousAction[index].nSousAct}');
+                                  Get.to(IntervenantsPage(
+                                    idAction:
+                                        controller.listSousAction[index].nAct,
+                                    idSousAction: controller
+                                        .listSousAction[index].nSousAct,
+                                  ));
+                                },
+                                backgroundColor: Color(0xFF0DBD90),
+                                foregroundColor: Colors.white,
+                                icon: Icons.edit,
+                                label: 'Intervenants',
+                              ),
                             ),
                           ],
                         ),
@@ -123,12 +132,7 @@ class SousActionPage extends GetView<SousActionController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

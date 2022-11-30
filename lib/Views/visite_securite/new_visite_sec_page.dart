@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -35,7 +34,6 @@ import '../../Services/incident_securite/local_incident_securite_service.dart';
 import '../../Services/visite_securite/local_visite_securite_service.dart';
 import '../../Services/visite_securite/visite_securite_service.dart';
 import 'package:path/path.dart' as mypath;
-
 import '../../Utils/utility_file.dart';
 
 class NewVisiteSecuPage extends StatefulWidget {
@@ -263,35 +261,36 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
   bool _dataValidation() {
     if ((listEquipeVisiteSecurite == [] && listEquipeSave == []) ||
         (listEquipeVisiteSecurite.isEmpty && listEquipeSave.isEmpty)) {
-      Message.taskErrorOrWarning("Warning", "Ajouter responsable");
+      Message.taskErrorOrWarning('warning'.tr, "${'add'.tr} responsable");
       return false;
     } else if (checkListModel == null) {
-      Message.taskErrorOrWarning("Warning", "CheckList is required");
+      Message.taskErrorOrWarning('warning'.tr, "CheckList ${'is_required'.tr}");
       return false;
     } else if (uniteModel == null) {
-      Message.taskErrorOrWarning("Warning", "Unite is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'unite'.tr} ${'is_required'.tr}");
       return false;
     } else if (zoneModel == null) {
-      Message.taskErrorOrWarning("Warning", "Zone is required");
+      Message.taskErrorOrWarning('warning'.tr, "Zone ${'is_required'.tr}");
       return false;
     } else if (dateVisiteController.text.trim() == '' &&
         date_visite_obligatoire == 1) {
-      Message.taskErrorOrWarning("Warning", "Date is required");
+      Message.taskErrorOrWarning('warning'.tr, "Date ${'is_required'.tr}");
       return false;
     } else if (comportementSurObserveController.text.trim() == '' &&
         comportement_sur_observe_obligatoire == 1) {
       Message.taskErrorOrWarning(
-          "Warning", "Comportement Observe est obligatoire");
+          'warning'.tr, "${'comportement_sur_observe'.tr} ${'is_required'.tr}");
       return false;
     } else if (comportementRisqueObserveController.text.trim() == '' &&
         comportement_risque_observe_obligatoire == 1) {
-      Message.taskErrorOrWarning(
-          "Warning", "Comportement risque Observe est obligatoire");
+      Message.taskErrorOrWarning('warning'.tr,
+          "${'comportement_risque_observe'.tr} ${'is_required'.tr}");
       return false;
     } else if (correctionImmediateController.text.trim() == '' &&
         correction_immediate_obligatoire == 1) {
       Message.taskErrorOrWarning(
-          "Warning", "Corrections Immediates est obligatoire");
+          'warning'.tr, "${'correction_immediate'.tr} ${'is_required'.tr}");
       return false;
     }
     return true;
@@ -328,7 +327,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
           ),
         ),
         title: Center(
-          child: Text("New Visite Securite"),
+          child: Text("${'new'.tr} Visite Securite"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -357,6 +356,31 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Check-list',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               onFind: (String? filter) => getCheckList(filter),
                               onChanged: (data) {
                                 setState(() {
@@ -367,7 +391,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                     selectedIdCheckList = 0;
                                     checkList = "";
                                   }
-                                  print(
+                                  debugPrint(
                                       'CheckList: ${checkListModel?.checklist}, id: ${selectedIdCheckList}');
                                 });
                               },
@@ -386,10 +410,35 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                               isFilteredOnline: true,
                               compareFn: (i, s) => i?.isEqual(s) ?? false,
                               dropdownSearchDecoration: InputDecoration(
-                                labelText: "Unite *",
+                                labelText: "${'unite'.tr} *",
                                 contentPadding:
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
+                              ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} ${'unite'.tr}',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
                               ),
                               onFind: (String? filter) => getUnite(filter),
                               onChanged: (data) {
@@ -401,7 +450,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                     selectedIdUnite = 0;
                                     unite = "";
                                   }
-                                  print(
+                                  debugPrint(
                                       'unite: ${unite}, id: ${selectedIdUnite}');
                                 });
                               },
@@ -425,6 +474,31 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Zones',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               onFind: (String? filter) => getZone(filter),
                               onChanged: (data) {
                                 zoneModel = data;
@@ -434,7 +508,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                   selectedIdZone = 0;
                                   zone = "";
                                 }
-                                print('zone: ${zone}, id: ${selectedIdZone}');
+                                debugPrint(
+                                    'zone: ${zone}, id: ${selectedIdZone}');
                               },
                               dropdownBuilder: customDropDownZone,
                               popupItemBuilder: customPopupItemBuilderZone,
@@ -500,6 +575,31 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Sites',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               onFind: (String? filter) => getSite(filter),
                               onChanged: (data) {
                                 setState(() {
@@ -510,7 +610,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                     selectedCodeSite = 0;
                                     site = "";
                                   }
-                                  print(
+                                  debugPrint(
                                       'site: ${siteModel?.site}, code: ${selectedCodeSite}');
                                 });
                               },
@@ -525,8 +625,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                           keyboardType: TextInputType.multiline,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Situation Observe ',
-                            hintText: 'Situation Observe',
+                            labelText: 'situation_travail_observe'.tr,
+                            hintText: 'situation_travail_observe'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -551,8 +651,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
                             labelText:
-                                'Comportement Sur Observe ${comportement_sur_observe_obligatoire == 1 ? '*' : ''}',
-                            hintText: 'Comportement Sur Observe',
+                                '${'comportement_sur_observe'.tr} ${comportement_sur_observe_obligatoire == 1 ? '*' : ''}',
+                            hintText: 'comportement_sur_observe'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -579,8 +679,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
                             labelText:
-                                'Comportement a risque observe ${comportement_risque_observe_obligatoire == 1 ? '*' : ''}',
-                            hintText: 'Comportement a risque observe',
+                                '${'comportement_risque_observe'.tr} ${comportement_risque_observe_obligatoire == 1 ? '*' : ''}',
+                            hintText: 'comportement_risque_observe'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -607,8 +707,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
                             labelText:
-                                'Corrections immédiates ${correction_immediate_obligatoire == 1 ? '*' : ''}',
-                            hintText: 'Corrections immédiates',
+                                '${'correction_immediate'.tr} ${correction_immediate_obligatoire == 1 ? '*' : ''}',
+                            hintText: 'correction_immediate'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -634,8 +734,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                           keyboardType: TextInputType.multiline,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Autres sujets',
-                            hintText: 'Autres sujets',
+                            labelText: 'autre_sujet'.tr,
+                            hintText: 'autre_sujet'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -658,9 +758,9 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                         ),
                         Center(
                           child: Text(
-                            'Equipe Visite Securite',
+                            '${'equipe'.tr} ${'visite_securite'.tr}',
                             style: TextStyle(
-                                fontSize: 17, fontWeight: FontWeight.w600),
+                                fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                         ),
                         SingleChildScrollView(
@@ -678,7 +778,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                               columns: [
                                 //DataColumn(label: Text('id', style: _contentStyleHeader), numeric: true),
                                 DataColumn(
-                                    label: Text('Nom Prenom',
+                                    label: Text('nom_prenom'.tr,
                                         style: _contentStyleHeader)),
                                 DataColumn(
                                     label: Text('Affectation',
@@ -803,7 +903,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                               ),
                                                               Center(
                                                                 child: Text(
-                                                                  'Equipe Visite Securite',
+                                                                  '${'equipe'.tr} ${'visite_securite'.tr}',
                                                                   style: TextStyle(
                                                                       fontWeight:
                                                                           FontWeight
@@ -813,7 +913,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                       color: Color(
                                                                           0xFF0769D2),
                                                                       fontSize:
-                                                                          30.0),
+                                                                          20.0),
                                                                 ),
                                                               ),
                                                               SizedBox(
@@ -857,6 +957,34 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                           border:
                                                                               OutlineInputBorder(),
                                                                         ),
+                                                                        popupTitle:
+                                                                            Center(
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.spaceBetween,
+                                                                            children: [
+                                                                              SizedBox(
+                                                                                width: MediaQuery.of(context).size.width * 0.5,
+                                                                                child: Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10),
+                                                                                  child: Text(
+                                                                                    '${'list'.tr} ${'equipe'.tr}s ${'visite_securite'.tr}',
+                                                                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              IconButton(
+                                                                                  onPressed: () {
+                                                                                    Navigator.of(context).pop();
+                                                                                  },
+                                                                                  icon: Icon(
+                                                                                    Icons.close,
+                                                                                    color: Colors.red,
+                                                                                  ))
+                                                                            ],
+                                                                          ),
+                                                                        ),
                                                                         onFind: (String?
                                                                                 filter) =>
                                                                             getEmploye(filter),
@@ -866,7 +994,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                               data?.mat;
                                                                           employeNompre =
                                                                               data?.nompre;
-                                                                          print(
+                                                                          debugPrint(
                                                                               'employe: ${employeNompre}, mat: ${employeMatricule}');
                                                                         },
                                                                         dropdownBuilder:
@@ -875,7 +1003,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                             customPopupItemBuilderEmploye,
                                                                         validator: (u) => u ==
                                                                                 null
-                                                                            ? "Employe is required "
+                                                                            ? "Employe ${'is_required'.tr}"
                                                                             : null,
                                                                       ),
                                                                     ),
@@ -896,8 +1024,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                               activeColor: Colors.blue,
                                                                               fillColor: MaterialStateProperty.all(Colors.blue),
                                                                             ),
-                                                                            const Text(
-                                                                              "Responsable Audit",
+                                                                            Text(
+                                                                              "${'responsable'.tr} Audit",
                                                                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
                                                                             )
                                                                           ],
@@ -913,8 +1041,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                               activeColor: Colors.blue,
                                                                               fillColor: MaterialStateProperty.all(Colors.blue),
                                                                             ),
-                                                                            const Text(
-                                                                              "Auditeur",
+                                                                            Text(
+                                                                              'auditeur'.tr,
                                                                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
                                                                             )
                                                                           ],
@@ -930,8 +1058,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                               activeColor: Colors.blue,
                                                                               fillColor: MaterialStateProperty.all(Colors.blue),
                                                                             ),
-                                                                            const Text(
-                                                                              "Observateur",
+                                                                            Text(
+                                                                              'observateur'.tr,
                                                                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
                                                                             )
                                                                           ],
@@ -967,7 +1095,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                             Icons.cancel),
                                                                         label:
                                                                             Text(
-                                                                          'Cancel',
+                                                                          'cancel'
+                                                                              .tr,
                                                                           style: TextStyle(
                                                                               fontSize: 16,
                                                                               color: Colors.white),
@@ -1007,7 +1136,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                             Icons.save),
                                                                         label:
                                                                             Text(
-                                                                          'Save',
+                                                                          'save'
+                                                                              .tr,
                                                                           style: TextStyle(
                                                                               fontSize: 16,
                                                                               color: Colors.white),
@@ -1032,7 +1162,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                                                                 getEquipeVisiteSecurite();
                                                                               });
                                                                             } catch (ex) {
-                                                                              print("Exception" + ex.toString());
+                                                                              debugPrint("Exception" + ex.toString());
                                                                               ShowSnackBar.snackBar("Exception", ex.toString(), Colors.red);
                                                                               throw Exception("Error " + ex.toString());
                                                                             }
@@ -1077,7 +1207,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                         ),
                         MaterialButton(
                             color: Colors.blue,
-                            child: const Text("Upload Images",
+                            child: Text("${'upload'.tr} Images",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),
@@ -1102,7 +1232,9 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                               )
                             : ConstrainedBox(
                                 constraints: BoxConstraints.tightFor(
-                                    width: 130, height: 50),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    height: 50),
                                 child: ElevatedButton.icon(
                                   style: ButtonStyle(
                                     shape: MaterialStateProperty.all(
@@ -1117,7 +1249,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                                   ),
                                   icon: Icon(Icons.save),
                                   label: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                         fontSize: 16, color: Colors.white),
                                   ),
@@ -1140,13 +1272,13 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
         String message_affect = '';
         switch (affect) {
           case 1:
-            message_affect = "Observateur";
+            message_affect = 'observateur'.tr;
             break;
           case 2:
-            message_affect = "Auditeur";
+            message_affect = 'auditeur'.tr;
             break;
           case 3:
-            message_affect = "Responsable Audit";
+            message_affect = "${'responsable'.tr} Audit";
             break;
           default:
             message_affect = "";
@@ -1168,7 +1300,8 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                         .removeWhere((element) => element.id == model.id);
                     listEquipeSave
                         .removeWhere((element) => element.mat == model.mat);
-                    print('new list equipe to save : ${listEquipeSave.length}');
+                    debugPrint(
+                        'new list equipe to save : ${listEquipeSave.length}');
                     /*if(response > 0){
                      listEquipeVisiteSecurite.removeWhere((element) => element.id == model.id);
                    } */
@@ -1767,7 +1900,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
       child: Column(
         children: <Widget>[
           Text(
-            "Choose Photo",
+            "${'choose'.tr} Photo",
             style: TextStyle(
               fontSize: 20.0,
             ),
@@ -1778,7 +1911,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             ConstrainedBox(
               constraints: BoxConstraints.tightFor(
-                  width: MediaQuery.of(context).size.width / 3, height: 50),
+                  width: MediaQuery.of(context).size.width / 2.5, height: 50),
               child: ElevatedButton.icon(
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all(
@@ -1789,7 +1922,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                   backgroundColor: MaterialStateProperty.all(Color(0xFD18A3A8)),
                   padding: MaterialStateProperty.all(EdgeInsets.all(14)),
                 ),
-                icon: Icon(Icons.image),
+                icon: Icon(Icons.camera_alt_rounded),
                 label: Text(
                   'Camera',
                   style: TextStyle(fontSize: 16, color: Colors.white),
@@ -1802,11 +1935,11 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                       dialogType: DialogType.ERROR,
                       body: Center(
                         child: Text(
-                          "You can choose 5 images maximum",
+                          'choose_max_5_images'.tr,
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
                       ),
-                      title: 'Cancel',
+                      title: 'cancel'.tr,
                       btnOkOnPress: () {
                         Navigator.of(context).pop();
                       },
@@ -1822,7 +1955,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
             ),
             ConstrainedBox(
               constraints: BoxConstraints.tightFor(
-                  width: MediaQuery.of(context).size.width / 3, height: 50),
+                  width: MediaQuery.of(context).size.width / 2.5, height: 50),
               child: ElevatedButton.icon(
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all(
@@ -1846,11 +1979,11 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
                       dialogType: DialogType.ERROR,
                       body: Center(
                         child: Text(
-                          "You can choose 5 images maximum",
+                          'choose_max_5_images'.tr,
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
                       ),
-                      title: 'Cancel',
+                      title: 'cancel'.tr,
                       btnOkOnPress: () {
                         Navigator.of(context).pop();
                       },
@@ -1924,7 +2057,7 @@ class _NewVisiteSecuPageState extends State<NewVisiteSecuPage> {
         modelImage.fileName =
             '${getRandomString(5)}_($matricule)_${mypath.basename(tempImage.path)}';
         base64List.add(modelImage);
-        print('list from camera ${base64List}');
+        debugPrint('list from camera ${base64List}');
       });
 
       Navigator.of(context).pop();

@@ -3,10 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
-import '../../../Models/pnc/pnc_a_corriger_model.dart';
 import '../../../Models/pnc/pnc_suivre_model.dart';
 import '../../../Services/pnc/local_pnc_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
@@ -14,6 +12,7 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_investigation_approuver.dart';
 
 class PNCInvestigationApprouverPage extends StatefulWidget {
@@ -61,9 +60,6 @@ class _PNCInvestigationApprouverPageState
             model.nomClt = data['nomClt'];
             listPNCInvestigation.add(model);
             listFiltered = listPNCInvestigation;
-            listPNCInvestigation.forEach((element) {
-              print('produit pnc ${element.produit}, id : ${element.nnc}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -87,9 +83,6 @@ class _PNCInvestigationApprouverPageState
               model.nomClt = data['nomClt'];
               listPNCInvestigation.add(model);
               listFiltered = listPNCInvestigation;
-              listPNCInvestigation.forEach((element) {
-                print('produit pnc ${element.produit}, id : ${element.nnc}');
-              });
             });
           });
         }, onError: (err) {
@@ -130,7 +123,7 @@ class _PNCInvestigationApprouverPageState
             ),
           ),
           title: Text(
-            'Investigation à Approuver : ${listPNCInvestigation.length}',
+            '${'investigation_a_approuver'.tr} : ${listPNCInvestigation.length}',
             style: TextStyle(color: Colors.black),
           ),
           backgroundColor: (lightPrimary),
@@ -166,7 +159,7 @@ class _PNCInvestigationApprouverPageState
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -196,7 +189,7 @@ class _PNCInvestigationApprouverPageState
                                 color: Color(0xFFFCF9F9),
                                 child: ListTile(
                                   title: Text(
-                                    'PNC N°${num_pnc}',
+                                    'P.N.C N°${num_pnc}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -240,7 +233,7 @@ class _PNCInvestigationApprouverPageState
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            'Client : ${listFiltered[index].nomClt}'),
+                                                            '${'client'.tr} : ${listFiltered[index].nomClt}'),
                                                   ],
                                                 ),
                                               ),
@@ -249,7 +242,7 @@ class _PNCInvestigationApprouverPageState
                                               top: 5, bottom: 5),
                                           child: Html(
                                             data:
-                                                'Produit : ${listFiltered[index].produit}', //htmlData,
+                                                '${'product'.tr} : ${listFiltered[index].produit}', //htmlData,
                                             //tagsList: Html.tags..remove(Platform.isAndroid ? "-" : ""),
                                             style: {
                                               "body": Style(
@@ -307,11 +300,7 @@ class _PNCInvestigationApprouverPageState
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
-                        style: TextStyle(
-                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
-                  )),
+                : EmptyListWidget()),
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -8,14 +7,9 @@ import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
-
 import '../../../Controllers/api_controllers_call.dart';
-import '../../../Models/employe_model.dart';
 import '../../../Models/pnc/pnc_a_traiter_model.dart';
 import '../../../Models/pnc/responsable_traitement_model.dart';
-import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/message.dart';
@@ -74,7 +68,7 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
   onChangePhaseTraite(var traite) {
     setState(() {
       phaseTraite = traite;
-      print('phase traite : ${phaseTraite}');
+      debugPrint('phase traite : ${phaseTraite}');
     });
   }
 
@@ -98,7 +92,7 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
     valeurRejeteController.text = valeur_rejete.toString();
     depreciationController.text = depreciation.toString();
     quantiy_detect = widget.pncTraiterModel.qteDetect!;
-    print('quantity detect : $quantiy_detect');
+    debugPrint('quantity detect : $quantiy_detect');
     super.initState();
   }
 
@@ -129,28 +123,31 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
 
     if (responsableTraitementModel == null && responsableTraitementId == 0) {
       Message.taskErrorOrWarning(
-          "Alert", "Veuillez selectionner responsable de traitement");
+          'warning'.tr, 'selectionner_responsable_traitement'.tr);
       return false;
     }
     if (depreciation > 100) {
       Message.taskErrorOrWarning(
-          "Alert", "Veuillez saisir donnée inférieur ou égal à 100");
+          'warning'.tr, 'saisir_donne_inferieur_ou_égal_100'.tr);
       return false;
     }
     if ((quantity_accepte + quantity_declasse + quantity_rejete) >
         quantiy_detect) {
-      Message.taskErrorOrWarning("Alert",
-          "La somme des quantités ne doit pas dépasser la quantité détectée");
+      Message.taskErrorOrWarning(
+          'warning'.tr, 'somme_quantite_ne_depasse_quantite_decter'.tr);
       return false;
     }
     if (quantityDeclasseController.text.trim() == '') {
-      Message.taskErrorOrWarning("Alert", "Quantite declassée est obligatoire");
+      Message.taskErrorOrWarning('warning'.tr,
+          "${'quantity'.tr} ${'declasse'.tr} ${'is_required'.tr}");
       return false;
     } else if (quantityAccepteController.text.trim() == '') {
-      Message.taskErrorOrWarning("Alert", "Quantite acceptée est obligatoire");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'quantity'.tr} ${'accepte'.tr} ${'is_required'.tr}");
       return false;
     } else if (quantityRejeteController.text.trim() == '') {
-      Message.taskErrorOrWarning("Alert", "Quantite rejetée est obligatoire");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'quantity'.tr} ${'rejete'.tr} ${'is_required'.tr}");
       return false;
     }
     /* if(quantityDeclasseController.text.trim()==''){
@@ -176,7 +173,7 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
           ),
         ),
         title: Center(
-          child: Text("PNC N° ${widget.pncTraiterModel.nnc}"),
+          child: Text("P.N.C N° ${widget.pncTraiterModel.nnc}"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -201,7 +198,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                           isFilteredOnline: true,
                           compareFn: (i, s) => i?.isEqual(s) ?? false,
                           dropdownSearchDecoration: InputDecoration(
-                            labelText: "Responsable Traitement *",
+                            labelText:
+                                "${'responsable'.tr} ${'processing'.tr} *",
                             contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                             border: OutlineInputBorder(),
                           ),
@@ -211,13 +209,14 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                             responsableTraitementId = data?.id_resptrait;
                             responsableTraitementModel = data;
                             //responsableTraitementMatricule = data?.mat;
-                            print(
+                            debugPrint(
                                 'resp traitement: ${data?.nompre}, id: ${responsableTraitementId}');
                           },
                           dropdownBuilder: customDropDownEmploye,
                           popupItemBuilder: customPopupItemBuilderEmploye,
-                          validator: (u) =>
-                              u == null ? "Responsable is required " : null,
+                          validator: (u) => u == null
+                              ? "${'responsable'.tr} ${'is_required'.tr}"
+                              : null,
                         ),
                         SizedBox(
                           height: 10.0,
@@ -236,8 +235,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                   fillColor:
                                       MaterialStateProperty.all(Colors.blue),
                                 ),
-                                const Text(
-                                  "Phase non traitée",
+                                Text(
+                                  "Phase ${'non_traite'.tr}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -257,8 +256,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                   fillColor:
                                       MaterialStateProperty.all(Colors.blue),
                                 ),
-                                const Text(
-                                  "Phase traitée",
+                                Text(
+                                  "Phase ${'traite'.tr}",
                                   style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -279,8 +278,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                           validator: (value) =>
                               Validator.validateField(value: value!),
                           decoration: InputDecoration(
-                            labelText: 'Product',
-                            hintText: 'product',
+                            labelText: 'product'.tr,
+                            hintText: 'product'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -306,8 +305,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                           validator: (value) =>
                               Validator.validateField(value: value!),
                           decoration: InputDecoration(
-                            labelText: 'Quantity declassée',
-                            hintText: 'Quantity declassée',
+                            labelText: '${'quantity'.tr} ${'declasse'.tr}',
+                            hintText: '${'quantity'.tr} ${'declasse'.tr}',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -337,8 +336,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                 validator: (value) =>
                                     Validator.validateField(value: value!),
                                 decoration: InputDecoration(
-                                  labelText: 'Quantite acceptée',
-                                  hintText: 'Quantite declassée',
+                                  labelText: '${'quantity'.tr} ${'accepte'.tr}',
+                                  hintText: '${'quantity'.tr} ${'accepte'.tr}',
                                   labelStyle: TextStyle(
                                     fontSize: 14.0,
                                   ),
@@ -367,8 +366,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                 validator: (value) =>
                                     Validator.validateField(value: value!),
                                 decoration: InputDecoration(
-                                  labelText: 'Quantity rejete',
-                                  hintText: 'Quantity rejete',
+                                  labelText: '${'quantity'.tr} ${'rejete'.tr}',
+                                  hintText: '${'quantity'.tr} ${'rejete'.tr}',
                                   labelStyle: TextStyle(
                                     fontSize: 14.0,
                                   ),
@@ -400,8 +399,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                 validator: (value) =>
                                     Validator.validateField(value: value!),
                                 decoration: InputDecoration(
-                                  labelText: 'valeur declassée',
-                                  hintText: 'valeur declassée',
+                                  labelText: '${'valeur'.tr} ${'declasse'.tr}',
+                                  hintText: '${'valeur'.tr} ${'declasse'.tr}',
                                   labelStyle: TextStyle(
                                     fontSize: 14.0,
                                   ),
@@ -429,8 +428,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                               validator: (value) =>
                                   Validator.validateField(value: value!),
                               decoration: InputDecoration(
-                                labelText: 'valeur rejete',
-                                hintText: 'valeur rejete',
+                                labelText: '${'valeur'.tr} ${'rejete'.tr}',
+                                hintText: '${'valeur'.tr} ${'rejete'.tr}',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -461,8 +460,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                 validator: (value) =>
                                     Validator.validateField(value: value!),
                                 decoration: InputDecoration(
-                                  labelText: 'Cout Traitement',
-                                  hintText: 'cout traitement',
+                                  labelText: '${'cout'.tr} ${'processing'.tr}',
+                                  hintText: '${'cout'.tr} ${'processing'.tr}',
                                   labelStyle: TextStyle(
                                     fontSize: 14.0,
                                   ),
@@ -490,8 +489,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                 validator: (value) =>
                                     Validator.validateField(value: value!),
                                 decoration: InputDecoration(
-                                  labelText: 'Cout Total',
-                                  hintText: 'cout total',
+                                  labelText: '${'cout'.tr} Total',
+                                  hintText: '${'cout'.tr} total',
                                   labelStyle: TextStyle(
                                     fontSize: 14.0,
                                   ),
@@ -518,8 +517,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Depriciation',
-                            hintText: 'Depriciation',
+                            labelText: 'Depreciation',
+                            hintText: 'Depreciation',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -559,7 +558,8 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                               selectedDate(context);
                             },
                             decoration: InputDecoration(
-                                labelText: 'Date Saisie Traitement',
+                                labelText:
+                                    '${'date_saisie'.tr} ${'processing'.tr}',
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -597,7 +597,7 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                               selectedDate(context);
                             },
                             decoration: InputDecoration(
-                                labelText: 'Date Traitement',
+                                labelText: 'Date ${'processing'.tr}',
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -630,8 +630,10 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                               keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Rapport de traitement',
-                                hintText: 'Rapport de traitement',
+                                labelText:
+                                    '${'rapport'.tr} ${'of'.tr} ${'processing'.tr}',
+                                hintText:
+                                    '${'rapport'.tr} ${'of'.tr} ${'processing'.tr}',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -680,7 +682,7 @@ class _RemplirPNCTraitementState extends State<RemplirPNCTraitement> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

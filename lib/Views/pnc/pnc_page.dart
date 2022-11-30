@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:qualipro_flutter/Controllers/pnc/pnc_controller.dart';
 import 'package:qualipro_flutter/Views/pnc/pnc_widget.dart';
 import '../../Widgets/build_shimmer.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/refresh_widget.dart';
 import 'add_products_pnc/products_pnc_page.dart';
 import 'image_pnc.dart';
@@ -123,12 +124,7 @@ class PNCPage extends GetView<PNCController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

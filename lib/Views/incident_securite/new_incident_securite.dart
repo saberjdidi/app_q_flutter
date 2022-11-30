@@ -55,7 +55,7 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
           ),
         ),
         title: Center(
-          child: Text("${'new'.tr} Incident Securite"),
+          child: Text("${'new'.tr} ${'incident_securite'.tr}"),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -107,13 +107,18 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                               minLines: 2,
                               maxLines: 5,
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.type_incident_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.type_incident_visible == 1
-                                    ? controller.isVisibileTypeIncident = true
-                                    : controller.isVisibileTypeIncident = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<TypeIncidentModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -126,6 +131,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Types Incidents',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getTypeIncident(filter),
@@ -154,8 +185,13 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       ? "Type incident ${'is_required'.tr}"
                                       : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.category_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.category_visible == 1
@@ -173,6 +209,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'of'.tr} ${'categorie'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getCategoryIncident(filter),
@@ -200,13 +262,17 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       ? "${'categorie'.tr} ${'is_required'.tr}"
                                       : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible:
+                                  controller.poste_visible == 1 ? true : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.poste_visible == 1
-                                    ? controller.isVisibilePoste = true
-                                    : controller.isVisibilePoste = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<PosteTravailModel>(
                                   showSelectedItems: true,
                                   showClearButton: true,
@@ -219,6 +285,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'poste_de_travail'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getPosteTravail(filter),
@@ -298,8 +390,13 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.date_entre_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                               visible: controller.date_entre_visible == 1
@@ -362,7 +459,7 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     controller.selectedTimeDebut(context);
                                   },
                                   decoration: InputDecoration(
-                                      labelText: '${'heur'.tr} incident',
+                                      labelText: '${'heur'.tr} incident *',
                                       hintText: 'time',
                                       labelStyle: TextStyle(
                                         fontSize: 14.0,
@@ -472,6 +569,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'secteur'.tr}s',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) =>
                                       getSecteur(filter),
                                   onChanged: (data) {
@@ -497,8 +620,13 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       ? "${'secteur'.tr} ${'is_required'.tr}"
                                       : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.gravite_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.gravite_visible == 1
@@ -516,6 +644,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'gravity'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getGravite(filter),
@@ -542,8 +696,13 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       ? "${'gravity'.tr} ${'is_required'.tr}"
                                       : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.cout_esteme_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.cout_esteme_visible == 1
@@ -561,6 +720,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'cout'.tr} ${'estime'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getCoutEstime(filter),
@@ -581,8 +766,15 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                   popupItemBuilder: controller
                                       .customPopupItemBuilderCoutEsteme,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible:
+                                  controller.evenenement_declencheur_visible ==
+                                          1
+                                      ? true
+                                      : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller
@@ -603,6 +795,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'evenement_declencheur'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getEvenementDeclencheur(filter),
@@ -649,10 +867,36 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                   isFilteredOnline: true,
                                   compareFn: (i, s) => i?.isEqual(s) ?? false,
                                   dropdownSearchDecoration: InputDecoration(
-                                    labelText: "${'detected'.tr} ${'by'.tr}",
+                                    labelText: "${'detected'.tr} ${'by'.tr} *",
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Employes',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getEmploye(filter),
@@ -724,13 +968,18 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                         }
                                     )
                                 ), */
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.site_visible.value == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.site_visible.value == 1
-                                    ? controller.isVisibileSite = true
-                                    : controller.isVisibileSite = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<SiteModel>(
                                   showSelectedItems: true,
                                   showClearButton:
@@ -747,6 +996,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Sites',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) => getSite(filter),
                                   onChanged: (data) {
                                     controller.siteModel = data;
@@ -757,7 +1032,7 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       controller.selectedCodeSite = 0;
                                       controller.siteIncident = "";
                                     }
-                                    print(
+                                    debugPrint(
                                         'site: ${controller.siteModel?.site}, code: ${controller.selectedCodeSite}');
                                   },
                                   dropdownBuilder:
@@ -770,13 +1045,18 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                           ? "site ${'is_required'.tr}"
                                           : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.processus_visible.value == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.processus_visible.value == 1
-                                    ? controller.isVisibileProcessus = true
-                                    : controller.isVisibileProcessus = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<ProcessusModel>(
                                   showSelectedItems: true,
                                   showClearButton:
@@ -792,6 +1072,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} Processus',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) =>
                                       getProcessus(filter),
@@ -819,13 +1125,18 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                           ? "processus ${'is_required'.tr}"
                                           : null,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.direction_visible.value == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.direction_visible.value == 1
-                                    ? controller.isVisibileDirection = true
-                                    : controller.isVisibileDirection = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<DirectionModel>(
                                     showSelectedItems: true,
                                     showClearButton:
@@ -842,6 +1153,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} Directions',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getDirection(filter),
@@ -899,13 +1236,18 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.service_visible.value == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.service_visible.value == 1
-                                    ? controller.isVisibileService = true
-                                    : controller.isVisibileService = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<ServiceModel>(
                                     showSelectedItems: true,
                                     showClearButton:
@@ -921,6 +1263,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} Services',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getService(filter),
@@ -979,13 +1347,18 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.activity_visible.value == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible: controller.activity_visible.value == 1
-                                    ? controller.isVisibileActivity = true
-                                    : controller.isVisibileActivity = false,
+                                    ? true
+                                    : false,
                                 child: DropdownSearch<ActivityModel>(
                                     showSelectedItems: true,
                                     showClearButton:
@@ -1002,6 +1375,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                       contentPadding:
                                           EdgeInsets.fromLTRB(12, 12, 0, 0),
                                       border: OutlineInputBorder(),
+                                    ),
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'activity'.tr}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
                                     ),
                                     onFind: (String? filter) =>
                                         getActivity(filter),
@@ -1101,6 +1500,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} ${'of'.tr} Types Causes',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 /* validator: (u) =>
                                   u == null || u.isEmpty ? "user field is required " : null, */
                                 onFind: (String? filter) =>
@@ -1134,8 +1559,13 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.cause_typique_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                               visible: controller.cause_typique_visible == 1
@@ -1164,13 +1594,39 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 showSearchBox: true,
                                 dropdownSearchDecoration: InputDecoration(
                                   labelText:
-                                      "Cause Typique  ${controller.cause_typique_incident_obligatoire.value == 1 ? '*' : ''}",
+                                      "Cause Typique ${controller.cause_typique_incident_obligatoire.value == 1 ? '*' : ''}",
                                   contentPadding:
                                       EdgeInsets.fromLTRB(12, 12, 0, 0),
                                   border: OutlineInputBorder(),
                                 ),
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} ${'of'.tr} Cause Typique',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 /* validator: (u) =>
                                   u == null || u.isEmpty ? "user field is required " : null, */
                                 onFind: (String? filter) =>
@@ -1243,6 +1699,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} Types Consequences',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 /* validator: (u) =>
                                   u == null || u.isEmpty ? "user field is required " : null, */
                                 onFind: (String? filter) =>
@@ -1275,8 +1757,13 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: controller.site_lesion_visible == 1
+                                  ? true
+                                  : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                               visible: controller.site_lesion_visible == 1
@@ -1317,6 +1804,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} Site lesion',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 /* validator: (u) =>
                                   u == null || u.isEmpty ? "user field is required " : null, */
                                 onFind: (String? filter) =>
@@ -1348,8 +1861,12 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible:
+                                  controller.isps_visible == 1 ? true : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             //Spacer(flex: 1,),
                             Visibility(
@@ -1368,6 +1885,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
                                   ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ISPS',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   onFind: (String? filter) => getISPS(filter),
                                   onChanged: (data) {
                                     controller.isps = data?.value;
@@ -1377,8 +1920,12 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                   dropdownBuilder: _customDropDownISPS,
                                   popupItemBuilder: _customPopupItemBuilderISPS,
                                 )),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible:
+                                  controller.week_visible == 1 ? true : false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
                                 visible:
@@ -1395,6 +1942,32 @@ class NewIncidentSecuritePage extends GetView<NewIncidentSecuriteController> {
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
+                                  ),
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'of'.tr} ${'week'.tr}',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
                                   ),
                                   onFind: (String? filter) => getWeek(filter),
                                   onChanged: (data) {

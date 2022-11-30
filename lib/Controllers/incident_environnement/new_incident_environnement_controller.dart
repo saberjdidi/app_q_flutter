@@ -596,7 +596,7 @@ class NewIncidentEnvironnementController extends GetxController {
     } else if (actionImmediateController.text.trim() == '' &&
         action_immediate_obligatoire.value == 1) {
       Message.taskErrorOrWarning(
-          'warning'.tr, "Description cause ${'is_required'.tr}");
+          'warning'.tr, "${'action_immediate'.tr} ${'is_required'.tr}");
       return false;
     } else if (quantityRejController.text.trim() == '') {
       quantityRejController.text = '0';

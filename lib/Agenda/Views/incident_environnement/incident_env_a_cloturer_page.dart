@@ -3,10 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qualipro_flutter/Services/incident_environnement/incident_environnement_service.dart';
-import 'package:qualipro_flutter/Services/reunion/local_reunion_service.dart';
-import 'package:qualipro_flutter/Services/reunion/reunion_service.dart';
 import '../../../Models/incident_environnement/incident_env_agenda_model.dart';
-import '../../../Models/reunion/reunion_model.dart';
 import '../../../Services/incident_environnement/local_incident_environnement_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
 import '../../../Utils/shared_preference.dart';
@@ -52,10 +49,6 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
             model.dateDetect = data['dateDetect'];
             listIncident.add(model);
             listFiltered = listIncident;
-            listIncident.forEach((element) {
-              print(
-                  'element incident ${element.nIncident} - ${element.incident}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -74,10 +67,6 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
               model.dateDetect = data['date_detect'];
               listIncident.add(model);
               listFiltered = listIncident;
-              listIncident.forEach((element) {
-                print(
-                    'element incident ${element.nIncident} - ${element.incident}');
-              });
             });
           });
         }, onError: (err) {
@@ -91,7 +80,7 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
     }
   }
 
-  final columns = ['Numéro', 'Incident', 'Date', ''];
+  final columns = ['number'.tr, 'Incident', 'Date', ''];
   int? sortColumnIndex;
   bool isAscending = false;
   final _contentStyleHeader = const TextStyle(
@@ -132,8 +121,8 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
             ),
           ),
           title: Text(
-            'Incident a Cloturer : ${listIncident.length}',
-            style: TextStyle(color: Colors.black),
+            '${'incident_a_cloturer'.tr} : ${listIncident.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -153,7 +142,7 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
                             title: new TextField(
                                 controller: controller,
                                 decoration: new InputDecoration(
-                                    hintText: 'Search',
+                                    hintText: 'search'.tr,
                                     border: InputBorder.none),
                                 onChanged: (value) {
                                   setState(() {
@@ -196,8 +185,8 @@ class _IncidentEnvACloturerPageState extends State<IncidentEnvACloturerPage> {
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
+                : Center(
+                    child: Text('empty_list'.tr,
                         style: TextStyle(
                             fontSize: 20.0, fontFamily: 'Brand-Bold')),
                   )),

@@ -19,6 +19,7 @@ import '../Services/login_service.dart';
 import '../Utils/shared_preference.dart';
 import '../Utils/snack_bar.dart';
 import 'login_controller.dart';
+import '../../Utils/http_response.dart';
 
 class LicenceController extends GetxController {
   final GlobalKey<FormState> licenceFormKey = GlobalKey<FormState>();
@@ -158,7 +159,7 @@ class LicenceController extends GetxController {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      Get.snackbar("Position", 'Please Turn On your position',
+      Get.snackbar("Position", 'trun_on_position'.tr,
           icon: Icon(Icons.podcasts),
           backgroundColor: Color(0xFD1598AA),
           colorText: Colors.white,
@@ -260,7 +261,7 @@ class LicenceController extends GetxController {
 
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.snackbar("No internet connexion", 'Verify your internet connexion',
+        Get.snackbar('no_internet'.tr, 'verify_internet_connexion'.tr,
             icon: Icon(Icons.voice_over_off_sharp),
             backgroundColor: Color(0xFDCB7810),
             colorText: Colors.white,
@@ -283,8 +284,8 @@ class LicenceController extends GetxController {
                   .isEqual(int.parse(result['nbInstallTaken'].toString())) ||
               int.parse(result['nbInstall'].toString()).isLowerThan(
                   int.parse(result['nbInstallTaken'].toString()))) {
-            ShowSnackBar.snackBar("Qualipro",
-                'Vous avez dépassé le nombre d' 'installation', Colors.orange);
+            ShowSnackBar.snackBar(
+                "Qualipro", 'depasse_nombre_installation'.tr, Colors.orange);
           } else {
             //Geolocator
             Position position = await _determinePosition();
@@ -326,7 +327,7 @@ class LicenceController extends GetxController {
                 'devicename': device_name.value,
                 'loginNB': '1',
                 'date': Timestamp.now(),
-                'address': currentLocation, //location.value,
+                'address': currentLocation,
                 //'lat_lang' : GeoPoint(position.latitude, position.longitude)
               }).then((value) {
                 debugPrint('Devices added successfully');
@@ -360,7 +361,7 @@ class LicenceController extends GetxController {
                   .update({
                 'loginNB': loginNB.value.toString(),
                 'date': Timestamp.now(), //DateTime.now()
-                'address': currentLocation //location.value,
+                'address': currentLocation,
               }).then((value) {
                 debugPrint('Devices update successfully');
               }).onError((error, stackTrace) async {
@@ -392,7 +393,8 @@ class LicenceController extends GetxController {
                 int.parse(result['module']['incsecu'].toString());
             modelLicence.visite =
                 int.parse(result['module']['visite'].toString());
-            //debugPrint('licence : client:${modelLicence.client} - licence:${modelLicence.licence} - webservice:${modelLicence.webservice} ');
+            debugPrint(
+                'licence : client:${modelLicence.client} - licence:${modelLicence.licence} - webservice:${modelLicence.webservice} ');
             //saving url in shared preference
             await SharedPreference.setWebServiceKey(
                 modelLicence.webservice.toString());
@@ -432,16 +434,21 @@ class LicenceController extends GetxController {
                     ShowSnackBar.snackBar("Error saving Licence in DB Local",
                         errorSavingLicence.toString(), Colors.red);
                   }); */
-              }, onError: (errorBeginLicence) {
-                ShowSnackBar.snackBar("Error saving Licence in DB",
-                    errorBeginLicence.toString(), Colors.red);
+              }, onError: (error) {
+                HttpResponse.StatusCode(error.toString());
+                //ShowSnackBar.snackBar("Error saving Licence in DB", errorBeginLicence.toString(), Colors.red);
               });
             }
 
             //save licence info in db local
+            debugPrint(
+                '-------------avant LicenceDeviceByLicenceId-----------------');
             await LoginService()
                 .LicenceDeviceByLicenceId(modelLicence.deviceId.toString())
                 .then((data) async {
+              debugPrint(
+                  '-------------apres LicenceDeviceByLicenceId-----------------');
+              debugPrint('LicenceDeviceByLicenceId : $data');
               //delete table if exist
               await LicenceService().deleteTableBeginLicence();
               var model = BeginLicenceModel();
@@ -457,9 +464,9 @@ class LicenceController extends GetxController {
               await LicenceService().saveBeginLicence(model);
               debugPrint(
                   'Inserting data in table MobileLicence : ${model.LicenseEnd} - ${model.DeviceId} ');
-            }, onError: (errorSavingLicence) {
-              ShowSnackBar.snackBar("Error saving Licence in DB Local",
-                  errorSavingLicence.toString(), Colors.red);
+            }, onError: (error) {
+              HttpResponse.StatusCode(error.toString());
+              //ShowSnackBar.snackBar("Error saving Licence in DB Local", error.toString(), Colors.red);
             });
 
             //verify licence if 0(licence not expired) or 1(licence expired)
@@ -498,16 +505,16 @@ class LicenceController extends GetxController {
                 Get.off(LoginScreen());
               } else {
                 ShowSnackBar.snackBar(modelLicence.licence.toString(),
-                    'Your licence has expired', Colors.lightBlueAccent);
+                    'licence_expired'.tr, Colors.lightBlueAccent);
               }
-            }, onError: (errorLicenceEnd) {
-              ShowSnackBar.snackBar(
-                  "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+            }, onError: (error) {
+              HttpResponse.StatusCode(error.toString());
+              //ShowSnackBar.snackBar("Error Licence End", error.toString(), Colors.red);
             });
           }
         } else {
           ShowSnackBar.snackBar(
-              "Licence not exist in Firebase", 'No Licence', Colors.red);
+              'warning'.tr, 'licence_not_exist_in_firebase'.tr, Colors.red);
         }
       }
     } on FirebaseException catch (e) {
@@ -515,8 +522,7 @@ class LicenceController extends GetxController {
       ShowSnackBar.snackBar("Firebase Exception", e.toString(), Colors.red);
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar(
-          "Licence not exist in Firebase", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar('warning'.tr, exception.toString(), Colors.red);
       debugPrint('exception : ${exception.toString()}');
     } finally {
       //isDataProcessing(false);

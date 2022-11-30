@@ -142,13 +142,15 @@ class PNCWidget extends StatelessWidget {
               'Type : ${pncModel.typeNC}',
               style: TextStyle(color: Colors.black87, fontSize: 15),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Text(
-                '${'fournisseur'.tr} : ${pncModel.fournisseur}',
-                style: TextStyle(color: Colors.black87, fontSize: 15),
-              ),
-            ),
+            (pncModel.fournisseur == '' || pncModel.fournisseur!.isEmpty)
+                ? Text('')
+                : Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: Text(
+                      '${'fournisseur'.tr} : ${pncModel.fournisseur}',
+                      style: TextStyle(color: Colors.black87, fontSize: 15),
+                    ),
+                  ),
             (pncModel.site == '' || pncModel.site!.isEmpty)
                 ? Text('')
                 : Text(

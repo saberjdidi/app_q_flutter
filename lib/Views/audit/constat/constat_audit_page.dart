@@ -5,14 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:qualipro_flutter/Models/audit/audit_model.dart';
 import 'package:qualipro_flutter/Services/audit/audit_service.dart';
 import 'package:qualipro_flutter/Services/audit/local_audit_service.dart';
-import 'package:qualipro_flutter/Services/visite_securite/visite_securite_service.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import '../../../Controllers/api_controllers_call.dart';
-import '../../../Controllers/audit/audit_controller.dart';
 import '../../../Models/action/type_action_model.dart';
 import '../../../Models/audit/auditeur_model.dart';
 import '../../../Models/audit/champ_audit_model.dart';
@@ -553,7 +550,8 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
               child: FloatingActionButton(
                 onPressed: () {
                   //----------------------Add Constat-----------------------------
-                  final _addItemFormKey = GlobalKey<FormState>();
+                  GlobalKey<FormState> _addItemFormKey =
+                      new GlobalKey<FormState>();
                   ChampAuditModel? champAuditModel = null;
                   int? selectedChampAuditCode = 0;
                   String? selectedChampAudit = '';
@@ -1099,6 +1097,8 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                       ),
                                       Form(
                                         key: _addItemFormKey,
+                                        autovalidateMode:
+                                            AutovalidateMode.always,
                                         child: Padding(
                                           padding: const EdgeInsets.all(10.0),
                                           child: Column(
@@ -1106,6 +1106,7 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                               Visibility(
                                                 visible: true,
                                                 child: TextFormField(
+                                                  //autovalidateMode: AutovalidateMode.always,
                                                   controller: objectController,
                                                   keyboardType:
                                                       TextInputType.text,
@@ -1199,6 +1200,38 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                           12, 12, 0, 0),
                                                   border: OutlineInputBorder(),
                                                 ),
+                                                popupTitle: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 10),
+                                                        child: Text(
+                                                          '${'list'.tr} ${'champ_audit'.tr}',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
                                                 onFind: (String? filter) =>
                                                     getChampAuditByFiche(
                                                         filter),
@@ -1242,6 +1275,40 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                       border:
                                                           OutlineInputBorder(),
                                                     ),
+                                                    popupTitle: Center(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    left: 10),
+                                                            child: Text(
+                                                              '${'list'.tr} Type Action',
+                                                              style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                          IconButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              icon: Icon(
+                                                                Icons.close,
+                                                                color:
+                                                                    Colors.red,
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    ),
                                                     onFind: (String? filter) =>
                                                         getTypeAction(filter),
                                                     onChanged: (data) {
@@ -1281,6 +1348,38 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                           12, 12, 0, 0),
                                                   border: OutlineInputBorder(),
                                                 ),
+                                                popupTitle: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 10),
+                                                        child: Text(
+                                                          '${'list'.tr} types constats',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ),
                                                 onFind: (String? filter) =>
                                                     getTypeConstat(filter),
                                                 onChanged: (data) {
@@ -1317,6 +1416,38 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                       EdgeInsets.fromLTRB(
                                                           12, 12, 0, 0),
                                                   border: OutlineInputBorder(),
+                                                ),
+                                                popupTitle: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 10),
+                                                        child: Text(
+                                                          '${'list'.tr} ${'gravity'.tr}',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.close,
+                                                            color: Colors.red,
+                                                          ))
+                                                    ],
+                                                  ),
                                                 ),
                                                 onFind: (String? filter) =>
                                                     getGravite(filter),
@@ -1373,6 +1504,41 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                                         0),
                                                             border:
                                                                 OutlineInputBorder(),
+                                                          ),
+                                                          popupTitle: Center(
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left: 10),
+                                                                  child: Text(
+                                                                    '${'list'.tr} ${'person_concerne'.tr} ',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                IconButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                    icon: Icon(
+                                                                      Icons
+                                                                          .close,
+                                                                      color: Colors
+                                                                          .red,
+                                                                    ))
+                                                              ],
+                                                            ),
                                                           ),
                                                           onFind: (String?
                                                                   filter) =>
@@ -1452,6 +1618,41 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                                         0),
                                                             border:
                                                                 OutlineInputBorder(),
+                                                          ),
+                                                          popupTitle: Center(
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left: 10),
+                                                                  child: Text(
+                                                                    '${'list'.tr} Employes ',
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                                IconButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                    icon: Icon(
+                                                                      Icons
+                                                                          .close,
+                                                                      color: Colors
+                                                                          .red,
+                                                                    ))
+                                                              ],
+                                                            ),
                                                           ),
                                                           onFind: (String?
                                                                   filter) =>
@@ -1641,8 +1842,10 @@ class _ConstatAuditPageState extends State<ConstatAuditPage> {
                                                                 Colors.white),
                                                       ),
                                                       onPressed: () async {
-                                                        if (_addItemFormKey
-                                                            .currentState!
+                                                        var formData =
+                                                            _addItemFormKey
+                                                                .currentState;
+                                                        if (formData!
                                                             .validate()) {
                                                           try {
                                                             var connection =

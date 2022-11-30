@@ -81,12 +81,8 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
             model.cloture = data['cloture'];
             model.priorite = data['priorite'];
             model.gravite = data['gravite'];
-
             listActionReal.add(model);
             listFiltered = listActionReal;
-            listActionReal.forEach((element) {
-              print('element act ${element.act}, id act: ${element.nAct}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -132,9 +128,6 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
               model.returnRespS = data['returnRespS'];
               listActionReal.add(model);
               listFiltered = listActionReal;
-              listActionReal.forEach((element) {
-                print('element act ${element.act}, id act: ${element.nAct}');
-              });
             });
           });
         }, onError: (err) {
@@ -176,8 +169,8 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
             ),
           ),
           title: Text(
-            'Actions à réaliser ${listActionReal.length}',
-            style: TextStyle(color: Colors.black),
+            '${'action_a_realiser'.tr} : ${listActionReal.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -212,7 +205,7 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -255,6 +248,15 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 5, bottom: 5),
+                                          child: Text(
+                                              'Designation : ${listFiltered[index].act}',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF415271))),
+                                        ),
                                         RichText(
                                           text: TextSpan(
                                             style: Theme.of(context)
@@ -272,7 +274,7 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
                                               ),
                                               TextSpan(
                                                   text:
-                                                      '${listFiltered[index].dateReal}'),
+                                                      '${listFiltered[index].delaiReal}'),
 
                                               //TextSpan(text: '${action.declencheur}'),
                                             ],
@@ -300,17 +302,8 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
                                             ],
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 5, bottom: 5),
-                                          child: Text(
-                                              'Designation : ${listFiltered[index].act}',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF415271))),
-                                        ),
                                         Text(
-                                            'Taux real : ${listFiltered[index].pourcentReal}',
+                                            '${'taux_realisation'.tr} : ${listFiltered[index].pourcentReal}',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 color: Color(0xFF5D6893))),
@@ -415,8 +408,8 @@ class _ActionRealisationPageState extends State<ActionRealisationPage> {
                 ),
               ), */
                   )
-                : const Center(
-                    child: Text('Empty List',
+                : Center(
+                    child: Text('empty_list'.tr,
                         style: TextStyle(
                             fontSize: 20.0, fontFamily: 'Brand-Bold')),
                   )),

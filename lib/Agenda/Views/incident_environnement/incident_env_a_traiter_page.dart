@@ -49,10 +49,6 @@ class _IncidentEnvATraiterPageState extends State<IncidentEnvATraiterPage> {
             model.dateDetect = data['dateDetect'];
             listIncident.add(model);
             listFiltered = listIncident;
-            listIncident.forEach((element) {
-              print(
-                  'element incident ${element.nIncident} - ${element.incident}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -71,10 +67,6 @@ class _IncidentEnvATraiterPageState extends State<IncidentEnvATraiterPage> {
               model.dateDetect = data['date_detect'];
               listIncident.add(model);
               listFiltered = listIncident;
-              listIncident.forEach((element) {
-                print(
-                    'element incident ${element.nIncident} - ${element.incident}');
-              });
             });
           });
         }, onError: (err) {
@@ -88,7 +80,7 @@ class _IncidentEnvATraiterPageState extends State<IncidentEnvATraiterPage> {
     }
   }
 
-  final columns = ['Numéro', 'Incident', 'Date', ''];
+  final columns = ['number'.tr, 'Incident', 'Date', ''];
   int? sortColumnIndex;
   bool isAscending = false;
   final _contentStyleHeader = const TextStyle(
@@ -129,8 +121,8 @@ class _IncidentEnvATraiterPageState extends State<IncidentEnvATraiterPage> {
             ),
           ),
           title: Text(
-            'Incident a Traiter : ${listIncident.length}',
-            style: TextStyle(color: Colors.black),
+            '${'incident_a_traiter'.tr} : ${listIncident.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -150,7 +142,7 @@ class _IncidentEnvATraiterPageState extends State<IncidentEnvATraiterPage> {
                             title: new TextField(
                                 controller: controller,
                                 decoration: new InputDecoration(
-                                    hintText: 'Search',
+                                    hintText: 'search'.tr,
                                     border: InputBorder.none),
                                 onChanged: (value) {
                                   setState(() {
@@ -194,7 +186,7 @@ class _IncidentEnvATraiterPageState extends State<IncidentEnvATraiterPage> {
                     ),
                   )
                 : const Center(
-                    child: Text('Empty List',
+                    child: Text('empty_list',
                         style: TextStyle(
                             fontSize: 20.0, fontFamily: 'Brand-Bold')),
                   )),

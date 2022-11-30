@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Utils/shared_preference.dart';
 import 'package:readmore/readmore.dart';
@@ -113,7 +114,7 @@ class VisiteSecuriteWidget extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 5.0),
                       child: ReadMoreText(
-                        "Unite : ${model.unite}",
+                        "${'unite'.tr} : ${model.unite}",
                         style: TextStyle(
                             color: Color(0xFF3B465E),
                             fontWeight: FontWeight.bold),

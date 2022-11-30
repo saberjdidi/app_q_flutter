@@ -9,6 +9,7 @@ import '../Models/licence_end_model.dart';
 import '../Models/user_model.dart';
 import '../Services/licence_service.dart';
 import '../Services/login_service.dart';
+import '../Utils/http_response.dart';
 import '../Utils/shared_preference.dart';
 import '../Utils/snack_bar.dart';
 import '../Views/home_page.dart';
@@ -51,7 +52,7 @@ class LoginController extends GetxController {
   String? validateEmail(String value) {
     if (value.isEmpty) {
       isDataProcessing(false);
-      return "Email required";
+      return "${'username'.tr} ${'is_required'.tr}";
     }
     /*if (!GetUtils.isEmail(value)) {
       return "Provide valid Email";
@@ -62,7 +63,7 @@ class LoginController extends GetxController {
   String? validatePassword(String value) {
     if (value.isEmpty) {
       isDataProcessing(false);
-      return "Password required";
+      return "${'password'.tr} ${'is_required'.tr}";
     }
     /*if (value.length < 6) {
       return "Password must be of 6 characters";
@@ -82,16 +83,15 @@ class LoginController extends GetxController {
 
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
-        Get.snackbar("No Connection", "Mode Offline",
-            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+        //Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
         debugPrint('licence End : ${licenceEndModel?.retour}');
         if (licenceEndModel?.retour == 0) {
           var response = await LoginService().readUser();
           response.forEach((data) {
-            print('login=${data['login']}, password=${data['password']}');
+            debugPrint('login=${data['login']}, password=${data['password']}');
             if (usernameController.text.trim() == data['login'] &&
                 passwordController.text.trim() == data['password']) {
-              print('login success');
+              debugPrint('login success');
               Future mat =
                   SharedPreference.setMatricule(data['mat'].toString());
               Future nomprenom =
@@ -101,13 +101,12 @@ class LoginController extends GetxController {
 
               Get.off(HomePage());
             } else {
-              Get.snackbar(
-                  "Connexion failed", "Your Username or Password incorrect",
+              Get.snackbar('warning'.tr, 'username_password_incorrect'.tr,
                   colorText: Colors.red, snackPosition: SnackPosition.BOTTOM);
             }
           });
         } else if (licenceEndModel?.retour == 1) {
-          Get.snackbar("Licence expired", "Your licence has expired",
+          Get.snackbar("Licence expired", 'licence_expired'.tr,
               colorText: Colors.lightBlue, snackPosition: SnackPosition.BOTTOM);
           Get.off(LicencePage());
         } else {
@@ -118,13 +117,13 @@ class LoginController extends GetxController {
         }
       } else if (connection == ConnectivityResult.wifi ||
           connection == ConnectivityResult.mobile) {
-        Get.snackbar("Internet Connection", "Mode Online",
-            colorText: Colors.blue, snackPosition: SnackPosition.TOP);
+        //Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.TOP);
 
         await LoginService().loginService({
           "login": usernameController.text.trim(),
           "mot_pass": passwordController.text.trim()
         }).then((resp) async {
+          //debugPrint('respone : $resp');
           resp.forEach((data) async {
             var model = UserModel();
             model.mat = data['mat'];
@@ -139,7 +138,7 @@ class LoginController extends GetxController {
             await LoginService().deleteTableUser();
             //save user in db local
             await LoginService().saveUser(model);
-            print(
+            debugPrint(
                 'Inserting data in table user : ${model.nompre}, login:${model.login}, password:${model.password} ');
 
             await SharedPreference.setMatricule(model.mat.toString());
@@ -169,21 +168,37 @@ class LoginController extends GetxController {
               if (responseCheckPermission['autorisation'] == 1) {
                 Get.off(OnBoardingPage());
               } else {
-                ShowSnackBar.snackBar(
-                    'Check Permission',
-                    'You dont have right to enter in Application ',
-                    Colors.lightBlueAccent);
+                ShowSnackBar.snackBar('Check Permission',
+                    'dont_right_enter_application'.tr, Colors.lightBlueAccent);
               }
             }, onError: (errorLicenceEnd) {
-              ShowSnackBar.snackBar(
-                  "Error Licence End", errorLicenceEnd.toString(), Colors.red);
+              ShowSnackBar.snackBar("Error Check Permission",
+                  errorLicenceEnd.toString(), Colors.red);
             });
 
             //Get.off(DashboardScreen());
             //Get.offAll(DashboardScreen());
           });
-        }, onError: (err) {
-          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        }, onError: (error) {
+          HttpResponse.StatusCode(error.toString());
+          /* if (error.toString() == 401.toString() ||
+              error.toString().contains(401.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'username_password_incorrect'.tr, Colors.red);
+          } else if (error.toString() == 404.toString() ||
+              error.toString().contains(404.toString())) {
+            ShowSnackBar.snackBar('warning'.tr, 'Not Found', Colors.red);
+          } else if (error.toString() == 500.toString() ||
+              error.toString().contains(500.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'internal_server_error'.tr, Colors.red);
+          } else if (error.toString() == 503.toString() ||
+              error.toString().contains(503.toString())) {
+            ShowSnackBar.snackBar(
+                'warning'.tr, 'service_unavailable'.tr, Colors.red);
+          } else {
+            ShowSnackBar.snackBar("Error", error.toString(), Colors.red);
+          } */
           isDataProcessing(false);
         });
       }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
@@ -9,20 +8,16 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Agenda/Views/action/action_suivi_page.dart';
-import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
-
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Models/action/action_suivi_model.dart';
 import '../../../Models/image_model.dart';
 import '../../../Services/action/action_service.dart';
-import '../../../Services/action/local_action_service.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Utils/utility_file.dart';
 import '../../../Validators/validator.dart';
-import 'action_realisation_page.dart';
 import 'update_taux_realisation.dart';
 import 'package:path/path.dart' as mypath;
 
@@ -93,33 +88,42 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
   bool _dataValidation() {
     taux_suivi = int.parse(pourcentSuivieController.text.toString());
 
-    if (widget.actionsuivi.pourcentReal! < 100) {
+    if (widget.actionsuivi.pourcentReal! == 0) {
+      //if (widget.actionsuivi.pourcentReal! < 100) {
       Message.taskErrorOrWarning(
-          "Taux realisation", "taux realisation doit etre egal 100");
+          'warning'.tr, "taux realisation doit etre egal 100");
       AwesomeDialog(
-        context: context,
-        animType: AnimType.SCALE,
-        dialogType: DialogType.ERROR,
-        body: Center(
-          child: Text(
-            'Voulez vous modifier taux realisation',
-            style: TextStyle(fontStyle: FontStyle.italic),
+          context: context,
+          animType: AnimType.SCALE,
+          dialogType: DialogType.ERROR,
+          body: Center(
+            child: Text(
+              'voulez_modifier_taux_realisation'.tr,
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
           ),
-        ),
-        title: 'Modifier Taux realisation',
-        btnCancel: Text('Cancel'),
-        btnOkOnPress: () {
-          //Navigator.of(context).pop();
-          Get.to(UpdateTauxRealisation(actionsuivi: widget.actionsuivi));
-        },
-      )..show();
+          title: 'taux_realisation'.tr,
+          btnCancel: TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          btnOkOnPress: () {
+            //Navigator.of(context).pop();
+            Get.to(UpdateTauxRealisation(actionsuivi: widget.actionsuivi));
+          }).show();
       return false;
     } else if (rapportEffController.text.trim() == '') {
-      Message.taskErrorOrWarning("Rapport eff", "rapport eff is required");
+      Message.taskErrorOrWarning(
+          'warning'.tr, "${'rapport'.tr} eff ${'is_required'.tr}");
       return false;
     } else if (taux_suivi > 100) {
       Message.taskErrorOrWarning(
-          "Taux Suivi", "Veuillez saisir donnée inférieur ou égal à 100");
+          'warning'.tr, 'saisir_donne_inferieur_ou_égal_100'.tr);
       return false;
     }
     return true;
@@ -221,8 +225,8 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Taux real',
-                            hintText: 'taux real',
+                            labelText: 'taux_realisation'.tr,
+                            hintText: 'taux_realisation'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -254,8 +258,8 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'Taux suivi',
-                            hintText: 'taux suivi',
+                            labelText: 'taux_efficacite'.tr,
+                            hintText: 'taux_efficacite'.tr,
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -282,37 +286,43 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                         SizedBox(
                           height: 10.0,
                         ),
-                        TextFormField(
-                          controller: dateSuiviController,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          validator: (value) =>
-                              Validator.validateField(value: value!),
-                          onChanged: (value) {
+                        InkWell(
+                          onTap: () {
                             selectedDate(context);
                           },
-                          decoration: InputDecoration(
-                              labelText: 'Date Suivi',
-                              hintText: 'date',
-                              labelStyle: TextStyle(
-                                fontSize: 14.0,
-                              ),
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 10.0,
-                              ),
-                              suffixIcon: InkWell(
-                                onTap: () {
-                                  selectedDate(context);
-                                },
-                                child: Icon(Icons.calendar_today),
-                              ),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.lightBlue, width: 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)))),
-                          style: TextStyle(fontSize: 14.0),
+                          child: TextFormField(
+                            enabled: false,
+                            controller: dateSuiviController,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            validator: (value) =>
+                                Validator.validateField(value: value!),
+                            onChanged: (value) {
+                              selectedDate(context);
+                            },
+                            decoration: InputDecoration(
+                                labelText: 'Date ${'suivi'.tr}',
+                                hintText: 'date',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    selectedDate(context);
+                                  },
+                                  child: Icon(Icons.calendar_today),
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)))),
+                            style: TextStyle(fontSize: 14.0),
+                          ),
                         ),
                         SizedBox(
                           height: 10.0,
@@ -324,8 +334,8 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                               keyboardType: TextInputType.multiline,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
-                                labelText: 'Rapport Eff *',
-                                hintText: 'rapport eff',
+                                labelText: '${'rapport'.tr} Eff *',
+                                hintText: '${'rapport'.tr} eff',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
                                 ),
@@ -350,7 +360,7 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                         ),
                         MaterialButton(
                             color: Colors.blue,
-                            child: const Text("Upload Images",
+                            child: Text("${'upload'.tr} Images",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),
@@ -404,7 +414,7 @@ class _RemplirActionSuiviState extends State<RemplirActionSuivi> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Save',
+                                    'save'.tr,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

@@ -1,57 +1,46 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as mypath;
-import 'package:qualipro_flutter/Agenda/Views/pnc/pnc_suivre_page.dart';
-import 'package:qualipro_flutter/Models/action/action_realisation_model.dart';
-
 import '../../../Controllers/api_controllers_call.dart';
 import '../../../Models/employe_model.dart';
-import '../../../Models/pnc/pnc_a_traiter_model.dart';
 import '../../../Models/pnc/pnc_details_model.dart';
-import '../../../Models/pnc/pnc_suivre_model.dart';
-import '../../../Services/action/action_service.dart';
 import '../../../Services/action/local_action_service.dart';
 import '../../../Services/pnc/pnc_service.dart';
 import '../../../Utils/custom_colors.dart';
-import '../../../Utils/message.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Utils/utility_file.dart';
 import '../../../Validators/validator.dart';
 import 'pnc_decision_traitement_page.dart';
-import 'pnc_investigation_approuver_page.dart';
-import 'pnc_investigation_effectuer_page.dart';
-import 'pnc_traiter_page.dart';
 
 class RemplirPNCInvestigationAEffectuer extends StatefulWidget {
   final nnc;
 
-  RemplirPNCInvestigationAEffectuer({Key? key, required this.nnc}) : super(key: key);
+  RemplirPNCInvestigationAEffectuer({Key? key, required this.nnc})
+      : super(key: key);
 
   @override
-  State<RemplirPNCInvestigationAEffectuer> createState() => _RemplirPNCInvestigationAEffectuerState();
+  State<RemplirPNCInvestigationAEffectuer> createState() =>
+      _RemplirPNCInvestigationAEffectuerState();
 }
 
-class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigationAEffectuer> {
+class _RemplirPNCInvestigationAEffectuerState
+    extends State<RemplirPNCInvestigationAEffectuer> {
   final _addItemFormKey = GlobalKey<FormState>();
   PNCService pncService = PNCService();
   bool _isProcessing = false;
   final matricule = SharedPreference.getMatricule();
 
   DateTime dateTime = DateTime.now();
-  TextEditingController  dateInvestigationController = TextEditingController();
-  TextEditingController  dateApprobationController = TextEditingController();
-  TextEditingController  rapportController = TextEditingController();
-  TextEditingController  investigationController = TextEditingController();
+  TextEditingController dateInvestigationController = TextEditingController();
+  TextEditingController dateApprobationController = TextEditingController();
+  TextEditingController rapportController = TextEditingController();
+  TextEditingController investigationController = TextEditingController();
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   String? responsableInvestigationMatricule = "";
@@ -89,23 +78,22 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
           //responsableInvestigationNomPrenom = model.respInvestigNom;
           //approbateurInvestigationNomPrenom = model.approbInvestigNom;
         });
-      }
-          , onError: (err) {
-            ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-          });
-
+      }, onError: (err) {
+        ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+      });
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
     }
   }
 
   @override
-  void initState(){
+  void initState() {
     getPNCByNNC();
-    dateInvestigationController.text = DateFormat('yyyy-MM-dd').format(dateTime);
+    dateInvestigationController.text =
+        DateFormat('yyyy-MM-dd').format(dateTime);
     dateApprobationController.text = DateFormat('yyyy-MM-dd').format(dateTime);
     necessiteInvestigation = Get.arguments['necessite_investigation'];
-    print('necessite Investigation : $necessiteInvestigation');
+    debugPrint('necessite Investigation : $necessiteInvestigation');
     super.initState();
   }
 
@@ -114,15 +102,15 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
         context: context,
         initialDate: dateTime,
         firstDate: DateTime(2000),
-        lastDate: DateTime(2050)
-    );
-    if(datePicker != null){
+        lastDate: DateTime(2050));
+    if (datePicker != null) {
       setState(() {
         dateTime = datePicker;
         //dateApprobationController.text = DateFormat('yyyy-MM-dd').format(datePicker);
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final fileName = file != null ? mypath.basename(file!.path) : '';
@@ -130,176 +118,207 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
       key: _globalKey,
       appBar: AppBar(
         leading: TextButton(
-          onPressed: (){
+          onPressed: () {
             Get.back();
           },
-          child: Icon(Icons.arrow_back, color: Colors.white,),
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
         title: Center(
-          child: Text("Investigation A Effectuer N° ${widget.nnc}",
-          style: TextStyle(fontSize: 15),),
+          child: Text(
+            "${'investigation_a_effectuer'.tr} N° ${widget.nnc}",
+            style: TextStyle(fontSize: 15),
+          ),
         ),
         backgroundColor: Colors.blue,
       ),
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: SingleChildScrollView(
-                child: Form(
-                    key: _addItemFormKey,
-                    child: Padding(
-                        padding: EdgeInsets.all(25.0),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: TextFormField(
-                                enabled: true,
-                                controller: dateInvestigationController,
-                                keyboardType: TextInputType.text,
-                                textInputAction: TextInputAction.next,
-                                validator: (value) => Validator.validateField(
-                                    value: value!
-                                ),
-                                onChanged: (value){
-                                  selectedDate(context);
-                                },
-                                decoration: InputDecoration(
-                                    labelText: 'Delai Investigation *',
-                                    hintText: 'date',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    suffixIcon: InkWell(
-                                      onTap: (){
-                                        selectedDate(context);
-                                      },
-                                      child: Icon(Icons.calendar_today),
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    )
-                                ),
-                                style: TextStyle(fontSize: 14.0),
-                              ),
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                                visible: true,
-                                child: TextFormField(
-                                  enabled: false,
-                                  controller: rapportController,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Rapport investigation',
-                                    hintText: 'Rapport',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    ),
-                                  ),
-                                  style: TextStyle(fontSize: 14.0),
-                                  minLines: 2,
-                                  maxLines: 5,
-                                )
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                                visible: true,
-                                child: TextFormField(
-                                  enabled: true,
-                                  controller: investigationController,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Investigation',
-                                    hintText: 'Investigation',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(10))
-                                    ),
-                                  ),
-                                  style: TextStyle(fontSize: 14.0),
-                                  minLines: 2,
-                                  maxLines: 5,
-                                )
-                            ),
-                            SizedBox(height: 10.0,),
-                            DropdownSearch<EmployeModel>(
-                              enabled: true,
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: true,
-                              isFilteredOnline: true,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Responsable investigation *",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
-                              ),
-                              onFind: (String? filter) => getResponsableInvestigation(filter),
-                              onChanged: (data) {
-                                responsableInvestigationMatricule = data?.mat;
-                                print('responsableInvestigation: ${data?.nompre}, mat: ${responsableInvestigationMatricule}');
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: SingleChildScrollView(
+            child: Form(
+                key: _addItemFormKey,
+                child: Padding(
+                    padding: EdgeInsets.all(25.0),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: InkWell(
+                            onTap: () {
+                              selectedDate(context);
+                            },
+                            child: TextFormField(
+                              enabled: false,
+                              controller: dateInvestigationController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) =>
+                                  Validator.validateField(value: value!),
+                              onChanged: (value) {
+                                selectedDate(context);
                               },
-                              dropdownBuilder: customDropDownResponsableInvestigation,
-                              popupItemBuilder: customPopupItemBuilderResponsableInvestigation,
-                              validator: (u) =>
-                              u == null ? "Responsable investigation est obligatoire " : null,
+                              decoration: InputDecoration(
+                                  labelText: 'Delai Investigation *',
+                                  hintText: 'date',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      selectedDate(context);
+                                    },
+                                    child: Icon(Icons.calendar_today),
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
                             ),
-                            SizedBox(height: 10.0,),
-                            DropdownSearch<EmployeModel>(
-                              enabled: true,
-                              showSelectedItems: true,
-                              showClearButton: true,
-                              showSearchBox: true,
-                              isFilteredOnline: true,
-                              compareFn: (i, s) => i?.isEqual(s) ?? false,
-                              dropdownSearchDecoration: InputDecoration(
-                                labelText: "Approbateur investigation *",
-                                contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-                                border: OutlineInputBorder(),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                            visible: true,
+                            child: TextFormField(
+                              enabled: false,
+                              controller: rapportController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              decoration: InputDecoration(
+                                labelText: '${'rapport'.tr} investigation',
+                                hintText: 'rapport'.tr,
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
                               ),
-                              onFind: (String? filter) => getResponsableInvestigation(filter),
-                              onChanged: (data) {
-                                approbateurInvestigationMatricule = data?.mat;
-                                print('approbateurInvestigation: ${data?.nompre}, mat: ${approbateurInvestigationMatricule}');
-                              },
-                              dropdownBuilder: customDropDownApprobateurInvestigation,
-                              popupItemBuilder: customPopupItemBuilderApprobateurInvestigation,
-                              validator: (u) =>
-                              u == null ? "Approbateur investigation est obligatoire " : null,
-                            ),
-                            SizedBox(height: 10.0,),
-                            Visibility(
-                              visible: true,
-                              child: CheckboxListTile(
-                                title: const Text('Investigation approuvée'),
-                               value: false,
-                               onChanged: null,
-                               /* value: checkInvestigationApprouve,
+                              style: TextStyle(fontSize: 14.0),
+                              minLines: 2,
+                              maxLines: 5,
+                            )),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                            visible: true,
+                            child: TextFormField(
+                              enabled: true,
+                              controller: investigationController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              decoration: InputDecoration(
+                                labelText: 'Investigation',
+                                hintText: 'Investigation',
+                                labelStyle: TextStyle(
+                                  fontSize: 14.0,
+                                ),
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10.0,
+                                ),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.lightBlue, width: 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                              ),
+                              style: TextStyle(fontSize: 14.0),
+                              minLines: 2,
+                              maxLines: 5,
+                            )),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        DropdownSearch<EmployeModel>(
+                          enabled: true,
+                          showSelectedItems: true,
+                          showClearButton: true,
+                          showSearchBox: true,
+                          isFilteredOnline: true,
+                          compareFn: (i, s) => i?.isEqual(s) ?? false,
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "${'responsable'.tr} investigation *",
+                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                            border: OutlineInputBorder(),
+                          ),
+                          onFind: (String? filter) =>
+                              getResponsableInvestigation(filter),
+                          onChanged: (data) {
+                            responsableInvestigationMatricule = data?.mat;
+                            debugPrint(
+                                'responsableInvestigation: ${data?.nompre}, mat: ${responsableInvestigationMatricule}');
+                          },
+                          dropdownBuilder:
+                              customDropDownResponsableInvestigation,
+                          popupItemBuilder:
+                              customPopupItemBuilderResponsableInvestigation,
+                          validator: (u) => u == null
+                              ? "${'responsable'.tr} investigation ${'is_required'.tr}"
+                              : null,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        DropdownSearch<EmployeModel>(
+                          enabled: true,
+                          showSelectedItems: true,
+                          showClearButton: true,
+                          showSearchBox: true,
+                          isFilteredOnline: true,
+                          compareFn: (i, s) => i?.isEqual(s) ?? false,
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "${'approbateur'.tr} investigation *",
+                            contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                            border: OutlineInputBorder(),
+                          ),
+                          onFind: (String? filter) =>
+                              getResponsableInvestigation(filter),
+                          onChanged: (data) {
+                            approbateurInvestigationMatricule = data?.mat;
+                            debugPrint(
+                                'approbateurInvestigation: ${data?.nompre}, mat: ${approbateurInvestigationMatricule}');
+                          },
+                          dropdownBuilder:
+                              customDropDownApprobateurInvestigation,
+                          popupItemBuilder:
+                              customPopupItemBuilderApprobateurInvestigation,
+                          validator: (u) => u == null
+                              ? "${'approbateur'.tr} investigation ${'is_required'.tr}"
+                              : null,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: CheckboxListTile(
+                            title: Text('Investigation ${'approuve'.tr}'),
+                            value: false,
+                            onChanged: null,
+                            /* value: checkInvestigationApprouve,
                                 onChanged: (bool? value) {
                                   setState(() {
                                     checkInvestigationApprouve = value!;
@@ -313,86 +332,89 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
                                   });
 
                                 }, */
-                                activeColor: Colors.blue,
-                                //secondary: const Icon(Icons.hourglass_empty),
+                            activeColor: Colors.blue,
+                            //secondary: const Icon(Icons.hourglass_empty),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 7.0,
+                        ),
+                        ElevatedButton.icon(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Color(0xFF11D0B9)),
+                              padding:
+                                  MaterialStateProperty.all(EdgeInsets.all(14)),
                             ),
-
-                            SizedBox(height: 7.0,),
-                            ElevatedButton.icon(
+                            icon: Icon(Icons.attach_file),
+                            label: Text(
+                              'Select ${'file'.tr}',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                            onPressed: () {
+                              selectFile();
+                            }),
+                        Text(
+                          fileName,
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        _isProcessing
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    CustomColors.firebaseOrange,
+                                  ),
+                                ),
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  saveBtn();
+                                },
                                 style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    CustomColors.googleBackground,
+                                  ),
                                   shape: MaterialStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  backgroundColor:
-                                  MaterialStateProperty.all(Color(0xFF11D0B9)),
-                                  padding: MaterialStateProperty.all(EdgeInsets.all(14)),
                                 ),
-                                icon: Icon(Icons.attach_file),
-                                label: Text(
-                                  'Select File',
-                                  style: TextStyle(fontSize: 14, color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  selectFile();
-                                }
-                            ),
-                            Text(fileName,
-                            style: TextStyle(fontSize: 16, color: Colors.black),),
-                            SizedBox(height: 20.0,),
-                            _isProcessing
-                                ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  CustomColors.firebaseOrange,
-                                ),
-                              ),
-                            )
-                                :
-                            ElevatedButton(
-                              onPressed: () async {
-                                saveBtn();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  CustomColors.googleBackground,
-                                ),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Text(
+                                    'save'.tr,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: CustomColors.firebaseWhite,
+                                      letterSpacing: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Text('Save',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: CustomColors.firebaseWhite,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                ),
-              ),
-            ),
-          )
-      ),
+                              )
+                      ],
+                    ))),
+          ),
+        ),
+      )),
     );
   }
 
   Future saveBtn() async {
-    if(_addItemFormKey.currentState!.validate()){
+    if (_addItemFormKey.currentState!.validate()) {
       try {
-        setState(()  {
+        setState(() {
           _isProcessing = true;
         });
         //if(file == null) return;
@@ -414,24 +436,25 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
           Get.to(PNCTraitementDecisionPage());
           await ApiControllersCall().getPNCDecision();
         }, onError: (err) {
-          setState(()  {
+          setState(() {
             _isProcessing = false;
           });
           ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
         });
-      }
-      catch (ex){
-        setState(()  {
+      } catch (ex) {
+        setState(() {
           _isProcessing = false;
         });
         AwesomeDialog(
           context: context,
           animType: AnimType.SCALE,
           dialogType: DialogType.ERROR,
-          body: Center(child: Text(
-            ex.toString(),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),),
+          body: Center(
+            child: Text(
+              ex.toString(),
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
           title: 'Error',
           btnCancel: Text('Cancel'),
           btnOkOnPress: () {
@@ -440,9 +463,8 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
         )..show();
         print("throwing new error " + ex.toString());
         throw Exception("Error " + ex.toString());
-      }
-      finally{
-        setState(()  {
+      } finally {
+        setState(() {
           _isProcessing = false;
         });
       }
@@ -452,16 +474,16 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
   Future selectFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(allowMultiple: false);
-      if(result==null) return;
+      if (result == null) return;
       final path = result.files.single.path!;
 
       setState(() {
         file = File(path);
-       base64File = UtilityFile.base64String(file!.readAsBytesSync());
-       print('base64 file : $base64File');
+        base64File = UtilityFile.base64String(file!.readAsBytesSync());
+        print('base64 file : $base64File');
       });
       final file_data = result.files.first;
-     /* print('Name : ${file_data.name}');
+      /* print('Name : ${file_data.name}');
       print('Bytes : ${file_data.bytes}');
       print('Path : ${file_data.path}');
       print('Extension : ${file_data.extension}'); */
@@ -471,10 +493,12 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
         context: context,
         animType: AnimType.SCALE,
         dialogType: DialogType.ERROR,
-        body: Center(child: Text(
-          error.toString(),
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),),
+        body: Center(
+          child: Text(
+            error.toString(),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
         title: 'Error',
         btnCancel: Text('Cancel'),
         btnOkOnPress: () {
@@ -487,10 +511,12 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
   //getResponsableInvestigation
   Future<List<EmployeModel>> getResponsableInvestigation(filter) async {
     try {
-      List<EmployeModel> employeList = await List<EmployeModel>.empty(growable: true);
-      List<EmployeModel>employeFilter = await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeList =
+          await List<EmployeModel>.empty(growable: true);
+      List<EmployeModel> employeFilter =
+          await List<EmployeModel>.empty(growable: true);
       var response = await LocalActionService().readEmploye();
-      response.forEach((data){
+      response.forEach((data) {
         var model = EmployeModel();
         model.mat = data['mat'];
         model.nompre = data['nompre'];
@@ -499,8 +525,7 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
       employeFilter = employeList.where((u) {
         var name = u.mat.toString().toLowerCase();
         var description = u.nompre!.toLowerCase();
-        return name.contains(filter) ||
-            description.contains(filter);
+        return name.contains(filter) || description.contains(filter);
       }).toList();
       return employeFilter;
     } catch (exception) {
@@ -508,16 +533,17 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
       return Future.error('service : ${exception.toString()}');
     }
   }
-  Widget customDropDownResponsableInvestigation(BuildContext context, EmployeModel? item) {
+
+  Widget customDropDownResponsableInvestigation(
+      BuildContext context, EmployeModel? item) {
     if (item == null) {
       return Container(
           child: ListTile(
-            contentPadding: EdgeInsets.all(0),
-            title: Text('${responsableInvestigationNomPrenom}', style: TextStyle(color: Colors.black)),
-          )
-      );
-    }
-    else{
+        contentPadding: EdgeInsets.all(0),
+        title: Text('${responsableInvestigationNomPrenom}',
+            style: TextStyle(color: Colors.black)),
+      ));
+    } else {
       return Container(
         child: ListTile(
           contentPadding: EdgeInsets.all(0),
@@ -526,6 +552,7 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
       );
     }
   }
+
   Widget customPopupItemBuilderResponsableInvestigation(
       BuildContext context, EmployeModel item, bool isSelected) {
     return Container(
@@ -533,47 +560,10 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
       decoration: !isSelected
           ? null
           : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
-      child: ListTile(
-        selected: isSelected,
-        title: Text(item.nompre ?? ''),
-        //subtitle: Text(item.mat.toString() ?? ''),
-      ),
-    );
-  }
-  //approbateur investigation
-  Widget customDropDownApprobateurInvestigation(BuildContext context, EmployeModel? item) {
-    if (item == null) {
-      return Container(
-          child: ListTile(
-            contentPadding: EdgeInsets.all(0),
-            title: Text('${approbateurInvestigationNomPrenom}', style: TextStyle(color: Colors.black)),
-          )
-      );
-    }
-    else{
-      return Container(
-        child: ListTile(
-          contentPadding: EdgeInsets.all(0),
-          title: Text('${item.nompre}', style: TextStyle(color: Colors.black)),
-        ),
-      );
-    }
-  }
-  Widget customPopupItemBuilderApprobateurInvestigation(
-      BuildContext context, EmployeModel item, bool isSelected) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      decoration: !isSelected
-          ? null
-          : BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(5),
-        color: Colors.white,
-      ),
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
       child: ListTile(
         selected: isSelected,
         title: Text(item.nompre ?? ''),
@@ -582,4 +572,42 @@ class _RemplirPNCInvestigationAEffectuerState extends State<RemplirPNCInvestigat
     );
   }
 
+  //approbateur investigation
+  Widget customDropDownApprobateurInvestigation(
+      BuildContext context, EmployeModel? item) {
+    if (item == null) {
+      return Container(
+          child: ListTile(
+        contentPadding: EdgeInsets.all(0),
+        title: Text('${approbateurInvestigationNomPrenom}',
+            style: TextStyle(color: Colors.black)),
+      ));
+    } else {
+      return Container(
+        child: ListTile(
+          contentPadding: EdgeInsets.all(0),
+          title: Text('${item.nompre}', style: TextStyle(color: Colors.black)),
+        ),
+      );
+    }
+  }
+
+  Widget customPopupItemBuilderApprobateurInvestigation(
+      BuildContext context, EmployeModel item, bool isSelected) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      decoration: !isSelected
+          ? null
+          : BoxDecoration(
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.white,
+            ),
+      child: ListTile(
+        selected: isSelected,
+        title: Text(item.nompre ?? ''),
+        //subtitle: Text(item.mat.toString() ?? ''),
+      ),
+    );
+  }
 }

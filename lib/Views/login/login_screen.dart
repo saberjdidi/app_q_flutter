@@ -4,7 +4,6 @@ import 'package:qualipro_flutter/Utils/custom_colors.dart';
 import '../../Controllers/login_controller.dart';
 
 class LoginScreen extends GetView<LoginController> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +36,8 @@ class LoginScreen extends GetView<LoginController> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      labelText: "Username",
-                      hintText: 'username',
+                      labelText: 'username'.tr,
+                      hintText: 'username'.tr,
                       prefixIcon: Icon(Icons.person),
                     ),
                     keyboardType: TextInputType.emailAddress,
@@ -54,14 +53,13 @@ class LoginScreen extends GetView<LoginController> {
                   SizedBox(
                     height: 16,
                   ),
-                  Obx(()=>
-                      TextFormField(
+                  Obx(() => TextFormField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            labelText: "Password",
-                            hintText: 'Password',
+                            labelText: 'password'.tr,
+                            hintText: 'password'.tr,
                             prefixIcon: Icon(Icons.lock),
                             suffixIcon: InkWell(
                               child: Icon(
@@ -71,11 +69,11 @@ class LoginScreen extends GetView<LoginController> {
                                 color: Colors.grey,
                                 size: 20,
                               ),
-                              onTap: (){
-                                controller.isPasswordHidden.value = !controller.isPasswordHidden.value;
+                              onTap: () {
+                                controller.isPasswordHidden.value =
+                                    !controller.isPasswordHidden.value;
                               },
-                            )
-                        ),
+                            )),
                         keyboardType: TextInputType.visiblePassword,
                         obscureText: controller.isPasswordHidden.value,
                         controller: controller.passwordController,
@@ -86,35 +84,44 @@ class LoginScreen extends GetView<LoginController> {
                         validator: (value) {
                           return controller.validatePassword(value!);
                         },
-                      )
-                  ),
+                      )),
                   SizedBox(
                     height: 16,
                   ),
                   ConstrainedBox(
                     constraints: BoxConstraints.tightFor(width: context.width),
-                    child: Obx(()=>
-                        ElevatedButton.icon(
+                    child: Obx(() => ElevatedButton.icon(
                           style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
                             ),
-                            backgroundColor:
-                            MaterialStateProperty.all(CustomColors.blueAccent),
-                            padding: MaterialStateProperty.all(EdgeInsets.all(14)),
+                            backgroundColor: MaterialStateProperty.all(
+                                CustomColors.blueAccent),
+                            padding:
+                                MaterialStateProperty.all(EdgeInsets.all(14)),
                           ),
-                          icon: controller.isDataProcessing.value ? CircularProgressIndicator(color: Colors.white,):Icon(Icons.login, color: Colors.white,),
+                          icon: controller.isDataProcessing.value
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Icon(
+                                  Icons.login,
+                                  color: Colors.white,
+                                ),
                           label: Text(
-                            controller.isDataProcessing.value ? 'Processing' : 'Login',
+                            controller.isDataProcessing.value
+                                ? 'processing'.tr
+                                : 'Login',
                             style: TextStyle(fontSize: 14, color: Colors.white),
                           ),
                           onPressed: () {
-                            controller.isDataProcessing.value ? null : controller.checkLogin();
+                            controller.isDataProcessing.value
+                                ? null
+                                : controller.checkLogin();
                           },
-                        )
-                    ),
+                        )),
                   ),
                   /* ConstrainedBox(
                     constraints: BoxConstraints.tightFor(width: context.width),

@@ -150,30 +150,6 @@ class NewActionPage extends GetView<ActionController> {
                             SizedBox(
                               height: 10.0,
                             ),
-                            TextFormField(
-                              controller: controller.causeController,
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                  labelText: 'Cause',
-                                  hintText: 'cause',
-                                  labelStyle: TextStyle(
-                                    fontSize: 14.0,
-                                  ),
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 10.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.lightBlue, width: 1),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10)))),
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
                             Visibility(
                               visible: true,
                               child: TextFormField(
@@ -216,7 +192,7 @@ class NewActionPage extends GetView<ActionController> {
                                   controller.selectedDate(context);
                                 },
                                 decoration: InputDecoration(
-                                    labelText: 'creation_date'.tr,
+                                    labelText: '${'creation_date'.tr} *',
                                     hintText: 'date',
                                     labelStyle: TextStyle(
                                       fontSize: 14.0,
@@ -295,7 +271,7 @@ class NewActionPage extends GetView<ActionController> {
                                   isFilteredOnline: true,
                                   compareFn: (i, s) => i?.isEqual(s) ?? false,
                                   dropdownSearchDecoration: InputDecoration(
-                                    labelText: "Type *",
+                                    labelText: "Type Action *",
                                     contentPadding:
                                         EdgeInsets.fromLTRB(12, 12, 0, 0),
                                     border: OutlineInputBorder(),
@@ -308,9 +284,35 @@ class NewActionPage extends GetView<ActionController> {
                                     if (controller.typeActionModel == null) {
                                       controller.selectedCodeTypeAct = 0;
                                     }
-                                    print(
+                                    debugPrint(
                                         'type action: ${controller.typeActionModel?.typeAct}, code: ${controller.selectedCodeTypeAct}');
                                   },
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'of'.tr} Type Action',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   dropdownBuilder:
                                       controller.customDropDownType,
                                   popupItemBuilder:
@@ -319,7 +321,6 @@ class NewActionPage extends GetView<ActionController> {
                                       ? "type ${'is_required'.tr} "
                                       : null,
                                 )),
-
                             SizedBox(
                               height: 10.0,
                             ),
@@ -350,9 +351,35 @@ class NewActionPage extends GetView<ActionController> {
                                     if (controller.sourceActionModel == null) {
                                       controller.selectedCodeSourceAct = 0;
                                     }
-                                    print(
+                                    debugPrint(
                                         'source action :${controller.sourceActionModel?.sourceAct}, code :${controller.selectedCodeSourceAct}');
                                   },
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'of'.tr} Source Action',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   dropdownBuilder:
                                       controller.customDropDownSource,
                                   popupItemBuilder:
@@ -361,7 +388,6 @@ class NewActionPage extends GetView<ActionController> {
                                       ? "source ${'is_required'.tr} "
                                       : null,
                                 )),
-
                             SizedBox(
                               height: 10.0,
                             ),
@@ -394,11 +420,35 @@ class NewActionPage extends GetView<ActionController> {
                                     if (controller.auditActionModel == null) {
                                       controller.selectedIdAudit = 0;
                                     }
-                                    print(controller.selectedRefAuditAct);
-                                    print(controller.selectedIdAudit);
-                                    print(
-                                        'ref audit:${controller.auditActionModel?.refAudit}, id: ${controller.selectedIdAudit}');
+                                    debugPrint(
+                                        'ref audit:${controller.selectedRefAuditAct}, id: ${controller.selectedIdAudit}');
                                   },
+                                  popupTitle: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            '${'list'.tr} ${'of'.tr} Ref Audit',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(
+                                              Icons.close,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                   dropdownBuilder:
                                       controller.customDropDownRefAudit,
                                   popupItemBuilder:
@@ -447,6 +497,32 @@ class NewActionPage extends GetView<ActionController> {
                                                 controller.siteModel == null)
                                             ? "site ${'is_required'.tr}"
                                             : null,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'of'.tr} Sites',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -529,6 +605,32 @@ class NewActionPage extends GetView<ActionController> {
                                             controller.processusModel == null)
                                         ? "processus ${'is_required'.tr} "
                                         : null,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'of'.tr} Processus',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -593,13 +695,39 @@ class NewActionPage extends GetView<ActionController> {
                                       if (controller.respClotureModel == null) {
                                         controller.selectedRespClotureCode = "";
                                       }
-                                      print(
+                                      debugPrint(
                                           'resp cloture: ${controller.respClotureModel?.nompre}, mat : ${controller.selectedRespClotureCode}');
                                     },
                                     dropdownBuilder:
                                         controller.customDropDownRespCloture,
                                     popupItemBuilder: controller
                                         .customPopupItemBuilderRespCloture,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'of'.tr} ${'resp_cloture'.tr}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -630,11 +758,14 @@ class NewActionPage extends GetView<ActionController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                                visible: true,
+                                visible: false,
                                 child: DropdownSearch<EmployeModel>(
                                     showSelectedItems: true,
                                     showClearButton:
@@ -728,13 +859,39 @@ class NewActionPage extends GetView<ActionController> {
                                       if (controller.employeModel == null) {
                                         controller.selectedOriginActionMat = "";
                                       }
-                                      print(
+                                      debugPrint(
                                           'origine de action : ${controller.employeModel?.nompre}, mat:${controller.selectedOriginActionMat}');
                                     },
                                     dropdownBuilder:
                                         controller.customDropDownEmploye,
                                     popupItemBuilder: controller
                                         .customPopupItemBuilderEmploye,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'origine_action'.tr}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -798,7 +955,7 @@ class NewActionPage extends GetView<ActionController> {
                                       if (controller.directionModel == null) {
                                         controller.selectedDirectionCode = 0;
                                       }
-                                      print(
+                                      debugPrint(
                                           'direction: ${controller.directionModel?.direction}, code: ${controller.selectedDirectionCode}');
                                     },
                                     dropdownBuilder:
@@ -811,6 +968,32 @@ class NewActionPage extends GetView<ActionController> {
                                             controller.directionModel == null)
                                         ? "direction ${'is_required'.tr} "
                                         : null,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'of'.tr} Directions',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -873,7 +1056,7 @@ class NewActionPage extends GetView<ActionController> {
                                       if (controller.serviceModel == null) {
                                         controller.selectedServiceCode = 0;
                                       }
-                                      print(
+                                      debugPrint(
                                           'service: ${controller.serviceModel?.service}, code: ${controller.selectedServiceCode}');
                                     },
                                     dropdownBuilder:
@@ -886,7 +1069,32 @@ class NewActionPage extends GetView<ActionController> {
                                             controller.service_obligatoire == 1)
                                         ? "service ${'is_required'.tr} "
                                         : null,
-                                    //u == null ? "service is required " : null,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'of'.tr} Services',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -963,6 +1171,32 @@ class NewActionPage extends GetView<ActionController> {
                                                     null)
                                             ? "activity ${'is_required'.tr} "
                                             : null,
+                                    popupTitle: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${'list'.tr} ${'activity'.tr}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
                                     onBeforeChange: (a, b) {
                                       if (b == null) {
                                         AlertDialog alert = AlertDialog(
@@ -995,11 +1229,14 @@ class NewActionPage extends GetView<ActionController> {
                                       }
                                       return Future.value(true);
                                     })),
-                            SizedBox(
-                              height: 10.0,
+                            Visibility(
+                              visible: false,
+                              child: SizedBox(
+                                height: 10.0,
+                              ),
                             ),
                             Visibility(
-                                visible: true,
+                                visible: false,
                                 child: TextFormField(
                                   controller: controller.commentaireController,
                                   keyboardType: TextInputType.text,
@@ -1024,37 +1261,6 @@ class NewActionPage extends GetView<ActionController> {
                                   minLines: 2,
                                   maxLines: 5,
                                 )),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Visibility(
-                                visible: controller.objectif_visible == 1
-                                    ? controller.isVisibileObjectif = true
-                                    : controller.isVisibileObjectif = false,
-                                child: TextFormField(
-                                  controller: controller.objectifController,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Objective',
-                                    hintText: 'Objective',
-                                    labelStyle: TextStyle(
-                                      fontSize: 14.0,
-                                    ),
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10.0,
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Colors.lightBlue, width: 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                  ),
-                                  style: TextStyle(fontSize: 14.0),
-                                )),
-                            // SizedBox(height: 10.0,),
-
                             /*  Visibility(
                                     visible: controller.product_visible == 1 ? controller.isVisibileProduct=true : controller.isVisibileProduct=false,
                                     child: DropdownSearch<ProductModel>.multiSelection(
@@ -1126,6 +1332,32 @@ class NewActionPage extends GetView<ActionController> {
                                     ),
                                   ),
                                 ),
+                                popupTitle: Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          '${'list'.tr} Types Causes',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          ))
+                                    ],
+                                  ),
+                                ),
                                 mode: Mode.DIALOG,
                                 isFilteredOnline: true,
                                 showClearButton: false,
@@ -1151,7 +1383,7 @@ class NewActionPage extends GetView<ActionController> {
                                   controller.listTypeCauseOffline.clear();
                                   controller.listTypeCauseOffline.addAll(data);
                                   data.forEach((element) {
-                                    print(
+                                    debugPrint(
                                         'type cause: ${element.typecause}, code: ${element.codetypecause}');
                                     List<int?> listCodeTypeCause = [];
                                     listCodeTypeCause
@@ -1172,7 +1404,59 @@ class NewActionPage extends GetView<ActionController> {
                                 ),
                               ),
                             ),
-
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Visibility(
+                                visible: controller.objectif_visible == 1
+                                    ? controller.isVisibileObjectif = true
+                                    : controller.isVisibileObjectif = false,
+                                child: TextFormField(
+                                  controller: controller.objectifController,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.next,
+                                  decoration: InputDecoration(
+                                    labelText: 'Objective',
+                                    hintText: 'Objective',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14.0,
+                                    ),
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 10.0,
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.lightBlue, width: 1),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10))),
+                                  ),
+                                  style: TextStyle(fontSize: 14.0),
+                                )),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            TextFormField(
+                              controller: controller.causeController,
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.next,
+                              decoration: InputDecoration(
+                                  labelText: 'Cause',
+                                  hintText: 'cause',
+                                  labelStyle: TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10.0,
+                                  ),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.lightBlue, width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
+                              style: TextStyle(fontSize: 14.0),
+                            ),
                             SizedBox(
                               height: 20.0,
                             ),

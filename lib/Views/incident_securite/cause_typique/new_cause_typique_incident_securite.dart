@@ -120,6 +120,31 @@ class _NewCauseTypiqueIncidentSecuriteState
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
                               ),
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Cause Typique',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               onFind: (String? filter) =>
                                   getCauseTypique(filter),
                               onChanged: (data) {
@@ -283,7 +308,7 @@ class _NewCauseTypiqueIncidentSecuriteState
             .then((resp) async {
           resp.forEach((data) async {
             var model = CauseTypiqueModel();
-            model.idIncidentCauseTypique = data['id_TypeCause'];
+            //model.idIncidentCauseTypique = data['id_TypeCause'];
             model.causeTypique = data['causeTypique'];
             model.idCauseTypique = data['id_CauseTypique'];
             _typeList.add(model);

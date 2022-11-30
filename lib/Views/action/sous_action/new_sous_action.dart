@@ -8,7 +8,6 @@ import 'package:qualipro_flutter/Models/priorite_model.dart';
 import '../../../Controllers/action/sous_action_controller.dart';
 import '../../../Models/employe_model.dart';
 import '../../../Models/processus_employe_model.dart';
-import '../../../Models/processus_model.dart';
 import '../../../Services/api_services_call.dart';
 import '../../../Utils/custom_colors.dart';
 import '../../../Utils/snack_bar.dart';
@@ -60,37 +59,6 @@ class NewSousActionPage extends GetView<SousActionController> {
                           decoration: InputDecoration(
                             labelText: '${'designation'.tr} *',
                             hintText: 'designation'.tr,
-                            labelStyle: TextStyle(
-                              fontSize: 14.0,
-                            ),
-                            hintStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 10.0,
-                            ),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.lightBlue, width: 1),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            /*suffixIcon: InkWell(
-                                    onTap: (){
-                                      actionController.clear();
-                                    },
-                                    child: Icon(Icons.close),
-                                  ) */
-                          ),
-                          style: TextStyle(fontSize: 14.0),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        TextFormField(
-                          controller: controller.risqueController,
-                          keyboardType: TextInputType.multiline,
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            labelText: 'Risque',
-                            hintText: 'risque',
                             labelStyle: TextStyle(
                               fontSize: 14.0,
                             ),
@@ -166,7 +134,7 @@ class NewSousActionPage extends GetView<SousActionController> {
                             },
                             decoration: InputDecoration(
                                 labelText:
-                                    '${'delai_suivi'.tr} ${controller.delai_suivi_obligatoire == 1 ? '*' : ''}',
+                                    '${'delai_suivi'.tr} ${controller.delai_suivi_obligatoire.value == 1 ? '*' : ''}',
                                 hintText: 'date',
                                 labelStyle: TextStyle(
                                   fontSize: 14.0,
@@ -189,11 +157,16 @@ class NewSousActionPage extends GetView<SousActionController> {
                             style: TextStyle(fontSize: 14.0),
                           ),
                         ),
-                        SizedBox(
-                          height: 10.0,
+                        Visibility(
+                          visible:
+                              controller.priorite_visible == 1 ? true : false,
+                          child: SizedBox(
+                            height: 10.0,
+                          ),
                         ),
                         Visibility(
-                            visible: true,
+                            visible:
+                                controller.priorite_visible == 1 ? true : false,
                             child: DropdownSearch<PrioriteModel>(
                               showSelectedItems: true,
                               showClearButton:
@@ -205,7 +178,7 @@ class NewSousActionPage extends GetView<SousActionController> {
                               compareFn: (i, s) => i?.isEqual(s) ?? false,
                               dropdownSearchDecoration: InputDecoration(
                                 labelText:
-                                    "${'priority'.tr} ${controller.priorite_obligatoire == 1 ? '*' : ''}",
+                                    "${'priority'.tr} ${controller.priorite_obligatoire.value == 1 ? '*' : ''}",
                                 contentPadding:
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
@@ -215,7 +188,7 @@ class NewSousActionPage extends GetView<SousActionController> {
                                 controller.selectedCodePriorite =
                                     data?.codepriorite;
                                 controller.prioriteModel = data;
-                                print(
+                                debugPrint(
                                     'priorite: ${controller.prioriteModel?.priorite}, code: ${controller.selectedCodePriorite}');
                               },
                               dropdownBuilder:
@@ -223,16 +196,46 @@ class NewSousActionPage extends GetView<SousActionController> {
                               popupItemBuilder:
                                   controller.customPopupItemBuilderPriorite,
                               validator: (u) =>
-                                  (controller.priorite_obligatoire == 1 &&
+                                  (controller.priorite_obligatoire.value == 1 &&
                                           controller.prioriteModel == null)
                                       ? "${'priority'.tr} ${'is_required'.tr} "
                                       : null,
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} ${'priority'.tr}',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                             )),
-                        SizedBox(
-                          height: 10.0,
+                        Visibility(
+                          visible:
+                              controller.gravite_visible == 1 ? true : false,
+                          child: SizedBox(
+                            height: 10.0,
+                          ),
                         ),
                         Visibility(
-                            visible: true,
+                            visible:
+                                controller.gravite_visible == 1 ? true : false,
                             child: DropdownSearch<GraviteModel>(
                               showSelectedItems: true,
                               showClearButton:
@@ -244,7 +247,7 @@ class NewSousActionPage extends GetView<SousActionController> {
                               compareFn: (i, s) => i?.isEqual(s) ?? false,
                               dropdownSearchDecoration: InputDecoration(
                                 labelText:
-                                    "${'gravity'.tr} ${controller.gravite_obligatoire == 1 ? '*' : ''}",
+                                    "${'gravity'.tr} ${controller.gravite_obligatoire.value == 1 ? '*' : ''}",
                                 contentPadding:
                                     EdgeInsets.fromLTRB(12, 12, 0, 0),
                                 border: OutlineInputBorder(),
@@ -254,17 +257,42 @@ class NewSousActionPage extends GetView<SousActionController> {
                                 controller.selectedCodeGravite =
                                     data?.codegravite;
                                 controller.graviteModel = data;
-                                print(
+                                debugPrint(
                                     'gravite: ${controller.graviteModel?.gravite}, code: ${controller.selectedCodeGravite}');
                               },
                               dropdownBuilder: controller.customDropDownGravite,
                               popupItemBuilder:
                                   controller.customPopupItemBuilderGravite,
                               validator: (u) =>
-                                  (controller.gravite_obligatoire == 1 &&
+                                  (controller.gravite_obligatoire.value == 1 &&
                                           controller.graviteModel == null)
                                       ? "${'gravity'.tr} ${'is_required'.tr} "
                                       : null,
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} ${'gravity'.tr}',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                             )),
                         SizedBox(
                           height: 10.0,
@@ -291,12 +319,37 @@ class NewSousActionPage extends GetView<SousActionController> {
                               onChanged: (data) {
                                 controller.selectedResRealCode = data?.mat;
                                 controller.respRealModel = data;
-                                print(
+                                debugPrint(
                                     'resp real : ${controller.respRealModel?.nompre}, mat:${controller.selectedResRealCode}');
                               },
                               dropdownBuilder: controller.customDropDownEmploye,
                               popupItemBuilder:
                                   controller.customPopupItemBuilderEmploye,
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} ${'resp_real'.tr}',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               /*  onBeforeChange: (a, b) {
                                         if (b == null) {
                                           AlertDialog alert = AlertDialog(
@@ -351,13 +404,38 @@ class NewSousActionPage extends GetView<SousActionController> {
                               onChanged: (data) {
                                 controller.selectedResSuiviCode = data?.mat;
                                 controller.resSuiviModel = data;
-                                print(
+                                debugPrint(
                                     'resp suivi : ${controller.resSuiviModel?.nompre}, mat:${controller.selectedResSuiviCode}');
                               },
                               dropdownBuilder:
                                   controller.customDropDownRespSuivi,
                               popupItemBuilder:
                                   controller.customPopupItemBuilderEmploye,
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} ${'resp_suivi'.tr}',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               /* onBeforeChange: (a, b) {
                                         if (b == null) {
                                           AlertDialog alert = AlertDialog(
@@ -419,6 +497,31 @@ class NewSousActionPage extends GetView<SousActionController> {
                                   controller.customDropDownProcessus,
                               popupItemBuilder:
                                   controller.customPopupItemBuilderProcessus,
+                              popupTitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${'list'.tr} Processus',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                ),
+                              ),
                               /* onBeforeChange: (a, b) {
                                         if (b == null) {
                                           AlertDialog alert = AlertDialog(
@@ -451,30 +554,71 @@ class NewSousActionPage extends GetView<SousActionController> {
                                         return Future.value(true);
                                       } */
                             )),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        TextFormField(
-                          controller: controller.coutPrevController,
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            labelText: 'Cout prev',
-                            hintText: 'cout prev',
-                            labelStyle: TextStyle(
-                              fontSize: 14.0,
-                            ),
-                            hintStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 10.0,
-                            ),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.lightBlue, width: 1),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
+                        Visibility(
+                          visible:
+                              controller.cout_prev_visible == 1 ? true : false,
+                          child: SizedBox(
+                            height: 10.0,
                           ),
-                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        Visibility(
+                          visible:
+                              controller.cout_prev_visible == 1 ? true : false,
+                          child: TextFormField(
+                            controller: controller.coutPrevController,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.next,
+                            decoration: InputDecoration(
+                              labelText: '${'cout'.tr} prev',
+                              hintText: '${'cout'.tr} prev',
+                              labelStyle: TextStyle(
+                                fontSize: 14.0,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 10.0,
+                              ),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.lightBlue, width: 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ),
+                        Visibility(
+                          visible: controller.risque == 1 ? true : false,
+                          child: SizedBox(
+                            height: 10.0,
+                          ),
+                        ),
+                        Visibility(
+                          visible: controller.risque == 1 ? true : false,
+                          child: TextFormField(
+                            controller: controller.risqueController,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction: TextInputAction.next,
+                            decoration: InputDecoration(
+                              labelText: 'Risques',
+                              hintText: 'risques',
+                              labelStyle: TextStyle(
+                                fontSize: 14.0,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 10.0,
+                              ),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.lightBlue, width: 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            style: TextStyle(fontSize: 14.0),
+                            minLines: 2,
+                            maxLines: 5,
+                          ),
                         ),
                         SizedBox(
                           height: 20.0,
@@ -609,8 +753,9 @@ class NewSousActionPage extends GetView<SousActionController> {
   //Processus
   Future<List<ProcessusEmployeModel>> getProcessus(filter) async {
     try {
-      if (controller.selectedResRealCode == null) {
-        Get.snackbar("No Data", "Please select Responsable Realisation",
+      if (controller.selectedResRealCode == null ||
+          controller.selectedResRealCode == "") {
+        Get.snackbar('warning'.tr, 'select_responsable_realisation'.tr,
             colorText: Colors.blue,
             backgroundColor: Colors.white,
             snackPosition: SnackPosition.BOTTOM);

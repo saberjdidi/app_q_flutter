@@ -10,6 +10,7 @@ import '../../Models/type_incident_model.dart';
 import '../../Services/incident_securite/incident_securite_service.dart';
 import '../../Utils/custom_colors.dart';
 import '../../Utils/snack_bar.dart';
+import '../../Widgets/empty_list_widget.dart';
 import '../../Widgets/loading_widget.dart';
 import '../../Widgets/navigation_drawer_widget.dart';
 import '../../Widgets/refresh_widget.dart';
@@ -59,7 +60,7 @@ class IncidentSecuritePage extends GetView<IncidentSecuriteController> {
                 Get.find<IncidentSecuriteController>().getIncident();
               },
               child: ListView.separated(
-                separatorBuilder: (context, index) => SizedBox(height: 5.0),
+                separatorBuilder: (context, index) => SizedBox(height: 1.0),
                 shrinkWrap: true,
                 itemCount: controller.listIncident.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -427,12 +428,7 @@ class IncidentSecuritePage extends GetView<IncidentSecuriteController> {
               ),
             );
           } else {
-            return Center(
-              child: Text(
-                'empty_list'.tr,
-                style: TextStyle(fontSize: 25),
-              ),
-            );
+            return EmptyListWidget();
           }
         }
       }),

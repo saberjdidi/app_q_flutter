@@ -73,7 +73,7 @@ class _ParticipantPageState extends State<ParticipantPage> {
               model.mat = data['mat'];
               model.aparticipe = data['aparticipe'];
               model.comment = data['comment'];
-              model.confirm = data['confirm'];
+              model.confirm = data['hasconfirmed'];
               model.id = data['id'];
               model.intExt = data['int_ext'];
               //model.nReunion = data['nReunion'];
@@ -141,16 +141,16 @@ class _ParticipantPageState extends State<ParticipantPage> {
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final status = listParticipant[index].confirm;
-                          String? message = "";
+                          var message;
                           switch (status) {
                             case 0:
-                              message = "Attente confirmation";
+                              message = 'attente_confirmation'.tr;
                               break;
                             case 1:
-                              message = "OUI";
+                              message = 'yes'.tr;
                               break;
                             case -1:
-                              message = "NON";
+                              message = 'no'.tr;
                               break;
                             default:
                               message = "";
@@ -181,7 +181,9 @@ class _ParticipantPageState extends State<ParticipantPage> {
                                             child: Icon(Icons.amp_stories),
                                           ),
                                         ), */
-                                      TextSpan(text: '${message}'),
+                                      TextSpan(
+                                          text:
+                                              '${'a_confirmer'.tr} : ${message}'),
 
                                       //TextSpan(text: '${action.declencheur}'),
                                     ],

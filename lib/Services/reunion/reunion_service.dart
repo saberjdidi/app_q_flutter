@@ -78,6 +78,23 @@ class ReunionService {
     }
   }
 
+  Future<List<dynamic>> getTypeReunionByMatricule(mat, online) async {
+    try {
+      var response = await http.get(
+          Uri.parse(
+              '${AppConstants.REUNION_URL}/getTypeReunionByMatricule?mat=$mat&online=$online'),
+          headers: {'Content-Type': 'application/json'});
+      //print('response ${jsonDecode(response.body)}');
+      if (response.statusCode == 200) {
+        return await jsonDecode(response.body);
+      } else {
+        return Future.error(response.statusCode.toString());
+      }
+    } catch (exception) {
+      return Future.error('service : ${exception.toString()}');
+    }
+  }
+
   //get participant
   Future<List<dynamic>> getParticipant(nReunion) async {
     try {

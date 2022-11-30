@@ -13,6 +13,7 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_traitement.dart';
 
 class PNCTraiterPage extends StatefulWidget {
@@ -25,6 +26,7 @@ class PNCTraiterPage extends StatefulWidget {
 class _PNCTraiterPageState extends State<PNCTraiterPage> {
   PNCService localService = PNCService();
   final matricule = SharedPreference.getMatricule();
+  final langue = SharedPreference.getLangue();
   final keyRefresh = GlobalKey<RefreshIndicatorState>();
   List<PNCTraiterModel> listPNCTraiter =
       List<PNCTraiterModel>.empty(growable: true);
@@ -64,9 +66,6 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
             model.typeT = data['typeT'];
             listPNCTraiter.add(model);
             listFiltered = listPNCTraiter;
-            listPNCTraiter.forEach((element) {
-              print('element pnc ${element.nc}, id : ${element.nnc}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -99,9 +98,6 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
               model.typeT = data['typeT'];
               listPNCTraiter.add(model);
               listFiltered = listPNCTraiter;
-              listPNCTraiter.forEach((element) {
-                print('element pnc ${element.nc}, id : ${element.nnc}');
-              });
             });
           });
         }, onError: (err) {
@@ -142,8 +138,8 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
             ),
           ),
           title: Text(
-            'Non Confirmité a Traiter ${listPNCTraiter.length}',
-            style: TextStyle(color: Colors.black),
+            '${'non_conformite_a_traiter'.tr} : ${listPNCTraiter.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -178,7 +174,7 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -208,13 +204,23 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
                               final num_pnc = listFiltered[index].nnc;
                               DateTime date = DateTime.parse(
                                   listFiltered[index].dateDetect.toString());
-                              final date_detect =
-                                  DateFormat('dd/MM/yyyy').format(date);
+                              var date_detect;
+                              if (langue == 'fr') {
+                                date_detect =
+                                    DateFormat('dd/MM/yyyy').format(date);
+                              } else if (langue == 'en') {
+                                date_detect =
+                                    DateFormat('MM/dd/yyyy').format(date);
+                              } else {
+                                date_detect =
+                                    DateFormat('dd/MM/yyyy').format(date);
+                              }
+
                               return Card(
                                 color: Color(0xFFFCF9F9),
                                 child: ListTile(
                                   title: Text(
-                                    ' PNC N°${num_pnc}',
+                                    ' P.N.C N°${num_pnc}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -269,7 +275,7 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
                                         ),
                                         Html(
                                           data:
-                                              'Produit : ${listFiltered[index].produit}', //htmlData,
+                                              '${'product'.tr} : ${listFiltered[index].produit}', //htmlData,
                                           //tagsList: Html.tags..remove(Platform.isAndroid ? "-" : ""),
                                           style: {
                                             "body": Style(
@@ -282,7 +288,7 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
                                           },
                                         ),
                                         ReadMoreText(
-                                          "Traitement : ${listFiltered[index].traitement}",
+                                          "${'processing'.tr} : ${listFiltered[index].traitement}",
                                           style: TextStyle(
                                               color: Color(0xFF2C406F),
                                               fontWeight: FontWeight.bold),
@@ -327,11 +333,7 @@ class _PNCTraiterPageState extends State<PNCTraiterPage> {
                       ],
                     ),
                   )
-                : Center(
-                    child: Text('empty_list'.tr,
-                        style: TextStyle(
-                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
-                  )),
+                : EmptyListWidget()),
       ),
     );
   }

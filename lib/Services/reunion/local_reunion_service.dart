@@ -24,6 +24,20 @@ class LocalReunionService {
     print('delete table TypeReunion');
   }
 
+  //Type Reunion matricule
+  readTypeReunionByMatricule(mat) async {
+    return await dbHelper.readTypeReunionByMatricule(mat);
+  }
+
+  saveTypeReunionMatricule(TypeReunionModel model) async {
+    return await dbHelper.insertTypeReunionMatricule(
+        DBTable.type_reunion_matricule, model.dataMapTypeRMat());
+  }
+
+  deleteTableTypeReunionMatricule() async {
+    return await dbHelper.deleteTableTypeReunionMatricule();
+  }
+
   //reunion
   readReunion() async {
     return await dbHelper.readReunion();

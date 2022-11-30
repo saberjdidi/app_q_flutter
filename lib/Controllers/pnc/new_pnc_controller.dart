@@ -144,8 +144,8 @@ class NewPNCController extends GetxController {
 
   onChangePNCDetected(var detectedBy) {
     pncDetected.value = detectedBy;
-    print('detected by : ${pncDetected.value}');
-    print('code client : ${selectedCodeClient}');
+    debugPrint('detected by : ${pncDetected.value}');
+    debugPrint('code client : ${selectedCodeClient}');
     if (pncDetected.value == 1) {
       isVisibleCLient.value = true;
     } else {
@@ -263,25 +263,18 @@ class NewPNCController extends GetxController {
 
   //champ cache
   int? isps_visible = 1;
-  bool isVisibileISPS = true;
   int? type_nc_visible = 1;
-  bool isVisibileTypeNC = true;
   int? product_bloque_visible = 1;
-  bool isVisibileProductBloque = true;
   int? product_isole_visible = 1;
-  bool isVisibileProductIsole = true;
   int? num_interne_visible = 1;
-  bool isVisibileNumInterne = true;
   int? detected_by_visible = 1;
-  bool isVisibileDetectedBy = true;
   int? origine_nc_visible = 1;
-  bool isVisibileOrigineNC = true;
   int? atelier_visible = 1;
-  bool isVisibileAtelier = true;
   int? fournisseur_visible = 1;
-  bool isVisibileFournisseur = true;
   int? unite_visible = 1;
-  bool isVisibileUnite = true;
+  int? numero_lot_visible = 1;
+  int? numero_of_visible = 1;
+  int? quantity_visible = 1;
   getChampCache() async {
     try {
       List<ChampCacheModel> listChampCache =
@@ -289,7 +282,7 @@ class NewPNCController extends GetxController {
       var connection = await Connectivity().checkConnectivity();
       if (connection == ConnectivityResult.none) {
         var response = await localActionService.readChampCacheByModule(
-            "P.N.C.", ""); //Demande action
+            "P.N.C.", "PNC"); //Demande action
         response.forEach((data) {
           var model = ChampCacheModel();
           model.id = data['id'];
@@ -298,8 +291,8 @@ class NewPNCController extends GetxController {
           model.listOrder = data['listOrder'];
           model.nomParam = data['nomParam'];
           model.visible = data['visible'];
-          print(
-              'module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+          debugPrint(
+              'champ cache : module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
           listChampCache.add(model);
 
           if (model.nomParam == "ISPS" && model.module == "P.N.C.") {
@@ -339,6 +332,13 @@ class NewPNCController extends GetxController {
           } else if (model.nomParam == "Unité" && model.module == "P.N.C.") {
             unite_visible = model.visible;
             //unite_visible = 0;
+          } else if (model.nomParam == "N° Lot" && model.module == "P.N.C.") {
+            numero_lot_visible = model.visible;
+          } else if (model.nomParam == "N° OF" && model.module == "P.N.C.") {
+            numero_of_visible = model.visible;
+          } else if (model.nomParam == "Quantité + Valeur" &&
+              model.module == "P.N.C.") {
+            quantity_visible = model.visible;
           }
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -355,8 +355,8 @@ class NewPNCController extends GetxController {
             model.listOrder = data['list_order'];
             model.nomParam = data['nom_param'];
             model.visible = data['visible'];
-            print(
-                'module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
+            debugPrint(
+                'champ cache : module : ${model.module}, nom_param:${model.nomParam}, visible:${model.visible}');
             listChampCache.add(model);
 
             if (model.nomParam == "ISPS" && model.module == "P.N.C.") {
@@ -396,7 +396,13 @@ class NewPNCController extends GetxController {
               //fournisseur_visible = 0;
             } else if (model.nomParam == "Unité" && model.module == "P.N.C.") {
               unite_visible = model.visible;
-              //unite_visible = 0;
+            } else if (model.nomParam == "N° Lot" && model.module == "P.N.C.") {
+              numero_lot_visible = model.visible;
+            } else if (model.nomParam == "N° OF" && model.module == "P.N.C.") {
+              numero_of_visible = model.visible;
+            } else if (model.nomParam == "Quantité + Valeur" &&
+                model.module == "P.N.C.") {
+              quantity_visible = model.visible;
             }
           });
         }, onError: (err) {
@@ -411,7 +417,7 @@ class NewPNCController extends GetxController {
   }
 
   //champ obligatoire
-  int? num_interne_obligatoire = 1;
+  var num_interne_obligatoire = 1.obs;
   int? date_liv_obligatoire = 1;
   int? num_of_obligatoire = 1;
   int? num_lot_obligatoire = 1;
@@ -460,7 +466,7 @@ class NewPNCController extends GetxController {
         model.pourcTypenc = data['pourcTypenc'];
         model.detectPar = data['detectPar'];
 
-        num_interne_obligatoire = model.numInterne;
+        num_interne_obligatoire.value = int.parse(model.numInterne.toString());
         date_liv_obligatoire = model.dateLivr;
         num_of_obligatoire = model.numOf;
         num_lot_obligatoire = model.numLot;
@@ -508,7 +514,8 @@ class NewPNCController extends GetxController {
         model.pourcTypenc = data['pourc_typenc'];
         model.detectPar = data['detect_par'];
 
-        num_interne_obligatoire = model.numInterne;
+        //num_interne_obligatoire = model.numInterne;
+        num_interne_obligatoire.value = int.parse(model.numInterne.toString());
         date_liv_obligatoire = model.dateLivr;
         num_of_obligatoire = model.numOf;
         num_lot_obligatoire = model.numLot;
@@ -550,7 +557,9 @@ class NewPNCController extends GetxController {
     } else if (sourcePNCModel == null && source_obligatoire == 1) {
       Message.taskErrorOrWarning('warning'.tr, "Source ${'is_required'.tr}");
       return false;
-    } else if (atelierPNCModel == null && atelier_obligatoire == 1) {
+    } else if (atelierPNCModel == null &&
+        atelier_visible == 1 &&
+        atelier_obligatoire == 1) {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'atelier'.tr} ${'is_required'.tr}");
       return false;
@@ -560,7 +569,9 @@ class NewPNCController extends GetxController {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'product'.tr} ${'is_required'.tr}");
       return false;
-    } else if (fournisseur_obligatoire == 1 && fournisseurModel == null) {
+    } else if (fournisseur_visible == 1 &&
+        fournisseur_obligatoire == 1 &&
+        fournisseurModel == null) {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'fournisseur'.tr} ${'is_required'.tr}");
       return false;
@@ -590,11 +601,14 @@ class NewPNCController extends GetxController {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'activity'.tr} ${'is_required'.tr}");
       return false;
-    } else if (origine_nc_obligatoire == 1 && employeModel == null) {
+    } else if (origine_nc_visible == 1 &&
+        origine_nc_obligatoire == 1 &&
+        employeModel == null) {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'origine_pnc'.tr} ${'is_required'.tr}");
       return false;
     } else if (num_interne_obligatoire == 1 &&
+        num_interne_visible == 1 &&
         numInterneController.text.trim() == '') {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'ref_interne'.tr} ${'is_required'.tr}");
@@ -604,11 +618,14 @@ class NewPNCController extends GetxController {
       Message.taskErrorOrWarning('warning'.tr, "Numero Of ${'is_required'.tr}");
       return false;
     } else if (num_lot_obligatoire == 1 &&
+        numero_lot_visible == 1 &&
         numeroLotController.text.trim() == '') {
       Message.taskErrorOrWarning(
           'warning'.tr, "Numero Lot ${'is_required'.tr}");
       return false;
-    } else if (unite_obligatoire == 1 && uniteController.text.trim() == '') {
+    } else if (unite_obligatoire == 1 &&
+        unite_visible == 1 &&
+        uniteController.text.trim() == '') {
       Message.taskErrorOrWarning(
           'warning'.tr, "${'unite'.tr} ${'is_required'.tr}");
       return false;
@@ -950,7 +967,7 @@ class NewPNCController extends GetxController {
                     barrierDismissible: false,
                     radius: 20,
                     content: Text(
-                      'Do you want to add products',
+                      '${'do_you_want_add'.tr} ${'product'.tr}s',
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,

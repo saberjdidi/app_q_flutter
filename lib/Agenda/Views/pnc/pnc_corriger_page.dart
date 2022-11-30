@@ -2,7 +2,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Widgets/refresh_widget.dart';
 import 'package:readmore/readmore.dart';
 import '../../../Models/pnc/pnc_a_corriger_model.dart';
@@ -12,6 +11,7 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_corriger.dart';
 
 class PNCCorrigerPage extends StatefulWidget {
@@ -61,9 +61,6 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
             model.ninterne = data['ninterne'];
             listPNCCorriger.add(model);
             listFiltered = listPNCCorriger;
-            listPNCCorriger.forEach((element) {
-              print('element pnc ${element.motifRefus}, id : ${element.nnc}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -90,9 +87,6 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
               model.ninterne = data['ninterne'];
               listPNCCorriger.add(model);
               listFiltered = listPNCCorriger;
-              listPNCCorriger.forEach((element) {
-                print('element pnc ${element.motifRefus}, id : ${element.nnc}');
-              });
             });
           });
         }, onError: (err) {
@@ -133,7 +127,7 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
             ),
           ),
           title: Text(
-            'Non Confirmité a Corriger ${listPNCCorriger.length}',
+            '${'non_conformite_a_corriger'.tr} ${listPNCCorriger.length}',
             style: TextStyle(color: Colors.black),
           ),
           backgroundColor: (lightPrimary),
@@ -169,7 +163,7 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -199,7 +193,7 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
                                 color: Color(0xFFFCF9F9),
                                 child: ListTile(
                                   title: Text(
-                                    ' PNC N°${num_pnc}',
+                                    ' P.N.C N°${num_pnc}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -227,8 +221,6 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
                                               TextSpan(
                                                   text:
                                                       '${listFiltered[index].dateDetect}'),
-
-                                              //TextSpan(text: '${action.declencheur}'),
                                             ],
                                           ),
                                         ),
@@ -250,7 +242,7 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
                                           ),
                                         ),
                                         Text(
-                                            'Produit : ${listFiltered[index].produit}',
+                                            '${'product'.tr} : ${listFiltered[index].produit}',
                                             style: TextStyle(
                                                 color: Colors.blueAccent)),
                                         ReadMoreText(
@@ -293,11 +285,7 @@ class _PNCCorrigerPageState extends State<PNCCorrigerPage> {
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
-                        style: TextStyle(
-                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
-                  )),
+                : EmptyListWidget()),
       ),
     );
   }

@@ -174,6 +174,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getDomaineAffectation().then((resp) async {
+        //delete table
+        await localActionService.deleteTableDomaineAffectation();
         resp.forEach((data) async {
           //print('get domaine affectation : ${data} ');
           var model = DomaineAffectationModel();
@@ -201,19 +203,34 @@ class ApiControllersCall extends GetxController {
           model.vEmpDirection = data['vEmpDirection'];
           model.vEmpService = data['vEmpService'];
           listDomaine.add(model);
-
-          //delete table
-          await localActionService.deleteTableDomaineAffectation();
           //save data
           await localActionService.saveDomaineAffectation(model);
           print(
               'Inserting data in table DomaineAffectation : ${model.id}, ${model.module} ');
         });
         print('get data');
-      }, onError: (err) {
+      }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error DomaineAffectation", err.toString(), Colors.red);
+        if (error.toString() == 500.toString() ||
+            error.toString().contains(500.toString())) {
+          Get.snackbar('warning'.tr, 'internal_server_error'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              duration: Duration(seconds: 5));
+          //ShowSnackBar.snackBar('warning'.tr, 'internal_server_error'.tr, Colors.red);
+        } else if (error.toString() == 503.toString() ||
+            error.toString().contains(503.toString())) {
+          Get.snackbar('warning'.tr, 'service_unavailable'.tr,
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              duration: Duration(seconds: 5));
+          //ShowSnackBar.snackBar('warning'.tr, 'service_unavailable'.tr, Colors.red);
+        } else {
+          ShowSnackBar.snackBar(
+              "Error DomaineAffectation", error.toString(), Colors.red);
+        }
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -229,6 +246,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       await ApiServicesCall().getChampCache({"module": "", "fiche": ""}).then(
           (resp) async {
+        //delete table
+        await localActionService.deleteTableChampCache();
         resp.forEach((data) async {
           //print('get champ obligatoire : ${data} ');
           var model = ChampCacheModel();
@@ -239,18 +258,15 @@ class ApiControllersCall extends GetxController {
           model.nomParam = data['nom_param'];
           model.visible = data['visible'];
           listChampCache.add(model);
-
-          //delete table
-          await localActionService.deleteTableChampCache();
           //save data
           await localActionService.saveChampCache(model);
-          print(
+          debugPrint(
               'Inserting data in table ChampCache : ${model.module}-${model.fiche}-${model.nomParam}-visible${model.visible} ');
         });
-        print('get data');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error ChampCache", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error ChampCache", err.toString(), Colors.red);
+        debugPrint('Error ChampCache : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -265,6 +281,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getChampObligatoireAction().then((resp) async {
+        //delete table
+        await localActionService.deleteTableChampObligatoireAction();
         resp.forEach((data) async {
           //print('get champ obligatoire : ${data} ');
           var model = ChampObligatoireActionModel();
@@ -277,18 +295,15 @@ class ApiControllersCall extends GetxController {
           model.commentaire = data['commentaire'];
           listChampObligatoireAction.add(model);
 
-          //delete table
-          await localActionService.deleteTableChampObligatoireAction();
           //save data
           await localActionService.saveChampObligatoireAction(model);
-          print(
+          debugPrint(
               'Inserting data in table ChampObligatoireAction : ${model.commentaire} ');
         });
-        print('get data');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ChampObligatoireAction", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error ChampObligatoireAction", err.toString(), Colors.red);
+        debugPrint('Error ChampObligatoireAction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -341,8 +356,8 @@ class ApiControllersCall extends GetxController {
         print('Inserting data in table ChampObligatoirePNC : ${data} ');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ChampObligatoirePNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ChampObligatoirePNC", err.toString(), Colors.red);
+        debugPrint('Error ChampObligatoirePNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -358,6 +373,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getSiteOffline(matricule).then((resp) async {
+        //delete table
+        await localActionService.deleteAllSite();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = SiteModel();
@@ -365,15 +382,15 @@ class ApiControllersCall extends GetxController {
           model.site = data['site'];
           model.module = data['module'];
           model.fiche = data['fiche'];
-          //delete table
-          await localActionService.deleteAllSite();
+
           //save data
           await localActionService.saveSite(model);
-          print('Inserting data in table Site : ${model.site} ');
+          debugPrint('Inserting data in table Site : ${model.site} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Site", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Site", err.toString(), Colors.red);
+        debugPrint('Error Site : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -388,6 +405,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getProcessusOffline(matricule).then((resp) async {
+        //delete table
+        await localActionService.deleteAllProcessus();
         resp.forEach((data) async {
           //print('get processus : ${data} ');
           var model = ProcessusModel();
@@ -396,15 +415,15 @@ class ApiControllersCall extends GetxController {
           model.module = data['module'];
           model.fiche = data['fiche'];
           //listProcessus.add(model);
-          //delete table
-          await localActionService.deleteAllProcessus();
+
           //save data
           await localActionService.saveProcessus(model);
           print('Inserting data in table processus : ${model.processus} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Processus", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Processus", err.toString(), Colors.red);
+        debugPrint('Error Processus : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -419,6 +438,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getDirectionOffline(matricule).then((resp) async {
+        //delete table
+        await localActionService.deleteAllDirection();
         resp.forEach((data) async {
           //print('get direction : ${data} ');
           var model = DirectionModel();
@@ -427,16 +448,16 @@ class ApiControllersCall extends GetxController {
           model.module = data['module'];
           model.fiche = data['fiche'];
           //listDirection.add(model);
-          //delete table
-          await localActionService.deleteAllDirection();
+
           //save data
           await localActionService.saveDirection(model);
-          print(
+          debugPrint(
               'Inserting data in table direction : ${model.direction}- module : ${model.module} - fiche: ${model.fiche} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Direction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Direction", err.toString(), Colors.red);
+        debugPrint('Error Direction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -452,6 +473,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       await ApiServicesCall().getService(matricule, 0, '', '').then(
           (resp) async {
+        //delete table
+        await localActionService.deleteAllService();
         resp.forEach((data) async {
           //print('get service : ${data} ');
           var model = ServiceModel();
@@ -461,15 +484,15 @@ class ApiControllersCall extends GetxController {
           model.module = data['module'];
           model.fiche = data['fiche'];
           //listService.add(model);
-          //delete table
-          await localActionService.deleteAllService();
+
           //save data
           await localActionService.saveService(model);
           print('Inserting data in table service : ${model.service} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Service", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Service", err.toString(), Colors.red);
+        debugPrint('Error Service : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -485,6 +508,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       await ApiServicesCall().getEmploye({"act": "", "lang": ""}).then(
           (resp) async {
+        //delete table
+        await localActionService.deleteAllEmploye();
         resp.forEach((data) async {
           //print('get employe : ${data} ');
           var model = EmployeModel();
@@ -492,16 +517,15 @@ class ApiControllersCall extends GetxController {
           model.nompre = data['nompre'];
           listEmploye.add(model);
 
-          //delete table
-          await localActionService.deleteAllEmploye();
           //save data
           await localActionService.saveEmploye(model);
-          print(
+          debugPrint(
               'Inserting data in table employe : ${model.nompre} - ${model.mat} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Employe", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error Employe", err.toString(), Colors.red);
+        debugPrint('Error Employe : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -516,6 +540,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getActivityOffline(matricule).then((resp) async {
+        //delete table
+        await localActionService.deleteAllActivity();
         resp.forEach((data) async {
           //print('get activity : ${data} ');
           var model = ActivityModel();
@@ -524,15 +550,15 @@ class ApiControllersCall extends GetxController {
           model.module = data['module'];
           model.fiche = data['fiche'];
           //listActivity.add(model);
-          //delete table
-          await localActionService.deleteAllActivity();
+
           //save data
           await localActionService.saveActivity(model);
-          print('Inserting data in table activity : ${model.domaine} ');
+          debugPrint('Inserting data in table activity : ${model.domaine} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Activity", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Activity", err.toString(), Colors.red);
+        debugPrint('Error Activity : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -556,6 +582,8 @@ class ApiControllersCall extends GetxController {
         "action_plus1": "",
         "typeAction": ""
       }).then((resp) async {
+        //delete db local
+        await localActionService.deleteAllAction();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = ActionModel();
@@ -577,16 +605,16 @@ class ApiControllersCall extends GetxController {
           //model.isd = data['isd'];
           //model.datsuivPrv = data['datsuiv_prv'];
           model.online = 1;
-          //delete db local
-          await localActionService.deleteAllAction();
+
           //save data in local db
           await localActionService.saveAction(model);
-          print(
+          debugPrint(
               'Inserting data in table Action : ${model.act} - nact:${model.nAct}');
         });
       }, onError: (err) {
         isDataProcessing.value = false;
-        ShowSnackBar.snackBar("Error Action", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Action", err.toString(), Colors.red);
+        debugPrint('Error Action : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -621,13 +649,13 @@ class ApiControllersCall extends GetxController {
 
           //save data
           await localActionService.saveTypeCauseAction(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCauseAction : ${model.nAct} - ${model.typecause} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeCauseAction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeCauseAction", err.toString(), Colors.red);
+        debugPrint('Error TypeCauseAction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -659,7 +687,8 @@ class ApiControllersCall extends GetxController {
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error SousAction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeCauseActionARattacher", err.toString(), Colors.red);
+        debugPrint('Error TypeCauseActionARattacher : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -675,6 +704,8 @@ class ApiControllersCall extends GetxController {
       var connection = await Connectivity().checkConnectivity();
       //rest api
       await ApiServicesCall().getSourceAction().then((resp) async {
+        //delete table
+        await localActionService.deleteAllSourceAction();
         resp.forEach((data) async {
           //print('get source actions : ${data} ');
           var model = SourceActionModel();
@@ -682,16 +713,15 @@ class ApiControllersCall extends GetxController {
           model.sourceAct = data['sourceAct'];
           listSourceAction.add(model);
 
-          //delete table
-          await localActionService.deleteAllSourceAction();
           //save data
           await localActionService.saveSourceAction(model);
-          print('Inserting data in table SourceA : ${model.sourceAct} ');
+          debugPrint(
+              'Inserting data in table SourceAction : ${model.sourceAct} ');
         });
-        print('get data');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error SousAction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SourceAction", err.toString(), Colors.red);
+        debugPrint('Error SourceAction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -708,6 +738,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       await ApiServicesCall().getTypeAction({"nom": "", "lang": ""}).then(
           (resp) async {
+        //delete table
+        await localActionService.deleteAllTypeAction();
         resp.forEach((data) async {
           //print('get type actions : ${data} ');
           var model = TypeActionModel();
@@ -717,15 +749,14 @@ class ApiControllersCall extends GetxController {
           model.analyseCause = data['analyse_cause'];
           listTypeAction.add(model);
 
-          //delete table
-          await localActionService.deleteAllTypeAction();
           //save data
           await localActionService.saveTypeAction(model);
-          print('Inserting data in table TypeA : ${model.typeAct} ');
+          print('Inserting data in table TypeAction : ${model.typeAct} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error TypeAction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeAction", err.toString(), Colors.red);
+        debugPrint('Error TypeAction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -740,6 +771,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getAllResponsableCloture().then((resp) async {
+        //delete table
+        await localActionService.deleteAllResponsableCloture();
         resp.forEach((data) async {
           //print('get resp cloture : ${data} ');
           var model = RespClotureModel();
@@ -751,16 +784,14 @@ class ApiControllersCall extends GetxController {
           model.processus = data['processus'];
           listRespCloture.add(model);
 
-          //delete table
-          await localActionService.deleteAllResponsableCloture();
           //save data
           await localActionService.saveResponsableCloture(model);
-          print('Inserting data in table RespCloture : ${model.mat} ');
+          debugPrint('Inserting data in table RespCloture : ${model.mat} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ResponsableCloture", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ResponsableCloture", err.toString(), Colors.red);
+        debugPrint('Error ResponsableCloture : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -775,6 +806,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getProcessusEmploye().then((resp) async {
+        //delete table
+        await localActionService.deleteTableProcessusEmploye();
         resp.forEach((data) async {
           //print('get processus employe : ${data} ');
           var model = ProcessusEmployeModel();
@@ -783,17 +816,15 @@ class ApiControllersCall extends GetxController {
           model.mat = data['mat'];
           listProcessusEmploye.add(model);
 
-          //delete table
-          await localActionService.deleteTableProcessusEmploye();
           //save data
           await localActionService.saveProcessusEmploye(model);
-          print(
+          debugPrint(
               'Inserting data in table processus employe : ${model.processus} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error processus emp", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error processus emp", err.toString(), Colors.red);
+        debugPrint('Error processus emp : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -810,6 +841,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       await ApiServicesCall()
           .getProduct({"codeProduit": "", "produit": ""}).then((resp) async {
+        //delete table
+        await localActionService.deleteAllProduct();
         resp.forEach((data) async {
           //print('get product : ${data} ');
           var model = ProductModel();
@@ -819,16 +852,14 @@ class ApiControllersCall extends GetxController {
           model.typeProduit = data['typeProduit'];
           model.codeTypeProduit = data['codeTypeProduit'];
           listProduct.add(model);
-
-          //delete table
-          await localActionService.deleteAllProduct();
           //save data
           await localActionService.saveProduct(model);
-          print('Inserting data in table product : ${model.produit} ');
+          debugPrint('Inserting data in table product : ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Product", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Product", err.toString(), Colors.red);
+        debugPrint('Error Product : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -843,6 +874,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getAuditAction().then((resp) async {
+        //delete table
+        await localActionService.deleteAllAuditAction();
         resp.forEach((data) async {
           //print('get audit actions : ${data} ');
           var model = AuditActionModel();
@@ -850,21 +883,19 @@ class ApiControllersCall extends GetxController {
           model.refAudit = data['refAudit'];
           model.interne = data['interne'];
           listAuditAction.add(model);
-
-          //delete table
-          await localActionService.deleteAllAuditAction();
           //save data
           await localActionService.saveAuditAction(model);
-          print('Inserting data in table AuditAction : ${model.idaudit} ');
+          debugPrint('Inserting data in table AuditAction : ${model.idaudit} ');
         });
-        print('get data');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error AuditAction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AuditAction", err.toString(), Colors.red);
+        debugPrint('Error AuditAction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception AuditAction", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -875,6 +906,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getPriorite().then((resp) async {
+        //delete table
+        await localActionService.deleteAllPriorite();
         resp.forEach((data) async {
           //print('get priorite : ${data} ');
           var model = PrioriteModel();
@@ -882,8 +915,6 @@ class ApiControllersCall extends GetxController {
           model.priorite = data['priorite'];
           listPriorite.add(model);
 
-          //delete table
-          await localActionService.deleteAllPriorite();
           //save data
           await localActionService.savePriorite(model);
           print('Inserting data in table Priorite : ${model.priorite} ');
@@ -891,11 +922,13 @@ class ApiControllersCall extends GetxController {
         //print('get data');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Priorite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Priorite", err.toString(), Colors.red);
+        debugPrint('Error Priorite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Priorite", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -906,6 +939,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getGravite().then((resp) async {
+        //delete table
+        await localActionService.deleteAllGravite();
         resp.forEach((data) async {
           //print('get gravite : ${data} ');
           var model = GraviteModel();
@@ -913,20 +948,20 @@ class ApiControllersCall extends GetxController {
           model.gravite = data['gravite'];
           listGravite.add(model);
 
-          //delete table
-          await localActionService.deleteAllGravite();
           //save data
           await localActionService.saveGravite(model);
-          print('Inserting data in table Gravite : ${model.gravite} ');
+          debugPrint('Inserting data in table Gravite : ${model.gravite} ');
         });
         //print('get data');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Gravite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Gravite", err.toString(), Colors.red);
+        debugPrint('Error Gravite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Gravite", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -937,6 +972,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getAllSousAction().then((resp) async {
+        //delete table
+        await localActionService.deleteAllSousAction();
         resp.forEach((data) async {
           //print('get all SousAction : ${data} ');
           var model = SousActionModel();
@@ -967,22 +1004,20 @@ class ApiControllersCall extends GetxController {
           model.online = 1;
           listSousAction.add(model);
 
-          //delete table
-          await localActionService.deleteAllSousAction();
           //save data
           await localActionService.saveSousAction(model);
-          print(
+          debugPrint(
               'Inserting data in table SousAction : NAct: ${model.nAct}, NSousAct ${model.nSousAct}, SousAct: ${model.sousAct}, online:${model.online} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AllSousAction", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AllSousAction", err.toString(), Colors.red);
+        debugPrint('Error SousAction : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar(
-          "Exception processus emp", exception.toString(), Colors.red);
+          "Exception SousAction", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -994,6 +1029,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await PNCService().getPNC(matricule).then((resp) async {
+        //delete table
+        await localPNCService.deleteTablePNC();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = PNCModel();
@@ -1022,20 +1059,19 @@ class ApiControllersCall extends GetxController {
           model.site = data['site'];
           model.fournisseur = data['frs'];
 
-          //delete table
-          await localPNCService.deleteTablePNC();
           //save data
           await localPNCService.savePNC(model);
-          print(
+          debugPrint(
               'Inserting data in table PNC : ${model.nnc}-${model.nc}-${model.produit}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        debugPrint('Error PNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1046,6 +1082,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await PNCService().getAllProductsPNC(0).then((resp) async {
+        //delete table
+        await localPNCService.deleteTableProductPNC();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = ProductPNCModel();
@@ -1061,20 +1099,20 @@ class ApiControllersCall extends GetxController {
           model.typeProduit = data['typeproduit'];
           model.unite = data['unite'];
           //model.typeNC = data['typeNC'];
-          //delete table
-          await localPNCService.deleteTableProductPNC();
           //save data
           await localPNCService.saveProductPNC(model);
-          print(
+          debugPrint(
               'Inserting data in table ProductPNC : ${model.nnc}-${model.codeProduit}-${model.produit}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        debugPrint('Error PNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ProductPNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1085,6 +1123,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await PNCService().getTypesCausesOfPNC(0).then((resp) async {
+        //delete table
+        await localPNCService.deleteTableTypeCausePNC();
         resp.forEach((data) async {
           var model = TypeCausePNCModel();
           model.online = 1;
@@ -1092,21 +1132,20 @@ class ApiControllersCall extends GetxController {
           model.idTypeCause = data['id_tab_pnc_typeCause'];
           model.codetypecause = data['codeTypeCause'];
           model.typecause = data['typeCause'];
-
-          //delete table
-          await localPNCService.deleteTableTypeCausePNC();
           //save data
           await localPNCService.saveTypeCausePNC(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCausePNC : ${model.nnc}-${model.codetypecause}-${model.typecause}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        debugPrint('Error TypeCausePNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeCausePNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1125,16 +1164,18 @@ class ApiControllersCall extends GetxController {
           model.typecause = data['typeCause'];
           //save data
           await localPNCService.saveTypeCausePNCARattacher(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCausePNCARattacher : ${model.codetypecause}-${model.typecause}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNC", err.toString(), Colors.red);
+        debugPrint('Error TypeCausePNCARattacher : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeCausePNCARattacher", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1165,8 +1206,8 @@ class ApiControllersCall extends GetxController {
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeProductPNC", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error TypeProductPNC", err.toString(), Colors.red);
+        debugPrint('Error TypeProductPNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -1183,6 +1224,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getFournisseurs(matricule).then((resp) async {
+        //delete table
+        await localPNCService.deleteTableFournisseur();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = FournisseurModel();
@@ -1190,19 +1233,18 @@ class ApiControllersCall extends GetxController {
           model.activite = data['activite'];
           model.codeFr = data['codeFr'];
 
-          //delete table
-          await localPNCService.deleteTableFournisseur();
           //save data
           await localPNCService.saveFournisseur(model);
-          print('Inserting data in table Fournisseur : ${model.codeFr} ');
+          debugPrint('Inserting data in table Fournisseur : ${model.codeFr} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Fournisseurs", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Fournisseurs", err.toString(), Colors.red);
+        debugPrint('Error Fournisseur : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Fournisseur", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1214,25 +1256,25 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getClients().then((resp) async {
+        //delete table
+        await localPNCService.deleteTableClient();
         resp.forEach((data) async {
-          //print('get site : ${data} ');
           var model = ClientModel();
           model.codeclt = data['codeclt'];
           model.nomClient = data['nomClient'];
-
-          //delete table
-          await localPNCService.deleteTableClient();
           //save data
           await localPNCService.saveClient(model);
-          print('Inserting data in table Fournisseur : ${model.nomClient} ');
+          debugPrint('Inserting data in table Client : ${model.nomClient} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Clients", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Clients", err.toString(), Colors.red);
+        debugPrint('Error Client : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Client", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1255,11 +1297,12 @@ class ApiControllersCall extends GetxController {
 
           //save data
           await localPNCService.saveTypePNC(model);
-          print('Inserting data in table TypePNC : ${model.typeNC} ');
+          debugPrint('Inserting data in table TypePNC : ${model.typeNC} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error TypePNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypePNC", err.toString(), Colors.red);
+        debugPrint('Error TypePNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -1276,25 +1319,26 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getGravitePNC().then((resp) async {
+        //delete table
+        await localPNCService.deleteTableGravitePNC();
         resp.forEach((data) async {
-          //print('get site : ${data} ');
           var model = GravitePNCModel();
           model.nGravite = data['nGravite'];
           model.gravite = data['gravite'];
 
-          //delete table
-          await localPNCService.deleteTableGravitePNC();
           //save data
           await localPNCService.saveGravitePNC(model);
           print('Inserting data in table GravitePNC : ${model.gravite} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error GravitePNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error GravitePNC", err.toString(), Colors.red);
+        debugPrint('Error GravitePNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception GravitePNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1306,25 +1350,27 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getSourcePNC().then((resp) async {
+        //delete table
+        await localPNCService.deleteTableSourcePNC();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = SourcePNCModel();
           model.codeSourceNC = data['codeSourceNC'];
           model.sourceNC = data['sourceNC'];
 
-          //delete table
-          await localPNCService.deleteTableSourcePNC();
           //save data
           await localPNCService.saveSourcePNC(model);
-          print('Inserting data in table SourcePNC : ${model.sourceNC} ');
+          debugPrint('Inserting data in table SourcePNC : ${model.sourceNC} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error SourcePNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SourcePNC", err.toString(), Colors.red);
+        debugPrint('Error SourcePNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception SourcePNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1336,25 +1382,27 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ApiServicesCall().getAtelierPNC().then((resp) async {
+        //delete table
+        await localPNCService.deleteTableAtelierPNC();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = AtelierPNCModel();
           model.codeAtelier = data['codeAtelier'];
           model.atelier = data['atelier'];
 
-          //delete table
-          await localPNCService.deleteTableAtelierPNC();
           //save data
           await localPNCService.saveAtelierPNC(model);
-          print('Inserting data in table AtelierPNC : ${model.atelier} ');
+          debugPrint('Inserting data in table AtelierPNC : ${model.atelier} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error AtelierPNC", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AtelierPNC", err.toString(), Colors.red);
+        debugPrint('Error AtelierPNC : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception AtelierPNC", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1366,6 +1414,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ReunionService().getReunion(matricule).then((resp) async {
+        //delete table
+        await localReunionService.deleteTableReunion();
         resp.forEach((data) async {
           var model = ReunionModel();
           model.online = 1;
@@ -1382,20 +1432,20 @@ class ApiControllersCall extends GetxController {
           //model.reunionPlus0 = data['reunion_plus0'];
           //model.reunionPlus1 = data['reunion_plus1'];
 
-          //delete table
-          await localReunionService.deleteTableReunion();
           //save data
           await localReunionService.saveReunion(model);
-          print(
+          debugPrint(
               'Inserting data in table Reunion : ${model.nReunion} - ${model.ordreJour}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Reunion", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Reunion", err.toString(), Colors.red);
+        debugPrint('Error Reunion : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Reunion", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1406,6 +1456,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ReunionService().getParticipant(0).then((resp) async {
+        //delete table
+        await localReunionService.deleteTableParticipantReunion();
         resp.forEach((data) async {
           var model = ParticipantReunionModel();
           model.online = 1;
@@ -1416,21 +1468,20 @@ class ApiControllersCall extends GetxController {
           model.confirm = data['confirm'];
           model.nReunion = data['nReunion'];
 
-          //delete table
-          await localReunionService.deleteTableParticipantReunion();
           //save data
           await localReunionService.saveParticipantReunion(model);
-          print(
-              'Inserting data in table ParticipantReunion : ${model.nReunion} - ${model.nompre}');
+          debugPrint(
+              'Inserting data in table ParticipantReunion : ${model.nReunion} - ${model.nompre} - a confirmé : ${model.confirm}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ParticipantReunion", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ParticipantReunion", err.toString(), Colors.red);
+        debugPrint('Error ParticipantReunion : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ParticipantReunion", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1456,17 +1507,18 @@ class ApiControllersCall extends GetxController {
 
           //save data
           await localReunionService.saveActionReunion(model);
-          print(
+          debugPrint(
               'Inserting data in table ActionReunion : ${model.nReunion} - ${model.nAct} - ${model.decision}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ActionReunion", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ActionReunion", err.toString(), Colors.red);
+        debugPrint('Error ActionReunion : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ActionReunion", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1478,25 +1530,60 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await ReunionService().getTypeReunion().then((resp) async {
+        //delete table
+        await localReunionService.deleteTableTypeReunion();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = TypeReunionModel();
           model.codeTypeR = data['codeTypeR'];
           model.typeReunion = data['type_Reunion'];
-
-          //delete table
-          await localReunionService.deleteTableTypeReunion();
           //save data
           await localReunionService.saveTypeReunion(model);
-          print('Inserting data in table TypeReunion : ${model.typeReunion} ');
+          debugPrint(
+              'Inserting data in table TypeReunion : ${model.typeReunion} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error TypeReunion", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeReunion", err.toString(), Colors.red);
+        debugPrint('Error TypeReunion : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeReunion", exception.toString(), Colors.red);
+    } finally {
+      isDataProcessing(false);
+    }
+  }
+
+  Future<void> getTypeReunionByMatricule() async {
+    try {
+      isDataProcessing(true);
+      //rest api
+      await ReunionService().getTypeReunionByMatricule('', 0).then(
+          (resp) async {
+        //delete table
+        await localReunionService.deleteTableTypeReunionMatricule();
+        resp.forEach((data) async {
+          //print('get site : ${data} ');
+          var model = TypeReunionModel();
+          model.codeTypeR = data['codeTypeR'];
+          model.typeReunion = data['typeR'];
+          model.mat = data['mat'];
+          //save data
+          await localReunionService.saveTypeReunionMatricule(model);
+          debugPrint(
+              'Inserting data in table TypeReunionMatricule : ${model.typeReunion} - ${model.mat} ');
+        });
+      }, onError: (err) {
+        isDataProcessing(false);
+        //ShowSnackBar.snackBar("Error TypeReunion", err.toString(), Colors.red);
+        debugPrint('Error TypeReunionMatricule : ${err.toString()}');
+      });
+    } catch (exception) {
+      isDataProcessing(false);
+      ShowSnackBar.snackBar(
+          "Exception TypeReunionMatricule", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1508,6 +1595,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await DocumentationService().getDocument(matricule).then((resp) async {
+        //delete table
+        await localDocumentationService.deleteTableDocumentation();
         resp.forEach((data) async {
           var model = DocumentationModel();
           model.online = 1;
@@ -1537,20 +1626,20 @@ class ApiControllersCall extends GetxController {
           model.important = data['important'];
           model.issuperviseur = data['issuperviseur'];
 
-          //delete table
-          await localDocumentationService.deleteTableDocumentation();
           //save data
           await localDocumentationService.saveDocumentation(model);
-          print(
+          debugPrint(
               'Inserting data in table Documentation : ${model.cdi} - ${model.libelle}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Document", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Document", err.toString(), Colors.red);
+        debugPrint('Error Document : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Document", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1561,25 +1650,27 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await DocumentationService().getTypeDocument().then((resp) async {
+        //delete table
+        await localDocumentationService.deleteTableTypeDocument();
         resp.forEach((data) async {
           var model = TypeDocumentModel();
           model.codeType = data['codeTypeDI'];
           model.type = data['type'];
 
-          //delete table
-          await localDocumentationService.deleteTableTypeDocument();
           //save data
           await localDocumentationService.saveTypeDocument(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeDocument : ${model.codeType} - ${model.type}');
         });
       }, onError: (err) {
         isDataProcessing(false);
         ShowSnackBar.snackBar("Error TypeDocument", err.toString(), Colors.red);
+        debugPrint('Error TypeDocument : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeDocument", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1592,6 +1683,9 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getIncident(matricule).then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableIncidentEnvironnement();
         resp.forEach((data) async {
           var model = IncidentEnvModel();
           model.online = 1;
@@ -1621,23 +1715,21 @@ class ApiControllersCall extends GetxController {
           model.gravite = data['gravite'];
           model.statut = data['statut'];
 
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableIncidentEnvironnement();
           //save data
           await localIncidentEnvironnementService
               .saveIncidentEnvironnement(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentEnvironnement : ${model.n} - ${model.incident}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentEnvironnement", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncidentEnvironnement", err.toString(), Colors.red);
+        debugPrint('Error IncidentEnvironnement : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception IncidentEnvironnement", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1650,7 +1742,9 @@ class ApiControllersCall extends GetxController {
       await IncidentEnvironnementService()
           .getChampObligatoireIncidentEnv()
           .then((data) async {
-        //print('get champ obligatoire : ${data} ');
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableChampObligatoireIncidentEnv();
         var model = ChampObligatoireIncidentEnvModel();
         model.incCat = data['inc_cat'];
         model.incTypecons = data['inc_typecons'];
@@ -1663,21 +1757,21 @@ class ApiControllersCall extends GetxController {
         model.descIncident = data['desc_incident'];
         model.descCauses = data['desc_causes'];
         model.gravite = data['gravite'];
-        //delete table
-        await localIncidentEnvironnementService
-            .deleteTableChampObligatoireIncidentEnv();
+
         //save data
         await localIncidentEnvironnementService
             .saveChampObligatoireIncidentEnv(model);
-        print('Inserting data in table ChampObligatoireIncidentEnv : ${data} ');
+        debugPrint(
+            'Inserting data in table ChampObligatoireIncidentEnv : ${data} ');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ChampObligatoireIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ChampObligatoireIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error ChampObligatoireIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception ChampObligatoireIncidentEnv",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1690,28 +1784,30 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getTypeCauseIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableTypeCauseIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = TypeCauseIncidentModel();
           model.idTypeCause = data['idTypeCause'];
           model.typeCause = data['typeCause'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableTypeCauseIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService
               .saveTypeCauseIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCauseIncidentEnv : ${model.typeCause} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeCauseIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeCauseIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error TypeCauseIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeCauseIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1738,17 +1834,18 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentEnvironnementService
               .saveTypeCauseRattacherIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCauseIncidentEnvRattacher : ${model.idIncident} - ${model.typeCause} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeCauseIncidentEnvR", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeCauseIncidentEnvR", err.toString(), Colors.red);
+        debugPrint('Error TypeCauseIncidentEnvR : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeCauseIncidentEnvR", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1761,28 +1858,30 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getCategoryIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableCategoryIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = CategoryModel();
           model.idCategorie = data['idCategorie'];
           model.categorie = data['categorie'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableCategoryIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService
               .saveCategoryIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table CategoryIncidentEnv : ${model.categorie} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CategoryIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CategoryIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error CategoryIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception CategoryIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1806,17 +1905,18 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentEnvironnementService
               .saveTypeConsequenceIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeConsequenceIncidentEnv : ${model.typeConsequence} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeConsequenceIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeConsequenceIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error TypeConsequenceIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception TypeConsequenceIncidentEnv",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1842,17 +1942,19 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentEnvironnementService
               .saveTypeConsequenceRattacherIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeConsequenceIncidentEnvRattacher : ${model.idIncident} - ${model.typeConsequence} -idIncConseq:${model.idIncidentConseq} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error TypeConsequenceIncidentEnvRattacher",
-            err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeConsequenceIncidentEnvRattacher",err.toString(), Colors.red);
+        debugPrint(
+            'Error TypeConsequenceIncidentEnvRattacher : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception TypeConsequenceIncidentEnvRattacher",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1865,22 +1967,23 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getTypeIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService.deleteTableTypeIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = TypeIncidentModel();
           model.idType = data['idType'];
           model.typeIncident = data['type_Incident_Env'];
-          //delete table
-          await localIncidentEnvironnementService.deleteTableTypeIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService.saveTypeIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeIncidentEnv : ${model.typeIncident}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error TypeIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -1897,25 +2000,27 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getLieuIncidentEnv(matricule).then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService.deleteTableLieuIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = LieuModel();
           model.code = data['code'];
           model.lieu = data['lieu'];
-          //delete table
-          await localIncidentEnvironnementService.deleteTableLieuIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService.saveLieuIncidentEnv(model);
-          print('Inserting data in table LieuIncidentEnv : ${model.lieu}');
+          debugPrint('Inserting data in table LieuIncidentEnv : ${model.lieu}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error LieuIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error LieuIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error LieuIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception LieuIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1928,26 +2033,28 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getSourceIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService.deleteTableSourceIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = SourceIncidentEnvModel();
           model.idSource = data['id_Source'];
           model.source = data['source'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableSourceIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService.saveSourceIncidentEnv(model);
-          print('Inserting data in table SourceIncidentEnv : ${model.source}');
+          debugPrint(
+              'Inserting data in table SourceIncidentEnv : ${model.source}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error SourceIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SourceIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error SourceIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception SourceIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1960,28 +2067,30 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getCoutEstimeIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableCoutEstimeIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = CoutEstimeIncidentEnvModel();
           model.idCout = data['id_cout'];
           model.cout = data['cout'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableCoutEstimeIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService
               .saveCoutEstimeIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table CoutEstimeIncidentEnv : ${model.cout}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CoutEstimeIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CoutEstimeIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error CoutEstimeIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception CoutEstimeIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -1994,27 +2103,28 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getGraviteIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService.deleteTableGraviteIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = GraviteModel();
           model.codegravite = data['code'];
           model.gravite = data['gravite'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableGraviteIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService.saveGraviteIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table GraviteIncidentEnv : ${model.gravite}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error GraviteIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error GraviteIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error GraviteIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception GraviteIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2027,27 +2137,28 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentEnvironnementService().getSecteurIncidentEnv().then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService.deleteTableSecteurIncidentEnv();
         resp.forEach((data) async {
           //print('get site : ${data} ');
           var model = SecteurModel();
           model.codeSecteur = data['code'];
           model.secteur = data['secteur'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableSecteurIncidentEnv();
+
           //save data
           await localIncidentEnvironnementService.saveSecteurIncidentEnv(model);
-          print(
+          debugPrint(
               'Inserting data in table SecteurIncidentEnv : ${model.secteur}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error SecteurIncidentEnv", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SecteurIncidentEnv", err.toString(), Colors.red);
+        debugPrint('Error SecteurIncidentEnv : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception SecteurIncidentEnv", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2073,8 +2184,8 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table ActionIncEnvRattacher :${model.idFiche} - ${model.nAct} - ${model.act}');
         });
       }, onError: (error) {
-        ShowSnackBar.snackBar(
-            'Error ActionIncEnvRattacher', error.toString(), Colors.redAccent);
+        //ShowSnackBar.snackBar('Error ActionIncEnvRattacher', error.toString(), Colors.redAccent);
+        debugPrint('Error ActionIncEnvRattacher : ${error.toString()}');
       });
     } catch (Exception) {
       isDataProcessing(false);
@@ -2091,6 +2202,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await IncidentSecuriteService().getIncident(matricule).then((resp) async {
+        //delete table
+        await localIncidentSecuriteService.deleteTableIncidentSecurite();
         resp.forEach((data) async {
           var model = IncidentSecuriteModel();
           model.online = 1;
@@ -2107,17 +2220,15 @@ class ApiControllersCall extends GetxController {
           model.typeCause = data['typeCause'];
           model.secteur = data['secteur'];
 
-          //delete table
-          await localIncidentSecuriteService.deleteTableIncidentSecurite();
           //save data
           await localIncidentSecuriteService.saveIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentSecurite : ${model.ref} - ${model.designation}');
         });
-      }, onError: (err) {
+      }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncidentSecurite", error.toString(), Colors.red);
+        debugPrint('Error IncidentSecurite : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -2134,7 +2245,9 @@ class ApiControllersCall extends GetxController {
       await IncidentSecuriteService()
           .getChampObligatoireIncidentSecurite()
           .then((data) async {
-        //print('get champ obligatoire : ${data} ');
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableChampObligatoireIncidentSecurite();
         var model = ChampObligatoireIncidentSecuriteModel();
         model.incidentGrav = data['incident_grav'];
         model.incidentCat = data['incident_cat'];
@@ -2159,22 +2272,22 @@ class ApiControllersCall extends GetxController {
         model.comportementRisquesObserves =
             data['comportement_risques_observes'];
         model.correctionsImmediates = data['corrections_immediates'];
-        //delete table
-        await localIncidentSecuriteService
-            .deleteTableChampObligatoireIncidentSecurite();
+
         //save data
         await localIncidentSecuriteService
             .saveChampObligatoireIncidentSecurite(model);
-        print(
+        debugPrint(
             'Inserting data in table ChampObligatoireIncidentSecurite : ${data} ');
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error ChampObligatoireIncidentSecurite",
-            err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ChampObligatoireIncidentSecurite", err.toString(), Colors.red);
+        debugPrint(
+            'Error ChampObligatoireIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception ChampObligatoireIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2186,26 +2299,27 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getPosteTravailIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService.deleteTablePosteTravail();
         resp.forEach((data) async {
           var model = PosteTravailModel();
           model.code = data['code'];
           model.poste = data['poste'];
 
-          //delete table
-          await localIncidentSecuriteService.deleteTablePosteTravail();
           //save data
           await localIncidentSecuriteService.savePosteTravail(model);
-          print(
-              'Inserting data in table PosteTravail : ${model.code} - ${model.poste}');
+          debugPrint(
+              'Inserting data in table PosteTravailIncidentSecurite : ${model.code} - ${model.poste}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error PosteTravailIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PosteTravailIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error PosteTravailIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PosteTravailIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2217,26 +2331,27 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getTypeIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService.deleteTableTypeIncidentSecurite();
         resp.forEach((data) async {
           var model = TypeIncidentModel();
           model.idType = data['id_Type'];
           model.typeIncident = data['type_incident'];
 
-          //delete table
-          await localIncidentSecuriteService.deleteTableTypeIncidentSecurite();
           //save data
           await localIncidentSecuriteService.saveTypeIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeIncidentSecurite : ${model.idType} - ${model.typeIncident}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error TypeIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeIncidentSecurite", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2248,28 +2363,29 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getCategoryIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableCategoryIncidentSecurite();
         resp.forEach((data) async {
           var model = CategoryModel();
           model.idCategorie = data['idCategorie'];
           model.categorie = data['categorie'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableCategoryIncidentSecurite();
           //save data
           await localIncidentSecuriteService
               .saveCategoryIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table CategoryIncidentSecurite : ${model.idCategorie} - ${model.categorie}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CategoryIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CategoryIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error CategoryIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception CategoryIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2293,17 +2409,18 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentSecuriteService
               .saveCauseTypiqueIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table CauseTypiqueIncidentSecurite : ${model.idCauseTypique} - ${model.causeTypique}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CauseTypiqueIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CauseTypiqueIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error CauseTypiqueIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception CauseTypiqueIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2332,13 +2449,13 @@ class ApiControllersCall extends GetxController {
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            'error cause typique inc sec', error.toString(), Colors.red);
+        //ShowSnackBar.snackBar('error cause typique inc sec', error.toString(), Colors.red);
+        debugPrint('Error CauseTypiqueIncSecRattacher : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar(
-          'Exception cause typique inc sec', exception.toString(), Colors.red);
+      ShowSnackBar.snackBar('Exception cause typique inc sec rattacher',
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2350,28 +2467,29 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getTypeCauseIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableTypeCauseIncidentSecurite();
         resp.forEach((data) async {
           var model = TypeCauseIncidentModel();
           model.idTypeCause = data['id_cause'];
           model.typeCause = data['cause'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableTypeCauseIncidentSecurite();
           //save data
           await localIncidentSecuriteService
               .saveTypeCauseIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCauseIncidentSecurite : ${model.idTypeCause} - ${model.typeCause}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeCauseIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeCauseIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error TypeCauseIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception TypeCauseIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2397,17 +2515,18 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentSecuriteService
               .saveTypeCauseIncSecRattacher(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeCauseIncidentSecRattacher : ${model.idIncident} - ${model.typeCause} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeCauseIncSecR", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeCauseIncSecR", err.toString(), Colors.red);
+        debugPrint('Error TypeCauseIncSecR : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeCauseIncSecR", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2419,24 +2538,24 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getTypeConsequenceIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableTypeConsequenceIncidentSecurite();
         resp.forEach((data) async {
           var model = TypeConsequenceModel();
           model.idTypeConseq = data['id_conseq'];
           model.typeConseq = data['consequence'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableTypeConsequenceIncidentSecurite();
           //save data
           await localIncidentSecuriteService
               .saveTypeConsequenceIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeConsequenceIncidentSecurite : ${model.idTypeConseq} - ${model.typeConseq}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error TypeConsequenceIncidentSecurite",
-            err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeConsequenceIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error TypeConsequenceIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -2464,17 +2583,18 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentSecuriteService
               .saveTypeConsequenceIncSecRattacher(model);
-          print(
+          debugPrint(
               'Inserting data in table TypeConsequenceIncSecRattacher : ${model.idIncident} - ${model.typeConsequence} -idIncConseq:${model.idIncidentConseq} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeConsequenceIncSecRattacher", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeConsequenceIncSecRattacher", err.toString(), Colors.red);
+        debugPrint('Error TypeConsequenceIncSecRattacher : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception TypeConsequenceIncSecRattacher",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2487,28 +2607,29 @@ class ApiControllersCall extends GetxController {
       await IncidentSecuriteService()
           .getSiteLesionIncidentSecurite('', matricule)
           .then((resp) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableSiteLesionIncidentSecurite();
         resp.forEach((data) async {
           var model = SiteLesionModel();
           model.codeSiteLesion = data['code_siteDeLesion'];
           model.siteLesion = data['siteDeLesion'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableSiteLesionIncidentSecurite();
           //save data
           await localIncidentSecuriteService
               .saveSiteLesionIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table SiteLesionIncidentSecurite : ${model.codeSiteLesion} - ${model.siteLesion}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error SiteLesionIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SiteLesionIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error SiteLesionIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception SiteLesion", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2533,13 +2654,14 @@ class ApiControllersCall extends GetxController {
           //save data
           await localIncidentSecuriteService
               .saveSiteLesionIncSecRattacher(model);
-          print(
+          debugPrint(
               'Inserting data in table SiteLesionIncidentSecuriteRattacher : ${model.idIncident} - ${model.siteLesion}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error SiteLesionIncidentSecuriteRattacher",
-            err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SiteLesionIncidentSecuriteRattacher", err.toString(), Colors.red);
+        debugPrint(
+            'Error SiteLesionIncidentSecuriteRattacher : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -2556,27 +2678,27 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getGraviteIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService.deleteTableGraviteIncidentSecurite();
         resp.forEach((data) async {
           var model = GraviteModel();
           model.codegravite = data['codegravite'];
           model.gravite = data['gravite'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableGraviteIncidentSecurite();
           //save data
           await localIncidentSecuriteService.saveGraviteIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table GraviteIncidentSecurite : ${model.codegravite} - ${model.gravite}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error GraviteIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error GraviteIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error GraviteIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception GraviteIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2588,27 +2710,27 @@ class ApiControllersCall extends GetxController {
       //rest api
       await IncidentSecuriteService().getSecteurIncidentSecurite().then(
           (resp) async {
+        //delete table
+        await localIncidentSecuriteService.deleteTableSecteurIncidentSecurite();
         resp.forEach((data) async {
           var model = SecteurModel();
           model.codeSecteur = data['code'];
           model.secteur = data['secteur'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableSecteurIncidentSecurite();
           //save data
           await localIncidentSecuriteService.saveSecteurIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table SecteurIncidentSecurite : ${model.codeSecteur} - ${model.secteur}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error SecteurIncidentSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SecteurIncidentSecurite", err.toString(), Colors.red);
+        debugPrint('Error SecteurIncidentSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception SecteurIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2619,27 +2741,29 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       await IncidentSecuriteService().getCoutEstemeIncidentSecurite().then(
           (response) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableCoutEstimeIncidentSecurite();
         response.forEach((element) async {
           var model = CoutEstimeIncidentEnvModel();
           model.idCout = element['id_cout'];
           model.cout = element['cout'];
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableCoutEstimeIncidentSecurite();
+
           //save data
           await localIncidentSecuriteService
               .saveCoutEstimeIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table CoutEstimeIncidentSecurite : ${model.idCout} - ${model.cout}');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CoutEstemeIncedentSecurite", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CoutEstemeIncedentSecurite", error.toString(), Colors.red);
+        debugPrint('Error CoutEstemeIncedentSecurite : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception CoutEstemeIncedentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2652,28 +2776,30 @@ class ApiControllersCall extends GetxController {
       await IncidentSecuriteService()
           .getEvenementDeclencheurIncidentSecurite()
           .then((resp) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableEvenementDeclencheurIncidentSecurite();
         resp.forEach((data) async {
           var model = EvenementDeclencheurModel();
           model.idEvent = data['id_Event'];
           model.event = data['evenement'];
 
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableEvenementDeclencheurIncidentSecurite();
           //save data
           await localIncidentSecuriteService
               .saveEvenementDeclencheurIncidentSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table EvenementDeclencheurIncidentSecurite : ${model.idEvent} - ${model.event}');
         });
-      }, onError: (err) {
+      }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error EvenementDeclencheurIncidentSecurite",
-            err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error EvenementDeclencheurIncidentSecurite", error.toString(), Colors.red);
+        debugPrint(
+            'Error EvenementDeclencheurIncidentSecurite : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception EvenementDeclencheurIncidentSecurite",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2696,8 +2822,8 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table ActionIncSecRattacher :${model.idFiche} - ${model.nAct} - ${model.act}');
         });
       }, onError: (error) {
-        ShowSnackBar.snackBar(
-            'Error ActionIncSecRattacher', error.toString(), Colors.redAccent);
+        // ShowSnackBar.snackBar('Error ActionIncSecRattacher', error.toString(), Colors.redAccent);
+        debugPrint('Error ActionIncSecRattacher : ${error.toString()}');
       });
     } catch (Exception) {
       isDataProcessing(false);
@@ -2715,6 +2841,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       await VisiteSecuriteService().getVisiteSecurite(matricule).then(
           (resp) async {
+        //delete table
+        await localVisiteSecuriteService.deleteTableVisiteSecurite();
         resp.forEach((data) async {
           var model = VisiteSecuriteModel();
           model.online = 1;
@@ -2724,17 +2852,15 @@ class ApiControllersCall extends GetxController {
           model.unite = data['unite'];
           model.zone = data['zone'];
 
-          //delete table
-          await localVisiteSecuriteService.deleteTableVisiteSecurite();
           //save data
           await localVisiteSecuriteService.saveVisiteSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table VisiteSecurite : ${model.id} - ${model.unite} - ${model.zone}');
         });
-      }, onError: (err) {
+      }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error VisiteSecurite", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error VisiteSecurite", error.toString(), Colors.red);
+        debugPrint('Error VisiteSecurite : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -2749,26 +2875,28 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await VisiteSecuriteService().getCheckList().then((resp) async {
+        //delete table
+        await localVisiteSecuriteService.deleteTableCheckList();
         resp.forEach((data) async {
           var model = CheckListModel();
           model.idCheck = data['id_Check'];
           model.code = data['code'];
           model.checklist = data['checklist'];
 
-          //delete table
-          await localVisiteSecuriteService.deleteTableCheckList();
           //save data
           await localVisiteSecuriteService.saveCheckList(model);
-          print(
+          debugPrint(
               'Inserting data in table CheckList : ${model.idCheck} - ${model.checklist}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error CheckList", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CheckList VS", err.toString(), Colors.red);
+        debugPrint('Error CheckList VS : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception CheckList VS", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2779,27 +2907,28 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await VisiteSecuriteService().getUniteVisiteSecurite().then((resp) async {
+        //delete table
+        await localVisiteSecuriteService.deleteTableUniteVisiteSecurite();
         resp.forEach((data) async {
           var model = UniteModel();
           model.idUnite = data['id_unite'];
           model.code = data['code'];
           model.unite = data['unite'];
 
-          //delete table
-          await localVisiteSecuriteService.deleteTableUniteVisiteSecurite();
           //save data
           await localVisiteSecuriteService.saveUniteVisiteSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table UniteVisiteSecurite : ${model.idUnite} - ${model.unite}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error UniteVisiteSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error UniteVisiteSecurite", err.toString(), Colors.red);
+        debugPrint('Error UniteVisiteSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception UniteVisiteSecurite", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2810,6 +2939,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await VisiteSecuriteService().getZone().then((resp) async {
+        //delete table
+        await localVisiteSecuriteService.deleteTableZoneVisiteSecurite();
         resp.forEach((data) async {
           var model = ZoneModel();
           model.idZone = data['id_Zone'];
@@ -2817,21 +2948,20 @@ class ApiControllersCall extends GetxController {
           model.code = data['codeZone'];
           model.zone = data['zone'];
 
-          //delete table
-          await localVisiteSecuriteService.deleteTableZoneVisiteSecurite();
           //save data
           await localVisiteSecuriteService.saveZoneVisiteSecurite(model);
-          print(
+          debugPrint(
               'Inserting data in table ZoneVisiteSecurite : ${model.idZone} - ${model.zone}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ZoneVisiteSecurite", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ZoneVisiteSecurite", err.toString(), Colors.red);
+        debugPrint('Error ZoneVisiteSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ZoneVisiteSecurite", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2843,20 +2973,22 @@ class ApiControllersCall extends GetxController {
       //rest api
       await VisiteSecuriteService().getSiteVisiteSecurite(matricule).then(
           (resp) async {
+        //delete table
+        await localVisiteSecuriteService.deleteTableSiteVisiteSecurite();
         resp.forEach((data) async {
           var model = SiteModel();
           model.codesite = data['codesite'];
           model.site = data['site'];
 
-          //delete table
-          await localVisiteSecuriteService.deleteTableSiteVisiteSecurite();
           //save data
           await localVisiteSecuriteService.saveSiteVisiteSecurite(model);
-          print('Inserting data in table SiteVisiteSecurite : ${model.site}');
+          debugPrint(
+              'Inserting data in table SiteVisiteSecurite : ${model.site}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error  ", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error SiteVisiteSecurite ", err.toString(), Colors.red);
+        debugPrint('Error SiteVisiteSecurite : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -2873,6 +3005,9 @@ class ApiControllersCall extends GetxController {
       //rest api
       await VisiteSecuriteService().getEquipeVisiteSecurite(0).then(
           (resp) async {
+        //delete table
+        await localVisiteSecuriteService
+            .deleteTableEquipeVisiteSecuriteOffline();
         resp.forEach((data) async {
           var model = EquipeVisiteSecuriteModel();
           model.online = 1;
@@ -2881,23 +3016,21 @@ class ApiControllersCall extends GetxController {
           model.mat = data['resp'];
           model.nompre = data['nomPre'];
 
-          //delete table
-          await localVisiteSecuriteService
-              .deleteTableEquipeVisiteSecuriteOffline();
           //save data
           await localVisiteSecuriteService
               .saveEquipeVisiteSecuriteOffline(model);
-          print(
+          debugPrint(
               'Inserting data in table EquipeVisiteSecuriteOffline : ${model.id} - ${model.nompre}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error EquipeVisiteSecuriteFromAPI", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error EquipeVisiteSecuriteFromAPI", err.toString(), Colors.red);
+        debugPrint('Error EquipeVisiteSecuriteFromAPI : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception EquipeVisiteSecurite", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -2926,8 +3059,8 @@ class ApiControllersCall extends GetxController {
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CheckListVSRattacher", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CheckListVSRattacher", err.toString(), Colors.red);
+        debugPrint('Error CheckListVSRattacher : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -2952,8 +3085,8 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table TauxCheckListVS :${model.id} - ${model.taux}');
         });
       }, onError: (error) {
-        ShowSnackBar.snackBar(
-            'Error TauxCheckListVS', error.toString(), Colors.redAccent);
+        //ShowSnackBar.snackBar('Error TauxCheckListVS', error.toString(), Colors.redAccent);
+        debugPrint('Error TauxCheckListVS : ${error.toString()}');
       });
     } catch (Exception) {
       isDataProcessing(false);
@@ -2981,8 +3114,8 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table ActionVSRattacher :${model.idFiche} - ${model.nAct} - ${model.act}');
         });
       }, onError: (error) {
-        ShowSnackBar.snackBar(
-            'Error ActionVSRattacher', error.toString(), Colors.redAccent);
+        //ShowSnackBar.snackBar('Error ActionVSRattacher', error.toString(), Colors.redAccent);
+        debugPrint('Error ActionVSRattacher : ${error.toString()}');
       });
     } catch (Exception) {
       isDataProcessing(false);
@@ -3000,6 +3133,9 @@ class ApiControllersCall extends GetxController {
       //rest api
       //final listAudit = await AuditService().getAudits() as List<AuditModel>;
       await AuditService().getAudits().then((resp) async {
+        //delete table
+        await localAuditService.deleteTableAudit();
+
         resp.forEach((data) async {
           var model = AuditModel();
           model.online = 1;
@@ -3022,21 +3158,20 @@ class ApiControllersCall extends GetxController {
           } else {
             model.rapportClot = data.rapportClot;
           }
-
-          //delete table
-          await localAuditService.deleteTableAudit();
           //save data
           await localAuditService.saveAudit(model);
-          print(
+          debugPrint(
               'Inserting data in table Audit : ${model.idAudit} - ${model.champ}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error Audits", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Audits", err.toString(), Colors.red);
+        debugPrint('Error Audit : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Audit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3049,6 +3184,9 @@ class ApiControllersCall extends GetxController {
       //final listAudit = await AuditService().getAudits() as List<AuditModel>;
       await AuditService().getConstatAudit(0, '%24_act_prov').then(
           (resp) async {
+        //delete table
+        await localAuditService.deleteTableConstatAudit();
+
         resp.forEach((data) async {
           var model = ConstatAuditModel();
           model.online = 1;
@@ -3083,17 +3221,15 @@ class ApiControllersCall extends GetxController {
             model.delaiReal = data['delaiReal'];
           }
 
-          //delete table
-          await localAuditService.deleteTableConstatAudit();
           //save data
           await localAuditService.saveConstatAudit(model);
-          print(
+          debugPrint(
               'Inserting data in table ConstatAudit Action Prov : ${model.refAudit} - ${model.idAudit} - ${model.champ}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error Constat Audits", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error Constat Audits", err.toString(), Colors.red);
+        debugPrint('Error Constat Audit : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -3147,17 +3283,18 @@ class ApiControllersCall extends GetxController {
           //await localAuditService.deleteTableConstatAudit();
           //save data
           await localAuditService.saveConstatAudit(model);
-          print(
+          debugPrint(
               'Inserting data in table ConstatAudit Action : ${model.refAudit} - ${model.idAudit} - ${model.champ}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error Constat Audits", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error Constat Audits", err.toString(), Colors.red);
+        debugPrint('Error Constat Audits : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception Constat Audits", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3166,6 +3303,8 @@ class ApiControllersCall extends GetxController {
   Future<void> getAuditeurInterne() async {
     try {
       await AuditService().getAuditeurInterne(0).then((response) async {
+        //delete table local
+        await localAuditService.deleteTableAuditeurInterne();
         response.forEach((data) async {
           var model = AuditeurModel();
           model.online = 1;
@@ -3173,24 +3312,21 @@ class ApiControllersCall extends GetxController {
           model.mat = data['mat'];
           model.nompre = data['nomPre'];
           model.affectation = data['affectation'];
-          //delete table local
-          await localAuditService.deleteTableAuditeurInterne();
+
           //save data in db local
           await localAuditService.saveAuditeurInterne(model);
-          print(
+          debugPrint(
               'Inserting data in table AuditeurInterne : ${model.refAudit} - ${model.nompre}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AuditeurInterne", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AuditeurInterne", error.toString(), Colors.red);
+        debugPrint('Error AuditeurInterne : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception AuditeurInterne", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3199,29 +3335,28 @@ class ApiControllersCall extends GetxController {
   Future<void> getAuditeurInterneARattacher() async {
     try {
       await AuditService().getAuditeurInterneToAdd(0).then((response) async {
+        //delete table local
+        await localAuditService.deleteTableAuditeurInterneARattacher();
         response.forEach((data) async {
           var model = AuditeurModel();
           model.refAudit = data['refAudit'];
           model.mat = data['mat'];
           model.nompre = data['nompre'];
-          //delete table local
-          await localAuditService.deleteTableAuditeurInterneARattacher();
+
           //save data in db local
           await localAuditService.saveAuditeurInterneARattacher(model);
-          print(
+          debugPrint(
               'Inserting data in table AuditeurInterneARattacher : ${model.refAudit} - ${model.nompre}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AuditeurInterneARattacher", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AuditeurInterneARattacher", error.toString(), Colors.red);
+        debugPrint('Error AuditeurInterneARattacher : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception AuditeurInterneARattacher",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3230,27 +3365,27 @@ class ApiControllersCall extends GetxController {
   Future<void> getChampAudit() async {
     try {
       await AuditService().getChampAudit(matricule).then((response) async {
+        //delete table local
+        await localAuditService.deleteTableChampAudit();
         response.forEach((element) async {
           var model = ChampAuditModel();
           model.codeChamp = element['codeChamp'];
           model.champ = element['champ'];
           model.criticite = element['criticite'];
-          //delete table local
-          await localAuditService.deleteTableChampAudit();
+
           //save data in db local
           await localAuditService.saveChampAudit(model);
-          print('Inserting data in table ChampAudit : ${model.champ}');
+          debugPrint('Inserting data in table ChampAudit : ${model.champ}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error ChampAudit", error.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error ChampAudit", error.toString(), Colors.red);
+        debugPrint('Error ChampAudit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ChampAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3259,6 +3394,8 @@ class ApiControllersCall extends GetxController {
   Future<void> getChampAuditByRefAudit() async {
     try {
       await AuditService().getChampAuditByFiche(0).then((response) async {
+        //delete table local
+        await localAuditService.deleteTableChampAuditConstat();
         response.forEach((element) async {
           var model = ChampAuditModel();
           model.online = 1;
@@ -3266,24 +3403,21 @@ class ApiControllersCall extends GetxController {
           model.champ = element['champ'];
           model.criticite = element['criticite'];
           model.refAudit = element['refAudit'];
-          //delete table local
-          await localAuditService.deleteTableChampAuditConstat();
+
           //save data in db local
           await localAuditService.saveChampAuditConstat(model);
-          print(
-              'Inserting data in table ChampAuditConstat : ${model.refAudit} - ${model.champ}');
+          debugPrint(
+              'Inserting data in table ChampAuditByRefAudit : ${model.refAudit} - ${model.champ}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeConstatAudit", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ChampAuditByRefAudit", error.toString(), Colors.red);
+        debugPrint('Error ChampAuditByRefAudit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ChampAuditByRefAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3300,18 +3434,17 @@ class ApiControllersCall extends GetxController {
           model.type = element['typeA'];
           //save data in db local
           await localAuditService.saveTypeAudit(model);
-          print('Inserting data in table TypeAudit : ${model.type}');
+          debugPrint('Inserting data in table TypeAudit : ${model.type}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error TypeAudit : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error TypeAudit", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error TypeAudit", error.toString(), Colors.red);
+        debugPrint('Error TypeAudit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3322,24 +3455,26 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       await AuditService().getGraviteAudit().then((resp) async {
+        //delete table
+        await localAuditService.deleteTableGraviteAudit();
         resp.forEach((data) async {
-          //print('get site : ${data} ');
           var model = GraviteModel();
           model.codegravite = data['nGravite'];
           model.gravite = data['gravite'];
-          //delete table
-          await localAuditService.deleteTableGraviteAudit();
+
           //save data
           await localAuditService.saveGraviteAudit(model);
-          print('Inserting data in table GraviteAudit : ${model.gravite}');
+          debugPrint('Inserting data in table GraviteAudit : ${model.gravite}');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error GraviteAudit", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error GraviteAudit", err.toString(), Colors.red);
+        debugPrint('Error GraviteAudit : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception GraviteAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3360,16 +3495,14 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table TypeConstatAudit : ${model.type}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error TypeConstatAudit", error.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error TypeConstatAudit", error.toString(), Colors.red);
+        debugPrint('Error TypeConstatAudit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception TypeConstatAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3395,8 +3528,8 @@ class ApiControllersCall extends GetxController {
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CheckList Audit", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CheckList Audit", error.toString(), Colors.red);
+        debugPrint('Error CheckList Audit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -3428,8 +3561,8 @@ class ApiControllersCall extends GetxController {
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error CritereCheckListAudit", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error CritereCheckListAudit", error.toString(), Colors.red);
+        debugPrint('Error CritereCheckListAudit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -3459,12 +3592,9 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table AuditeurExterneRattacher : ${model.refAudit} - ${model.nompre}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AuditeurExterneRattacher", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AuditeurExterneRattacher", error.toString(), Colors.red);
+        debugPrint('Error AuditeurExterneRattacher : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -3491,12 +3621,9 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table AllAuditeursExterne : ${model.code} - ${model.nompre}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AllAuditeursExterne", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AllAuditeursExterne", error.toString(), Colors.red);
+        debugPrint('Error AllAuditeursExterne : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -3524,12 +3651,9 @@ class ApiControllersCall extends GetxController {
               'Inserting data in table EmployeHabiliteAudit : ${model.refAudit} - ${model.nompre}');
         });
       }, onError: (error) {
-        if (kDebugMode) {
-          print('error : ${error.toString()}');
-        }
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error EmployeHabiliteAudit", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error EmployeHabiliteAudit", error.toString(), Colors.red);
+        debugPrint('Error EmployeHabiliteAudit : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -3558,6 +3682,8 @@ class ApiControllersCall extends GetxController {
         "filtre_nact": ""
       }).then((resp) async {
         //isDataProcessing(false);
+        //delete table
+        await localActionService.deleteAllActionRealisation();
         resp.forEach((data) async {
           var model = ActionRealisationModel();
           model.nomPrenom = data['nompre'];
@@ -3584,23 +3710,21 @@ class ApiControllersCall extends GetxController {
           model.priorite = data['priorite'];
           model.gravite = data['gravite'];
           model.returnRespS = data['returnRespS'];
-
           listActionReal.add(model);
-          //delete table
-          await localActionService.deleteAllActionRealisation();
           //save data
           await localActionService.saveActionRealisation(model);
-          print(
+          debugPrint(
               'Inserting data in table ActionRealisation : ${model.nAct} - ${model.sousAct} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ActionsRealisation", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ActionsRealisation", err.toString(), Colors.red);
+        debugPrint('Error ActionsRealisation : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ActionsRealisation", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3617,9 +3741,9 @@ class ApiControllersCall extends GetxController {
         "ch_s": "0",
         "nact": 0,
         "nsact": ""
-      }).then((resp) {
-        //print('response: $resp');
-        //isDataProcessing(false);
+      }).then((resp) async {
+        //delete table
+        await localActionService.deleteAllActionSuivi();
         resp.forEach((data) async {
           var model = ActionSuiviModel();
           model.nSousAct = data['nSousAct'];
@@ -3644,20 +3768,21 @@ class ApiControllersCall extends GetxController {
           model.priorite = data['priorite'];
           model.gravite = data['gravite'];
           listActionSuivi.add(model);
-          //delete table
-          await localActionService.deleteAllActionSuivi();
+
           //save data
           await localActionService.saveActionSuivi(model);
-          print(
+          debugPrint(
               'Inserting data in table ActionSuivi : ${model.nAct} - ${model.sousAct} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error ActionsSuivi", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ActionsSuivi", err.toString(), Colors.red);
+        debugPrint('Error ActionsSuivi : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ActionsSuivi", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3670,6 +3795,8 @@ class ApiControllersCall extends GetxController {
 
       //rest api
       await ActionService().getActionSuiteAudit(matricule).then((resp) async {
+        //delete table
+        await localActionService.deleteAllActionSuiteAudit();
         resp.forEach((data) async {
           var model = ActionSuiteAudit();
           model.nact = data['nact'];
@@ -3677,23 +3804,22 @@ class ApiControllersCall extends GetxController {
           model.ind = data['ind'];
           model.datsuivPrv = data['datsuiv_prv'];
           model.isd = data['isd'];
-
           listActionSuiteAudit.add(model);
-          //delete table
-          await localActionService.deleteAllActionSuiteAudit();
+
           //save data
           await localActionService.saveActionSuiteAudit(model);
-          print(
+          debugPrint(
               'Inserting data in table ActionSuiteAudit : ${model.nact} - ${model.act} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ActionsSuiteAudit", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ActionsSuiteAudit", err.toString(), Colors.red);
+        debugPrint('Error ActionsSuiteAudit : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ActionsSuiteAudit", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3708,6 +3834,9 @@ class ApiControllersCall extends GetxController {
       //rest api
       PNCService().getPNCAValider(matricule).then((resp) async {
         //isDataProcessing(false);
+        //delete table
+        await localPNCService.deleteTablePNCValider();
+
         resp.forEach((data) async {
           var model = PNCCorrigerModel();
           model.nnc = data['nnc'];
@@ -3722,20 +3851,21 @@ class ApiControllersCall extends GetxController {
           model.dateT = data['dateT'];
           model.dateST = data['dateST'];
           model.ninterne = data['ninterne'];
-          //delete table
-          await localPNCService.deleteTablePNCValider();
+
           //save data
           await localPNCService.savePNCValider(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCValider : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNCAValider", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNCAValider", err.toString(), Colors.red);
+        debugPrint('Error PNCAValider : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNCAValider", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3748,6 +3878,9 @@ class ApiControllersCall extends GetxController {
       //rest api
       PNCService().getPNCACorriger(matricule).then((resp) async {
         //isDataProcessing(false);
+        //delete table
+        await localPNCService.deleteTablePNCACorriger();
+
         resp.forEach((data) async {
           var model = PNCCorrigerModel();
           model.nnc = data['nnc'];
@@ -3763,20 +3896,20 @@ class ApiControllersCall extends GetxController {
           model.dateT = data['dateT'];
           model.dateST = data['dateST'];
           model.ninterne = data['ninterne'];
-          //delete table
-          await localPNCService.deleteTablePNCACorriger();
           //save data
           await localPNCService.savePNCACorriger(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCACorriger : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNCACorriger", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error PNCACorriger", err.toString(), Colors.red);
+        debugPrint('Error PNCACorriger : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNCACorriger", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3806,17 +3939,18 @@ class ApiControllersCall extends GetxController {
           model.commentaire = data['commentaire'];
           //save data
           await localPNCService.savePNCDecision(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCDecision : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error PNC Decision Traitement", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNC Decision Traitement", err.toString(), Colors.red);
+        debugPrint('Error PNC Decision Traitement : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNC Decision Traitement",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3833,6 +3967,9 @@ class ApiControllersCall extends GetxController {
         "nnc": ""
       }).then((resp) async {
         //isDataProcessing(false);
+        //delete table
+        await localPNCService.deleteTablePNCATraiter();
+
         resp.forEach((data) async {
           var model = PNCTraiterModel();
           model.nnc = data['nnc'];
@@ -3850,20 +3987,20 @@ class ApiControllersCall extends GetxController {
           model.nomClt = data['nomClt'];
           model.traitement = data['traitement'];
           model.typeT = data['typeT'];
-          //delete table
-          await localPNCService.deleteTablePNCATraiter();
           //save data
           await localPNCService.savePNCATraiter(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCATraiter : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNCATraiter", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNCATraiter", err.toString(), Colors.red);
+        debugPrint('Error PNCATraiter : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNCATraiter", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3876,6 +4013,8 @@ class ApiControllersCall extends GetxController {
 
       //rest api
       PNCService().getPNCInvestigationApprouver(matricule).then((resp) async {
+        //delete table
+        await localPNCService.deleteTablePNCInvestigationApprouver();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = PNCSuivreModel();
@@ -3888,21 +4027,20 @@ class ApiControllersCall extends GetxController {
           model.nlot = data['nlot'];
           model.ind = data['ind'];
           model.nomClt = data['nomClt'];
-          //delete table
-          await localPNCService.deleteTablePNCInvestigationApprouver();
           //save data
           await localPNCService.savePNCInvestigationApprouver(model);
-          print(
+          debugPrint(
               'Inserting data in table InvestigationApprouver : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error PNCInvestigationApprouver", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNCInvestigationApprouver", err.toString(), Colors.red);
+        debugPrint('Error PNCInvestigationApprouver : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNCInvestigationApprouver",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3915,6 +4053,8 @@ class ApiControllersCall extends GetxController {
 
       //rest api
       PNCService().getPNCInvestigationEffectuer(matricule).then((resp) async {
+        //delete table
+        await localPNCService.deleteTablePNCInvestigationEffectuer();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = PNCSuivreModel();
@@ -3927,21 +4067,20 @@ class ApiControllersCall extends GetxController {
           model.nlot = data['nlot'];
           model.ind = data['ind'];
           model.nomClt = data['nomClt'];
-          //delete table
-          await localPNCService.deleteTablePNCInvestigationEffectuer();
           //save data
           await localPNCService.savePNCInvestigationEffectuer(model);
-          print(
+          debugPrint(
               'Inserting data in table InvestigationEffectuer : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error PNCInvestigationEffectuer", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNCInvestigationEffectuer", err.toString(), Colors.red);
+        debugPrint('Error InvestigationEffectuer : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception InvestigationEffectuer", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3954,6 +4093,8 @@ class ApiControllersCall extends GetxController {
 
       //rest api
       PNCService().getPNCASuivre(matricule).then((resp) async {
+        //delete table
+        await localPNCService.deleteTablePNCASuivre();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = PNCSuivreModel();
@@ -3969,20 +4110,21 @@ class ApiControllersCall extends GetxController {
           model.traitee = data['traitee'];
           model.nc = data['nc'];
           model.nomClt = data['nomClt'];
-          //delete table
-          await localPNCService.deleteTablePNCASuivre();
+
           //save data
           await localPNCService.savePNCASuivre(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCASuivre : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNCASuivre", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNCASuivre", err.toString(), Colors.red);
+        debugPrint('Error PNCASuivre : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNCASuivre", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -3994,6 +4136,8 @@ class ApiControllersCall extends GetxController {
       isDataProcessing(true);
       //rest api
       PNCService().getApprobationFinale(matricule).then((resp) async {
+        //delete table
+        await localPNCService.deleteTablePNCApprobationFinale();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = PNCSuivreModel();
@@ -4006,21 +4150,21 @@ class ApiControllersCall extends GetxController {
           model.nlot = data['nlot'];
           model.ind = data['ind'];
           model.nomClt = data['nomClt'];
-          //delete table
-          await localPNCService.deleteTablePNCApprobationFinale();
+
           //save data
           await localPNCService.savePNCApprobationFinale(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCApprobationFinale : ${model.nnc} - ${model.produit} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error PNCApprobationFinale", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error PNCApprobationFinale", err.toString(), Colors.red);
+        debugPrint('Error PNCApprobationFinale : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception PNCApprobationFinale", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4033,6 +4177,8 @@ class ApiControllersCall extends GetxController {
       //rest api
       PNCService().getPNCValiderDecisionTraitement(matricule).then(
           (resp) async {
+        //delete table
+        await localPNCService.deleteTablePNCDecisionValidation();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = PNCValidationTraitementModel();
@@ -4044,21 +4190,21 @@ class ApiControllersCall extends GetxController {
           model.codePdt = data['codePdt'];
           model.nc = data['nc'];
           model.nomClt = data['nomClt'];
-          //delete table
-          await localPNCService.deleteTablePNCDecisionValidation();
+
           //save data
           await localPNCService.savePNCDecisionValidation(model);
-          print(
+          debugPrint(
               'Inserting data in table PNCDecisionValidation : ${model.nnc} - ${model.nc} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error PNCDecisionTraitementAValidater",
-            err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error PNCDecisionTraitementAValidater", err.toString(), Colors.red);
+        debugPrint('Error PNCDecisionTraitementAValidater : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception PNCDecisionTraitementAValidater",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4069,9 +4215,10 @@ class ApiControllersCall extends GetxController {
   Future<void> getReunionInformer() async {
     try {
       isDataProcessing(true);
-
       //rest api
       ReunionService().getReunionInformer(matricule).then((resp) async {
+        //delete table
+        await localReunionService.deleteTableReunionInformer();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = ReunionModel();
@@ -4080,21 +4227,21 @@ class ApiControllersCall extends GetxController {
           model.datePrev = data['datePrev'];
           model.heureDeb = data['heureDeb'];
           model.lieu = data['lieu'];
-          //delete table
-          await localReunionService.deleteTableReunionInformer();
+
           //save data
           await localReunionService.saveReunionInformer(model);
-          print(
+          debugPrint(
               'Inserting data in table ReunionInformer : ${model.nReunion} - ${model.typeReunion} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ReunionInformer", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ReunionInformer", err.toString(), Colors.red);
+        debugPrint('Error ReunionInformer : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ReunionInformer", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4107,6 +4254,8 @@ class ApiControllersCall extends GetxController {
 
       //rest api
       ReunionService().getReunionPlanifier(matricule).then((resp) async {
+        //delete table
+        await localReunionService.deleteTableReunionPlanifier();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = ReunionModel();
@@ -4117,21 +4266,21 @@ class ApiControllersCall extends GetxController {
           model.heureDeb = data['heureDeb'];
           model.heureFin = data['heureFin'];
           model.lieu = data['lieu'];
-          //delete table
-          await localReunionService.deleteTableReunionPlanifier();
+
           //save data
           await localReunionService.saveReunionPlanifier(model);
-          print(
+          debugPrint(
               'Inserting data in table ReunionPlanifier : ${model.nReunion} - ${model.typeReunion} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error ReunionPlanifier", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error ReunionPlanifier", err.toString(), Colors.red);
+        debugPrint('Error ReunionPlanifier : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception ReunionPlanifier", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4147,29 +4296,31 @@ class ApiControllersCall extends GetxController {
       IncidentEnvironnementService()
           .getListIncidentEnvDecisionTraitement(matricule)
           .then((resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableIncidentEnvDecisionTraitement();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = IncidentEnvAgendaModel();
           model.nIncident = data['nIncident'];
           model.incident = data['incident'];
           model.dateDetect = data['date_detect'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableIncidentEnvDecisionTraitement();
+
           //save data
           await localIncidentEnvironnementService
               .saveIncidentEnvDecisionTraitement(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentEnvDecisionTraitement : ${model.nIncident} - ${model.incident} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentEnvDecisionTraitement", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncEnvDecisionTraitement", err.toString(), Colors.red);
+        debugPrint('Error IncEnvDecisionTraitement : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception IncEnvDecisionTraitement",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4183,29 +4334,31 @@ class ApiControllersCall extends GetxController {
       //rest api
       IncidentEnvironnementService().getListIncidentEnvATraiter(matricule).then(
           (resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableIncidentEnvATraiter();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = IncidentEnvAgendaModel();
           model.nIncident = data['nIncident'];
           model.incident = data['incident'];
           model.dateDetect = data['date_detect'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableIncidentEnvATraiter();
+
           //save data
           await localIncidentEnvironnementService
               .saveIncidentEnvATraiter(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentEnvATraiter : ${model.nIncident} - ${model.incident} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentEnvATraiter", err.toString(), Colors.red);
+        // ShowSnackBar.snackBar("Error IncidentEnvATraiter", err.toString(), Colors.red);
+        debugPrint('Error IncEnvATraiter : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception IncEnvATraiter", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4219,29 +4372,31 @@ class ApiControllersCall extends GetxController {
       IncidentEnvironnementService()
           .getListIncidentEnvACloturer(matricule)
           .then((resp) async {
+        //delete table
+        await localIncidentEnvironnementService
+            .deleteTableIncidentEnvACloturer();
         //isDataProcessing(false);
         resp.forEach((data) async {
           var model = IncidentEnvAgendaModel();
           model.nIncident = data['nIncident'];
           model.incident = data['incident'];
           model.dateDetect = data['date_detect'];
-          //delete table
-          await localIncidentEnvironnementService
-              .deleteTableIncidentEnvACloturer();
+
           //save data
           await localIncidentEnvironnementService
               .saveIncidentEnvACloturer(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentEnvACloturer : ${model.nIncident} - ${model.incident} ');
         });
       }, onError: (err) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentEnvACloturer", err.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncidentEnvACloturer", err.toString(), Colors.red);
+        debugPrint('Error IncEnvACloturer : ${err.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar(
+          "Exception IncEnvACloturer", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4254,28 +4409,30 @@ class ApiControllersCall extends GetxController {
       await IncidentSecuriteService()
           .getListIncidentSecuriteDecisionTraitement(matricule)
           .then((response) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableIncidentSecuriteDecisionTraitement();
         response.forEach((data) async {
           var model = IncidentSecuriteAgendaModel();
           model.ref = data['ref'];
           model.designation = data['designation'];
           model.dateInc = data['date_inc'];
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableIncidentSecuriteDecisionTraitement();
+
           //save data
           await localIncidentSecuriteService
               .saveIncidentSecuriteDecisionTraitement(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentSecuriteDecisionTraitement : ${model.ref} - ${model.designation} ');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar("Error IncidentSecuriteDecisionTraitement",
-            error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncidentSecuriteDecisionTraitement", error.toString(), Colors.red);
+        debugPrint('Error IncSecDecisionTraitement : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
-      ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
+      ShowSnackBar.snackBar("Exception IncSecDecisionTraitement",
+          exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }
@@ -4287,24 +4444,26 @@ class ApiControllersCall extends GetxController {
       await IncidentSecuriteService()
           .getListIncidentSecuriteATraiter(matricule)
           .then((response) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableIncidentSecuriteATraiter();
+
         response.forEach((data) async {
           var model = IncidentSecuriteAgendaModel();
           model.ref = data['ref'];
           model.designation = data['designation'];
           model.dateInc = data['date_inc'];
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableIncidentSecuriteATraiter();
+
           //save data
           await localIncidentSecuriteService
               .saveIncidentSecuriteATraiter(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentSecuriteATraiter : ${model.ref} - ${model.designation} ');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentSecuriteATraiter", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncidentSecuriteATraiter", error.toString(), Colors.red);
+        debugPrint('Error IncSecDecisionATraiter : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -4321,24 +4480,26 @@ class ApiControllersCall extends GetxController {
       await IncidentSecuriteService()
           .getListIncidentSecuriteACloturer(matricule)
           .then((response) async {
+        //delete table
+        await localIncidentSecuriteService
+            .deleteTableIncidentSecuriteACloturer();
+
         response.forEach((data) async {
           var model = IncidentSecuriteAgendaModel();
           model.ref = data['ref'];
           model.designation = data['designation'];
           model.dateInc = data['date_inc'];
-          //delete table
-          await localIncidentSecuriteService
-              .deleteTableIncidentSecuriteACloturer();
+
           //save data
           await localIncidentSecuriteService
               .saveIncidentSecuriteACloturer(model);
-          print(
+          debugPrint(
               'Inserting data in table IncidentSecuriteACloturer : ${model.ref} - ${model.designation} ');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error IncidentSecuriteACloturer", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error IncidentSecuriteACloturer", error.toString(), Colors.red);
+        debugPrint('Error IncSecDecisionACloturer : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -4354,6 +4515,8 @@ class ApiControllersCall extends GetxController {
     try {
       isDataProcessing(true);
       await AuditService().getAuditsEnTantQueAudite().then((response) async {
+        //delete table
+        await localAuditService.deleteTableAuditAudite();
         response.forEach((element) async {
           var model = new AuditModel();
           model.idAudit = element['idAudit'];
@@ -4361,17 +4524,16 @@ class ApiControllersCall extends GetxController {
           model.champ = element['champ'];
           model.dateDebPrev = element['dateDebPrev'];
           model.interne = element['interne'];
-          //delete table
-          await localAuditService.deleteTableAuditAudite();
+
           //save data
           await localAuditService.saveAuditAudite(model);
-          print(
+          debugPrint(
               'Inserting data in table AuditAudite : ${model.idAudit} - ${model.champ} ');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AuditAudite", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AuditAudite", error.toString(), Colors.red);
+        debugPrint('Error AuditAudite : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -4386,6 +4548,8 @@ class ApiControllersCall extends GetxController {
     try {
       isDataProcessing(true);
       await AuditService().getAuditsEnTantQueAuditeur().then((response) async {
+        //delete table
+        await localAuditService.deleteTableAuditAuditeur();
         response.forEach((element) async {
           var model = new AuditModel();
           model.idAudit = element['idAudit'];
@@ -4393,17 +4557,16 @@ class ApiControllersCall extends GetxController {
           model.champ = element['champ'];
           model.dateDebPrev = element['dateDebPrev'];
           model.interne = element['interne'];
-          //delete table
-          await localAuditService.deleteTableAuditAuditeur();
+
           //save data
           await localAuditService.saveAuditAuditeur(model);
-          print(
+          debugPrint(
               'Inserting data in table AuditAuditeur : ${model.idAudit} - ${model.champ} ');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AuditAuditeur", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error AuditAuditeur", error.toString(), Colors.red);
+        debugPrint('Error AuditAuditeur : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
@@ -4418,6 +4581,8 @@ class ApiControllersCall extends GetxController {
     try {
       isDataProcessing(true);
       await AuditService().getRapportAuditsAValider().then((response) async {
+        //delete table
+        await localAuditService.deleteTableRapportAuditAValider();
         response.forEach((element) async {
           var model = new AuditModel();
           model.idAudit = element['idAudit'];
@@ -4425,22 +4590,21 @@ class ApiControllersCall extends GetxController {
           model.champ = element['champ'];
           model.typeA = element['typeA'];
           model.interne = element['interne'];
-          //delete table
-          await localAuditService.deleteTableRapportAuditAValider();
+
           //save data
           await localAuditService.saveRapportAuditAValider(model);
-          print(
+          debugPrint(
               'Inserting data in table RapportAuditAValider : ${model.idAudit} - ${model.champ} ');
         });
       }, onError: (error) {
         isDataProcessing(false);
-        ShowSnackBar.snackBar(
-            "Error AuditAudite", error.toString(), Colors.red);
+        //ShowSnackBar.snackBar("Error RapportAuditsAValider", error.toString(), Colors.red);
+        debugPrint('Error RapportAuditsAValider : ${error.toString()}');
       });
     } catch (exception) {
       isDataProcessing(false);
       ShowSnackBar.snackBar(
-          "Exception AuditAudite", exception.toString(), Colors.red);
+          "Exception RapportAuditsAValider", exception.toString(), Colors.red);
     } finally {
       isDataProcessing(false);
     }

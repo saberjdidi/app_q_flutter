@@ -12,6 +12,7 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_decision_traitement.dart';
 
 class PNCTraitementDecisionPage extends StatefulWidget {
@@ -60,9 +61,6 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
             model.commentaire = data['commentaire'];
             listPNCDecision.add(model);
             listFiltered = listPNCDecision;
-            listPNCDecision.forEach((element) {
-              print('element pnc ${element.nc}, id : ${element.nnc}');
-            });
           });
         });
       } else if (connection == ConnectivityResult.wifi ||
@@ -88,9 +86,6 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
               model.commentaire = data['commentaire'];
               listPNCDecision.add(model);
               listFiltered = listPNCDecision;
-              listPNCDecision.forEach((element) {
-                print('element pnc ${element.nc}, id : ${element.nnc}');
-              });
             });
           });
         }, onError: (err) {
@@ -131,8 +126,8 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
             ),
           ),
           title: Text(
-            'Decision de Traitement : ${listPNCDecision.length}',
-            style: TextStyle(color: Colors.black),
+            '${'decision_de_traitement'.tr} : ${listPNCDecision.length}',
+            style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
           elevation: 0,
@@ -167,7 +162,7 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
                                       ? Text('')
                                       : Icon(Icons.cancel),
                                 ),
-                                hintText: 'Search',
+                                hintText: 'search'.tr,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
@@ -200,7 +195,7 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
                                 color: Color(0xFFFCF9F9),
                                 child: ListTile(
                                   title: Text(
-                                    'PNC N°${num_pnc}',
+                                    'P.N.C N°${num_pnc}',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -237,7 +232,7 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 7),
                                           child: ReadMoreText(
-                                            "Non Conformité : ${listFiltered[index].nc}",
+                                            "${'non_conformite'.tr} : ${listFiltered[index].nc}",
                                             style: TextStyle(
                                                 color: Color(0xFF1C4F8E),
                                                 fontWeight: FontWeight.bold),
@@ -258,7 +253,7 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
                                               top: 3, bottom: 0),
                                           child: Html(
                                             data:
-                                                'Produit : ${listFiltered[index].produit}', //htmlData,
+                                                '${'product'.tr} : ${listFiltered[index].produit}', //htmlData,
                                             //tagsList: Html.tags..remove(Platform.isAndroid ? "-" : ""),
                                             style: {
                                               "body": Style(
@@ -324,11 +319,7 @@ class _PNCTraitementDecisionPageState extends State<PNCTraitementDecisionPage> {
                       ],
                     ),
                   )
-                : const Center(
-                    child: Text('Empty List',
-                        style: TextStyle(
-                            fontSize: 20.0, fontFamily: 'Brand-Bold')),
-                  )),
+                : EmptyListWidget()),
       ),
     );
   }

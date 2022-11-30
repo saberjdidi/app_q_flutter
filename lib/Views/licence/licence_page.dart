@@ -5,10 +5,8 @@ import '../../Controllers/licence_controller.dart';
 import '../../Utils/custom_colors.dart';
 
 class LicencePage extends GetView<LicenceController> {
-
   @override
   Widget build(BuildContext context) {
-
     return Stack(
       children: [
         ShaderMask(
@@ -62,15 +60,17 @@ class LicencePage extends GetView<LicenceController> {
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(color: Colors.white)
-                              ),
-
+                                  borderSide: BorderSide(color: Colors.white)),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               labelText: "Licence",
                               hintText: 'Licence',
-                              prefixIcon: const Icon(Icons.keyboard, color: Colors.white, size: 30,),
+                              prefixIcon: const Icon(
+                                Icons.keyboard,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                               hintStyle: const TextStyle(
                                 fontSize: 22,
                                 color: Colors.white,
@@ -98,29 +98,41 @@ class LicencePage extends GetView<LicenceController> {
                             height: 80,
                           ),
                           ConstrainedBox(
-                            constraints: BoxConstraints.tightFor(width: context.width),
-                            child: Obx(()=>
-                                ElevatedButton.icon(
+                            constraints:
+                                BoxConstraints.tightFor(width: context.width),
+                            child: Obx(() => ElevatedButton.icon(
                                   style: ButtonStyle(
                                     shape: MaterialStateProperty.all(
                                       RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                     ),
-                                    backgroundColor:
-                                    MaterialStateProperty.all(Color(0xFD1A79B8)),
-                                    padding: MaterialStateProperty.all(EdgeInsets.all(14)),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Color(0xFD1A79B8)),
+                                    padding: MaterialStateProperty.all(
+                                        EdgeInsets.all(14)),
                                   ),
-                                  icon: controller.isDataProcessing.value ? CircularProgressIndicator(color: Colors.white,):Icon(Icons.login, color: Colors.white,),
+                                  icon: controller.isDataProcessing.value
+                                      ? CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : Icon(
+                                          Icons.login,
+                                          color: Colors.white,
+                                        ),
                                   label: Text(
-                                    controller.isDataProcessing.value ? 'Processing' : 'Save',
-                                    style: TextStyle(fontSize: 14, color: Colors.white),
+                                    controller.isDataProcessing.value
+                                        ? 'processing'.tr
+                                        : 'save'.tr,
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
                                   ),
                                   onPressed: () {
-                                    controller.isDataProcessing.value ? null : controller.checkLicence();
+                                    controller.isDataProcessing.value
+                                        ? null
+                                        : controller.checkLicence();
                                   },
-                                )
-                            ),
+                                )),
                           ),
                           const SizedBox(
                             height: 80,
@@ -215,5 +227,4 @@ class LicencePage extends GetView<LicenceController> {
     );
     */
   }
-
 }

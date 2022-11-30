@@ -2,7 +2,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:qualipro_flutter/Services/pnc/local_pnc_service.dart';
 import 'package:readmore/readmore.dart';
 import 'package:searchable_listview/resources/arrays.dart';
@@ -13,10 +12,10 @@ import '../../../Utils/custom_colors.dart';
 import '../../../Utils/shared_preference.dart';
 import '../../../Utils/snack_bar.dart';
 import '../../../Views/home_page.dart';
+import '../../../Widgets/empty_list_widget.dart';
 import 'remplir_pnc_validation.dart';
 
 class PNCValiderPage extends StatefulWidget {
-
   PNCValiderPage({Key? key}) : super(key: key);
 
   @override
@@ -24,10 +23,10 @@ class PNCValiderPage extends StatefulWidget {
 }
 
 class _PNCValiderPageState extends State<PNCValiderPage> {
-
   PNCService localService = PNCService();
   final matricule = SharedPreference.getMatricule();
-  List<PNCCorrigerModel> listPNCValider = List<PNCCorrigerModel>.empty(growable: true);
+  List<PNCCorrigerModel> listPNCValider =
+      List<PNCCorrigerModel>.empty(growable: true);
 
   @override
   void initState() {
@@ -38,11 +37,11 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
   void getPNCAValider() async {
     try {
       var connection = await Connectivity().checkConnectivity();
-      if(connection == ConnectivityResult.none) {
-       // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+      if (connection == ConnectivityResult.none) {
+        // Get.snackbar("No Connection", "Mode Offline", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
 
         var response = await LocalPNCService().readPNCValider();
-        response.forEach((data){
+        response.forEach((data) {
           setState(() {
             var model = PNCCorrigerModel();
             model.nnc = data['nnc'];
@@ -58,16 +57,12 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
             model.dateST = data['dateST'];
             model.ninterne = data['ninterne'];
             listPNCValider.add(model);
-
-            listPNCValider.forEach((element) {
-              print('produit pnc ${element.produit}, id : ${element.nnc}');
-            });
           });
         });
-      }
-      else if(connection == ConnectivityResult.wifi || connection == ConnectivityResult.mobile) {
-       // Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
-       //rest api
+      } else if (connection == ConnectivityResult.wifi ||
+          connection == ConnectivityResult.mobile) {
+        // Get.snackbar("Internet Connection", "Mode Online", colorText: Colors.blue, snackPosition: SnackPosition.BOTTOM, duration: Duration(milliseconds: 900));
+        //rest api
         await PNCService().getPNCAValider(matricule).then((resp) async {
           //isDataProcessing(false);
           resp.forEach((data) async {
@@ -87,22 +82,15 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
               model.dateST = data['dateST'];
               model.ninterne = data['ninterne'];
               listPNCValider.add(model);
-
-              listPNCValider.forEach((element) {
-                print('element pnc ${element.motifRefus}, id : ${element.nnc}');
-              });
             });
           });
-        }
-            , onError: (err) {
-              ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
-            });
-    }
-
+        }, onError: (err) {
+          ShowSnackBar.snackBar("Error", err.toString(), Colors.red);
+        });
+      }
     } catch (exception) {
       ShowSnackBar.snackBar("Exception", exception.toString(), Colors.red);
-    }
-    finally {
+    } finally {
       //isDataProcessing(false);
     }
   }
@@ -117,21 +105,24 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                lightPrimary,
-                darkPrimary,
-              ])),
+            lightPrimary,
+            darkPrimary,
+          ])),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           leading: TextButton(
-            onPressed: (){
+            onPressed: () {
               Get.offAll(HomePage());
             },
-            child: Icon(Icons.arrow_back, color: Colors.blue,),
+            child: Icon(
+              Icons.arrow_back,
+              color: Colors.blue,
+            ),
           ),
           title: Text(
-            'Non Confirmité a Valider : ${listPNCValider.length}',
+            '${'non_conformite_a_valider'.tr} : ${listPNCValider.length}',
             style: TextStyle(color: Colors.black),
           ),
           backgroundColor: (lightPrimary),
@@ -139,10 +130,10 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
         ),
         backgroundColor: Colors.transparent,
         body: SafeArea(
-            child: listPNCValider.isNotEmpty ?
-            Container(
-              child: SearchableList<PNCCorrigerModel>(
-                /* onPaginate: () async {
+            child: listPNCValider.isNotEmpty
+                ? Container(
+                    child: SearchableList<PNCCorrigerModel>(
+                      /* onPaginate: () async {
                             await Future.delayed(const Duration(milliseconds: 1000));
                             setState(() {
                               actors.addAll([
@@ -152,34 +143,33 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
                               ]);
                             });
                           }, */
-                initialList: listPNCValider,
-                builder: (PNCCorrigerModel item) => PNCItem(pncCorrigerModel: item),
-                filter: _filterPNCList,
-                emptyWidget: const Center(child: Text('Empty List', style: TextStyle(
-                    fontSize: 20.0,
-                    fontFamily: 'Brand-Bold'
-                )),),
-                onRefresh: () async {},
-                onItemSelected: (PNCCorrigerModel item) {},
-                searchMode: SearchMode.onEdit,
-                inputDecoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(right: 5, left: 5),
-                  labelText: "Search N.C a valider",
-                  fillColor: Colors.white,
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                      color: Colors.blue,
-                      width: 1.0,
+                      initialList: listPNCValider,
+                      builder: (PNCCorrigerModel item) =>
+                          PNCItem(pncCorrigerModel: item),
+                      filter: _filterPNCList,
+                      emptyWidget: const EmptyListWidget(),
+                      onRefresh: () async {},
+                      onItemSelected: (PNCCorrigerModel item) {},
+                      searchMode: SearchMode.onEdit,
+                      inputDecoration: InputDecoration(
+                        contentPadding: EdgeInsets.only(right: 5, left: 5),
+                        labelText:
+                            "${'search'.tr} ${'non_conformite_a_valider'.tr}",
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: Colors.blue,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: Colors.lightBlue, width: 2)),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.lightBlue, width: 2)
-                  ),
-                ),
-              ),
-             /* ListView.builder(
+                    /* ListView.builder(
                 itemBuilder: (context, index) {
                   final num_pnc = listPNCValider[index].nnc;
 
@@ -282,12 +272,8 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
                 itemCount: listPNCValider.length,
                 //itemCount: actionsList.length + 1,
               ), */
-            )
-                : const Center(child: Text('Empty List', style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Brand-Bold'
-            )),)
-        ),
+                  )
+                : const EmptyListWidget()),
       ),
     );
   }
@@ -296,9 +282,10 @@ class _PNCValiderPageState extends State<PNCValiderPage> {
     return listPNCValider
         .where(
           (element) =>
-          element.nnc.toString().toLowerCase().contains(searchTerm) ||
-          element.produit.toString().contains(searchTerm),
-    ).toList();
+              element.nnc.toString().toLowerCase().contains(searchTerm) ||
+              element.produit.toString().contains(searchTerm),
+        )
+        .toList();
   }
 }
 
@@ -319,7 +306,7 @@ class PNCItem extends StatelessWidget {
         color: Color(0xFFEDF1F1),
         child: ListTile(
           title: Text(
-            'PNC N°${pncCorrigerModel.nnc}',
+            'P.N.C N°${pncCorrigerModel.nnc}',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Padding(
@@ -341,7 +328,6 @@ class PNCItem extends StatelessWidget {
 
                       //TextSpan(text: '${action.declencheur}'),
                     ],
-
                   ),
                 ),
                 Text('${pncCorrigerModel.produit}',
@@ -349,8 +335,7 @@ class PNCItem extends StatelessWidget {
                 ReadMoreText(
                   "${pncCorrigerModel.typeNC}",
                   style: TextStyle(
-                      color: Color(0xFF3B465E),
-                      fontWeight: FontWeight.bold),
+                      color: Color(0xFF3B465E), fontWeight: FontWeight.bold),
                   trimLines: 3,
                   colorClickableText: CustomColors.bleuCiel,
                   trimMode: TrimMode.Line,
@@ -374,9 +359,14 @@ class PNCItem extends StatelessWidget {
               children: <Widget>[
                 IconButton(
                   onPressed: () async {
-                    Get.to(RemplirPNCValidation(nnc: pncCorrigerModel.nnc,));
+                    Get.to(RemplirPNCValidation(
+                      nnc: pncCorrigerModel.nnc,
+                    ));
                   },
-                  icon: Icon(Icons.edit, color: Colors.green,),
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.green,
+                  ),
                   tooltip: 'pnc validation',
                 ),
                 /*IconButton(
@@ -389,9 +379,12 @@ class PNCItem extends StatelessWidget {
               ],
             ),
           ),
+
           /// this function uses to navigate (move to next screen) User Details page and pass user objects into the User Details page. ///
           onTap: () {
-            Get.to(RemplirPNCValidation(nnc: pncCorrigerModel.nnc,));
+            Get.to(RemplirPNCValidation(
+              nnc: pncCorrigerModel.nnc,
+            ));
           },
         ),
       ),

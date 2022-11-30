@@ -3,11 +3,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:qualipro_flutter/Services/incident_securite/incident_securite_service.dart';
 import 'package:qualipro_flutter/Services/visite_securite/visite_securite_service.dart';
 import '../../../Controllers/api_controllers_call.dart';
-import '../../../Controllers/incident_securite/incident_securite_controller.dart';
 import '../../../Controllers/visite_securite/visite_securite_controller.dart';
 import '../../../Models/employe_model.dart';
 import '../../../Models/visite_securite/equipe_visite_securite_model.dart';
@@ -117,7 +114,7 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
             ),
           ),
           title: Text(
-            'Equipe Visite Securite N°${widget.numFiche}',
+            '${'equipe'.tr} ${'visite_securite'.tr} N°${widget.numFiche}',
             style: TextStyle(color: Colors.black, fontSize: 15),
           ),
           backgroundColor: (lightPrimary),
@@ -133,13 +130,13 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                         String? message_evaluation = '';
                         switch (affectation) {
                           case 1:
-                            message_evaluation = "Observateur";
+                            message_evaluation = 'observateur'.tr;
                             break;
                           case 2:
-                            message_evaluation = "Auditeur";
+                            message_evaluation = 'auditeur'.tr;
                             break;
                           case 3:
-                            message_evaluation = "Responsable Audit";
+                            message_evaluation = "${'responsable'.tr} Audit";
                             break;
                           default:
                             message_evaluation = "";
@@ -288,12 +285,12 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                 ),
                                 Center(
                                   child: Text(
-                                    'Equipe Visite Securite',
+                                    '${'equipe'.tr} ${'visite_securite'.tr}',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        fontFamily: "Signatra",
+                                        fontFamily: "Brand-Bold",
                                         color: Color(0xFF0769D2),
-                                        fontSize: 30.0),
+                                        fontSize: 20.0),
                                   ),
                                 ),
                                 SizedBox(
@@ -320,12 +317,42 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                                 12, 12, 0, 0),
                                             border: OutlineInputBorder(),
                                           ),
+                                          popupTitle: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10),
+                                                  child: Text(
+                                                    '${'list'.tr} Employes',
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.close,
+                                                      color: Colors.red,
+                                                    ))
+                                              ],
+                                            ),
+                                          ),
                                           onFind: (String? filter) =>
                                               getEmploye(filter),
                                           onChanged: (data) {
                                             employeMatricule = data?.mat;
                                             employeNompre = data?.nompre;
-                                            print(
+                                            debugPrint(
                                                 'employe: ${employeNompre}, mat: ${employeMatricule}');
                                           },
                                           dropdownBuilder:
@@ -333,7 +360,7 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                           popupItemBuilder:
                                               customPopupItemBuilderEmploye,
                                           validator: (u) => u == null
-                                              ? "Employe is required "
+                                              ? "Employe ${'is_required'.tr}"
                                               : null,
                                         ),
                                       ),
@@ -356,8 +383,8 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                                     MaterialStateProperty.all(
                                                         Colors.blue),
                                               ),
-                                              const Text(
-                                                "Responsable Audit",
+                                              Text(
+                                                "${'responsable'.tr} Audit",
                                                 style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
@@ -379,8 +406,8 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                                     MaterialStateProperty.all(
                                                         Colors.blue),
                                               ),
-                                              const Text(
-                                                "Auditeur",
+                                              Text(
+                                                'auditeur'.tr,
                                                 style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
@@ -402,8 +429,8 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                                     MaterialStateProperty.all(
                                                         Colors.blue),
                                               ),
-                                              const Text(
-                                                "Observateur",
+                                              Text(
+                                                'observateur'.tr,
                                                 style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
@@ -440,7 +467,7 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                           ),
                                           icon: Icon(Icons.cancel),
                                           label: Text(
-                                            'Cancel',
+                                            'cancel'.tr,
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.white),
@@ -477,7 +504,7 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
                                           ),
                                           icon: Icon(Icons.save),
                                           label: Text(
-                                            'Save',
+                                            'save'.tr,
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.white),
@@ -588,11 +615,11 @@ class _EquipeVisiteSecPageState extends State<EquipeVisiteSecPage> {
         dialogType: DialogType.ERROR,
         body: Center(
           child: Text(
-            'Are you sure to delete this item ${mat}',
+            '${'delete_item'.tr} ${mat}',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
-        title: 'Delete',
+        title: 'delete'.tr,
         btnOk: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(
